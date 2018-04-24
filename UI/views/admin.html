@@ -1,0 +1,129 @@
+<!DOCTYPE HTML>
+
+<html>
+
+	<head>
+		<title>BookAMeal</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../css/book_a_meal.css" />
+	</head>
+
+	<body>
+
+		<!-- Wrapper -->
+			<div id="app_wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<div class="content">
+							<div class="inner">
+								<h1>Book A Meal</h1>
+							</div>
+
+						</div>
+					</header>
+
+				<!-- Main -->
+					<div id="main_block">
+
+						<div class="admin_action_block">
+
+							<button class="menu_of_the_day_button">Manage meals</button>
+							<button class="order_history_button">Menu of the Day</button>
+							<button class="order_history_button">Orders</button>
+							<button class="order_history_button">Order History</button>
+
+
+						</div>
+
+						<div class="admin_details_block">
+							
+							<!-- Managing Meal Options Block (ADD MEAL, EDIT, DELETE), SELECT TO ADD TO MENU OF THE DAY -->
+							<div class="manage_meals_block">
+								 
+								<!-- MENU ITEMS -->
+								<div class="menu_item">
+									<input type="radio" id="item1" name="item1">
+									<p>Beef with Matooke</p>
+								</div>
+
+								<div class="menu_item">
+									<input type="radio" id="item2" name="item2">
+									<p>Beef with Rice</p>
+								</div>
+
+								<div class="menu_item">
+									<input type="radio" id="item3" name="item3">
+									<p>Fish with Kaloo</p>
+								</div>
+
+
+								<!-- BUTTON TO ORDER FOR SELECTED MENU ITEMS -->
+								<ul class="actions"> 
+									<li><input type="button" value="Order" class="order_menu_item_button" /></li>
+								</ul>
+
+							</div>
+							
+							<!-- MEALS FOR THE DAY -->
+							<div class="menu_of_the_day_block">
+								
+								<!-- ORDER ITEMS BY THE USER -->
+								<div class="menu_item">
+									<input type="radio" id="order1" name="order1">
+									<p>Beef with Matooke</p>
+									<p>Date: 19/08/23</p>
+									<button>Edit</button>
+								</div>
+
+								<div class="menu_item">
+									<input type="radio" id="order2" name="order2">
+									<p>Beef with Rice</p>
+									<p>Date: 19/08/23</p>
+									<button>Edit</button>
+								</div>
+
+								<div class="menu_item">
+									<input type="radio" id="order3" name="order3">
+									<p>Fish with Kaloo</p>
+									<p>Date: 19/08/23</p>
+									<button>Edit</button>
+								</div>
+
+							</div>
+
+							<!-- VENDOR ORDERS -->
+							<div class="user_orders_block">
+								
+							</div>
+
+							<!-- ORDERS HISTORY WITH TOTAL AMOUNT MADE -->
+							<div class="orders_history_block">
+								
+							</div>
+
+
+
+						</div>
+
+					</div>
+
+				<!-- Footer -->
+					<footer id="footer">
+						<p class="copyright">&copy; Book A Meal Uganda. Developed: <a href="#">Andela Bootcamp VII</a>.</p>
+					</footer>
+
+			</div>
+
+		<!-- BACKGROUND -->
+			<div id="background"></div>
+
+		<!-- Scripts -->
+		<script src="../js/book_a_meal.js"></script>
+
+
+
+	</body>
+</html>
+
