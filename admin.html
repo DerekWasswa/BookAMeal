@@ -1,0 +1,234 @@
+<!DOCTYPE HTML>
+
+<html>
+
+	<head>
+		<title>BookAMeal</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="https://derekwasswa.github.io/BookAMeal/css/book_a_meal.css" />
+	</head>
+
+	<body>
+
+		<!-- Wrapper -->
+			<div id="app_wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<div class="content">
+							<div class="app_name header_item">
+								<h1>Book A Meal</h1>
+							</div>
+
+							<div class="user_details header_item">
+								<p class="header_item">Demarks restaurant</p>
+								<button class="header_item">Logout</button>
+							</div>
+
+						</div>
+					</header>
+
+				<!-- Main -->
+					<div id="main_block">
+
+						<div class="admin_action_block">
+
+							<button id="manage_meals_button">Manage meals</button>
+							<button id="menu_of_the_day_button">Menu of the Day</button>
+							<button id="orders_button">Orders</button>
+							<button id="order_history_button">Order History</button>
+
+
+						</div>
+
+						<div class="details_block">
+							
+							<!-- Managing Meal Options Block (ADD MEAL, EDIT, DELETE), SELECT TO ADD TO MENU OF THE DAY -->
+							<div class="admin_actions" id="manage_meals_block">
+								 
+								<h3>Manage Meal</h3>
+
+								<!-- MENU ITEMS -->
+								<div>
+									<input type="checkbox" id="item1" name="item1" class="meal_item">
+									<p class="meal_item">Beef with Matooke</p>
+									<p class="meal_item">  12000 UGX</p>
+									<button class="meal_item">Edit</button>
+								</div>
+
+								<div>
+									<input type="checkbox" id="item2" name="item2" class="meal_item">
+									<p class="meal_item">Beef with Rice</p>
+									<p class="meal_item">  15000 UGX</p>
+									<button class="meal_item">Edit</button>
+								</div>
+
+								<div>
+									<input type="checkbox" id="item3" name="item3" class="meal_item">
+									<p class="meal_item">Fish with Kaloo</p>
+									<p class="meal_item">  22000 UGX</p>
+									<button class="meal_item">Edit</button>
+								</div>
+
+
+								<!-- BUTTON TO ORDER FOR SELECTED MENU ITEMS -->
+								<div>
+									<input type="button" value="ADD" id="add_meal_to_menu" /></li>
+
+									<input type="button" value="DELETE" id="delete_meal" /></li>
+
+									<input type="button" value="ADD TO MENU OF THE DAY" id="add_to_menu_of_the_day" /></li>
+								</div>
+							</div>
+							
+							<!-- MEALS FOR THE DAY -->
+							<div id="menu_of_the_day_block" class="admin_actions block_off_screen">
+								
+								<h3>Menu Of the Day</h3>
+								<!-- MEAL ITEMS ON THE MENU OF THE DAY -->
+								<div>
+									<input type="checkbox" id="order1" name="order1" class="meal_item">
+									<p class="meal_item">Beef with Matooke</p>
+									<p class="meal_item">12000 UGX</p>
+									<p class="meal_item">Date: 19/08/23</p>
+									<button class="meal_item">Remove</button>
+								</div>
+
+								<div>
+									<input type="checkbox" id="order2" name="order2" class="meal_item">
+									<p class="meal_item">Beef with Rice</p>
+									<p class="meal_item">15000 UGX</p>
+									<p class="meal_item">Date: 19/08/23</p>
+									<button class="meal_item">Remove</button>
+								</div>
+
+								<div>
+									<input type="checkbox" id="order3" name="order3" class="meal_item">
+									<p class="meal_item">Fish with Kaloo</p>
+									<p class="meal_item">22000 UGX</p>
+									<p class="meal_item">Date: 19/08/23</p>
+									<button class="meal_item">Remove</button>
+								</div>
+							</div>
+
+							<!-- VENDOR ORDERS -->
+							<div id="user_orders_block" class="admin_actions block_off_screen">
+								
+								<h3>Orders</h3>
+
+								<div class="order_item">
+									<div>Customer: Wasswa Derick</div>
+									<p class="meal_item">Beef with Matooke</p>
+									<p class="meal_item">Date: 19/08/23</p>
+								</div>
+
+								<div class="order_item">
+									<div>Customer: Faith Kilungi</div>
+									<p class="meal_item">Kalo with Fish</p>
+									<p class="meal_item">Date: 19/08/23</p>
+								</div>
+
+								<div class="order_item">
+									<div>Customer: Iradukunda Becky</div>
+									<p class="meal_item">Chicken Luwombo with Rice</p>
+									<p class="meal_item">Date: 19/08/23</p>
+								</div>
+							</div>
+
+							<!-- ORDERS HISTORY WITH TOTAL AMOUNT MADE -->
+							<div id="orders_history_block" class="admin_actions block_off_screen">
+								
+								<h3>Order History</h3>
+
+								<div>
+									<label for="time-period">Time Period</label>
+									<select name="time-period" id="time-period">
+										<option value="">-</option>
+										<option value="1">Today</option>
+										<option value="2">Yesterday</option>
+										<option value="3">Past Week</option>
+										<option value="4">Past Month</option>
+									</select>
+								</div>	
+
+								<div class="order_item">
+									<div>Customer: Iradukunda Becky</div>
+									<p class="meal_item">Chicken Luwombo with Rice</p>
+									<p class="meal_item">Date: 19/08/23</p>
+								</div>
+
+								<div class="order_item">
+									<div>Customer: Faith Kilungi</div>
+									<p class="meal_item">Kalo with Fish</p>
+									<p class="meal_item">Date: 19/08/23</p>
+								</div>
+
+								<div class="order_item">
+									<div>Customer: Wasswa Derick</div>
+									<p class="meal_item">Beef with Matooke</p>
+									<p class="meal_item">Date: 19/08/23</p>
+								</div>
+
+								<div class="order_item">
+									<div>Customer: Kato Charles</div>
+									<p class="meal_item">Chicken Luwombo with Matooke</p>
+									<p class="meal_item">Date: 19/08/23</p>
+								</div>
+
+								<div class="order_item">
+									<div>Customer: Nalumansi Sandra</div>
+									<p class="meal_item">Chicken stew with Rice</p>
+									<p class="meal_item">Date: 19/08/23</p>
+								</div>	
+							</div>
+
+							<!-- ADD MEAL ITEM ON THE MENU -->
+							<div id="add_meal_item_block" class="admin_actions block_off_screen">
+								
+								<form method="post" action="#">
+
+									<label>Add Meal</label>
+									<div class="field">
+										<input type="text" name="meal_name" id="meal-name" placeholder="Meal Name" />
+									</div>
+										
+									<div class="field">
+										<input type="button" value="ADD" id="add_meal" />
+									</div>
+
+								</form>
+
+							</div>
+
+						</div>
+
+					</div>
+
+				<!-- Footer -->
+					<footer id="footer">
+						<p class="copyright">&copy; Book A Meal Uganda. Developed: <a href="#">Andela Bootcamp VII</a>.</p>
+					</footer>
+
+			</div>
+
+		<!-- BACKGROUND -->
+			<div id="background"></div>
+
+		<!-- Scripts -->
+		<script src="https://derekwasswa.github.io/BookAMeal/js/book_a_meal.js"></script>
+		<script>
+			
+			document.getElementById('manage_meals_button').onclick = meals;
+			document.getElementById('menu_of_the_day_button').onclick = menuOfTheDay;
+
+			document.getElementById('order_history_button').onclick = orderHistory;
+			document.getElementById('orders_button').onclick = orders;
+
+			document.getElementById('add_meal_to_menu').onclick = addAMeal;
+
+		</script>
+
+
+	</body>
+</html>
