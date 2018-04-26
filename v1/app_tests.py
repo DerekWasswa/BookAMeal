@@ -1,40 +1,46 @@
 import unittest
-from app import signUp, login, getAllMeals, addMeal, updateAMeal, deleteAMeal, setMenuOfTheDay, getMenuOfTheDay, makeOrder, modifyOrder, getAllOrders
+from app import signUp, login, getAllMeals, addMeal, updateAMeal, deleteAMeal, setMenuOfTheDay, getMenuOfTheDay, makeOrder, modifyOrder, getAllOrders, appUsers, appVendorAdmins, appMeals, appMenu, appOrders
 
 class AppTest(unittest.TestCase):
     
 	def test_sign_up(self):
-		self.assertEqual(signUp(), "Hello Andela")
+		self.assertEqual(signUp(), True)
 
 	def test_login(self):
-		self.assertEqual(type(login()), list)
+		self.assertFalse(len(appUsers), 0)
+		self.assertEqual(bool(appVendorAdmins), True)
+		self.assertEqual(login(), True)
 
 	def test_getting_all_meals(self):
-		self.assertEqual(type(getAllMeals()), list)
+		self.assertTrue(isinstance(getAllMeals, dict))
 
 	def test_add_meal(self):
-		self.assertEqual(addMeal(), range(200, 320))
+		self.assertFalse(len(appMeals), 0)
 
 	def test_updating_a_meal(self):
-		self.assertEqual(updateAMeal()[0]%7 and updateAMeal()[0]%5, 0)
+		self.assertFalse(len(appMeals), 0)
+		self.assertTrue(isinstance(updateAMeal("mealId"), (int, str)))
 	
 	def test_deleting_a_meal(self):
-		self.assertEqual(signUp(), "Hello Andela")
+		self.assertFalse(len(appMeals), 0)
+		self.assertTrue(isinstance(deleteAMeal("mealId"), (int, str)))
 
 	def test_set_menu_of_the_day(self):
-		self.assertEqual(type(login()), list)
+		self.assertFalse(len(appMenu), 0)
 
 	def test_get_menu_of_the_day(self):
-		self.assertEqual(type(getAllMeals()), list)
+		self.assertTrue(isinstance(getMenuOfTheDay, dict))
 
 	def test_make_an_order(self):
-		self.assertEqual(addMeal(), range(200, 320))
+		self.assertFalse(len(appMenu), 0)
+		self.assertFalse(len(appUsers), 0)
 
 	def test_modifying_an_order(self):
-		self.assertEqual(updateAMeal()[0]%7 and updateAMeal()[0]%5, 0)
+		self.assertFalse(len(appOrders), 0)
+		self.assertTrue(isinstance(modifyOrder("orderlId"), (int, str)))
 
 	def test_retrieving_all_orders(self):
-		self.assertEqual(updateAMeal()[0]%7 and updateAMeal()[0]%5, 0)        
+		self.assertTrue(isinstance(getAllOrders, dict))
 
 if __name__ == '__main__':
 	unittest.main()

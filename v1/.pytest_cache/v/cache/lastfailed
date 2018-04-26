@@ -1,0 +1,10 @@
+{
+  "app_tests.py::AppTest::test_add_meal": true, 
+  "app_tests.py::AppTest::test_deleting_a_meal": true, 
+  "app_tests.py::AppTest::test_get_menu_of_the_day": true, 
+  "app_tests.py::AppTest::test_getting_all_meals": true, 
+  "app_tests.py::AppTest::test_login": true, 
+  "app_tests.py::AppTest::test_retrieving_all_orders": true, 
+  "app_tests.py::AppTest::test_sign_up": true, 
+  "app_tests.py::AppTest::test_updating_a_meal": true
+}

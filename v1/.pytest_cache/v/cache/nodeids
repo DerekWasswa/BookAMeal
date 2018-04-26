@@ -1,0 +1,13 @@
+[
+  "app_tests.py::AppTest::test_add_meal", 
+  "app_tests.py::AppTest::test_deleting_a_meal", 
+  "app_tests.py::AppTest::test_get_menu_of_the_day", 
+  "app_tests.py::AppTest::test_getting_all_meals", 
+  "app_tests.py::AppTest::test_login", 
+  "app_tests.py::AppTest::test_make_an_order", 
+  "app_tests.py::AppTest::test_modifying_an_order", 
+  "app_tests.py::AppTest::test_retrieving_all_orders", 
+  "app_tests.py::AppTest::test_set_menu_of_the_day", 
+  "app_tests.py::AppTest::test_sign_up", 
+  "app_tests.py::AppTest::test_updating_a_meal"
+]
