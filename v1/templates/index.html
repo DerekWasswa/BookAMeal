@@ -1,0 +1,116 @@
+<!DOCTYPE HTML>
+
+<html>
+
+	<head>
+		<title>BookAMeal</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" type="text/css"  href="{{ url_for('static', filename='css/book_a_meal.css') }}"  />
+	</head>
+
+	<body>
+
+		<!-- APP WRAPPER -->
+			<div id="app_wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<div class="content">
+							<div class="inner">
+								<h1>Book A Meal</h1>
+							</div>
+
+						</div>
+					</header>
+
+				<!-- Main -->
+					<div id="main_block">
+
+						<div class="authentication_block" id="signin_block">
+
+							<form method="post" action="#">
+							<label>Signin</label>
+								<div class="field">
+									<input type="email" name="userEmail" id="userEmail" placeholder="Email" />
+								</div>
+
+								<div class="field">
+									<input type="password" name="userPassword" id="userPassword" placeholder="Password" />
+								</div><br>
+									
+								<div class="field">
+									<input type="button" value="Signin" id="signin_button" />
+								</div>
+
+								<div class="field">
+									<a href="javascript:void(0);" id="signup_link">Not Registered? Signup</a>
+								</div>
+
+							</form>
+
+						</div>
+
+						<div class="authentication_block block_off_screen" id="signup_block">
+
+							<form method="post" action="#">
+
+								<label>Signup</label>
+								<div class="field">
+									<input type="text" name="customerName" id="customerName" placeholder="Full name" />
+								</div>
+
+								<div class="field">
+									<input type="radio" id="Customer" class="customer" name="customer" />
+									<label for="customer">Customer</label>
+								</div>
+
+								<div class="field">
+									<input type="radio" id="vendor" class="vendor" name="vendor" />
+									<label for="vendor">Vendor</label>
+								</div>
+
+								<div class="field">
+									<input type="email" name="email" id="customerEmail" placeholder="Email" />
+								</div>
+
+								<div class="field">
+									<input type="password" name="Password" id="customerPassword" placeholder="Password" />
+								</div><br>
+									
+								<div class="field">
+									<input type="button" value="Signup" id="signup_button" />
+								</div>
+								
+								<div class="field">
+									<a href="javascript:void(0);" id="signin_link">Already Registered? Signin</a>
+								</div>
+							</form>
+
+						</div>
+
+					</div>
+
+				<!-- Footer -->
+					<footer id="footer">
+						<p class="copyright">&copy; Book A Meal Uganda. Developed: <a href="#">Andela Bootcamp VII</a>.</p>
+					</footer>
+
+			</div>
+
+		<!-- JS SCRIPTS -->
+		<script src="{{url_for('static', filename='js/book_a_meal.js')}}"></script>
+		<script>
+			
+			document.getElementById('signin_button').onclick = signIn;
+			document.getElementById('signup_link').onclick = redirectSignUp;
+
+			document.getElementById('signup_button').onclick = signUp;
+			document.getElementById('signin_link').onclick = redirectSignIn;
+
+		</script>
+
+
+	</body>
+</html>
+
