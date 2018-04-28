@@ -1,11 +1,12 @@
 # API ENDPOINTS
 from flask import Flask, render_template, session, request, redirect, url_for, jsonify
 from flask_socketio import SocketIO
+from flask_api import FlaskAPI, status
 import json
 
 
  # Initialize the Flask application
-app = Flask(__name__)
+app = FlaskAPI(__name__, instance_relative_config=True)
 asyncMode = None
 socketio  = SocketIO(app, async_mode=asyncMode)
 
