@@ -1,0 +1,6 @@
+__pycache
+.pytest_cache
+
+app_tests.py
+
+app.pyc

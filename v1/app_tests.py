@@ -1,46 +1,59 @@
 import unittest
-from app import signUp, login, getAllMeals, addMeal, updateAMeal, deleteAMeal, setMenuOfTheDay, getMenuOfTheDay, makeOrder, modifyOrder, getAllOrders, appUsers, appVendorAdmins, appMeals, appMenu, appOrders
+from app import app
+import json
 
 class AppTest(unittest.TestCase):
     
-	def test_sign_up(self):
-		self.assertEqual(signUp(), True)
+	def setUp(self):
+		#Set up the globally used variables for use
+		self.client = app.test_client()
 
-	def test_login(self):
-		self.assertFalse(len(appUsers), 0)
-		self.assertEqual(bool(appVendorAdmins), True)
-		self.assertEqual(login(), True)
+	def test_registration(self):
+		#User registration should complete successfully
+		user_data = json.dumps({
+			'email': 'test@example.com',
+			'password': '12345'
+		})
+		response = self.client.post('/auth/signup', data = user_data)
+		result = json.loads(response.data.decode())
+		self.assertEqual(response.status_code, 201)
+		self.assertEqual(result['message'], 'Successfully Registered. Please login')
 
-	def test_getting_all_meals(self):
-		self.assertTrue(isinstance(getAllMeals, dict))
+	def test_existing_user(self):
+		#A user with the same email can not register more than once
+		user_data = json.dumps({
+			'email': 'test@example.com',
+			'password': '12345'
+		})
+		response1 = self.client.post('/auth/register', data = user_data)
+		self.assertEqual(response1.status_code, 201)
+		response2 = self.client.post('/auth/register', data = user_data)
+		self.assertEqual(response2.status_code, 202)
+		result = json.loads(response2.data.decode())
+		self.assertEqual(result['message'], "User already exists. Please login.")
 
-	def test_add_meal(self):
-		self.assertFalse(len(appMeals), 0)
+	def test_user_registration_with_invalid_email(self):
+		#User should register with the correct format of an email
+		user_data = json.dumps({
+			'email': 'test',
+			'password': '12345'
+		})
+		response = self.client.post('/auth/register', data = user_data)
+		self.assertEqual(response.status_code, 200)
+		result = json.loads(response.data.decode())
+		self.assertEqual(result['message'], "Invalid Email")
 
-	def test_updating_a_meal(self):
-		self.assertFalse(len(appMeals), 0)
-		self.assertTrue(isinstance(updateAMeal("mealId"), (int, str)))
-	
-	def test_deleting_a_meal(self):
-		self.assertFalse(len(appMeals), 0)
-		self.assertTrue(isinstance(deleteAMeal("mealId"), (int, str)))
+	def test_user_with_empty_credentials(self):
+		#User should not register with missing credentials
+		user_data = json.dumps({
+			'email': '',
+			'password': ''
+		})
+		response = self.client.post('/auth/register', data = user_data)
+		self.assertEqual(response.status_code, 200)
+		result = json.loads(response.data.decode())
+		self.assertEqual(result['message'], "Missing Credentials")		
 
-	def test_set_menu_of_the_day(self):
-		self.assertFalse(len(appMenu), 0)
-
-	def test_get_menu_of_the_day(self):
-		self.assertTrue(isinstance(getMenuOfTheDay, dict))
-
-	def test_make_an_order(self):
-		self.assertFalse(len(appMenu), 0)
-		self.assertFalse(len(appUsers), 0)
-
-	def test_modifying_an_order(self):
-		self.assertFalse(len(appOrders), 0)
-		self.assertTrue(isinstance(modifyOrder("orderlId"), (int, str)))
-
-	def test_retrieving_all_orders(self):
-		self.assertTrue(isinstance(getAllOrders, dict))
 
 if __name__ == '__main__':
 	unittest.main()
