@@ -1,11 +1,17 @@
-/v1/__pycache
+/v1/__pycache__
+
 *$py.class
 
 .pytest_cache
+
 /v1/.pytest_cache/*
+
 /.vscode/*
-app_tests.py
+
 /env/*
+
 /v1/app.pyc
-/v1/test_app.pvc
+
+/v1/test_app.pyc
+
 /v1/models.pyc
