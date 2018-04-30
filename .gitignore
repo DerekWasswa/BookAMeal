@@ -2,9 +2,8 @@ __pycache
 *$py.class
 
 .pytest_cache
-.pytest_cache/v/cache
-
-.vscode
+/.pytest_cache/*
+/.vscode/*
 app_tests.py
-env
+/env/*
 app.pyc
