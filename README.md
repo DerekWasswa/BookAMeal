@@ -1,2 +1,2 @@
 # BookAMeal
-Make Orders for a variety of Meals
+An application that allows a user to make meal orders from various vendors
