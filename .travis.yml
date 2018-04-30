@@ -9,13 +9,9 @@ before_install:
     - pip install pytest pytest-cov
     - pip install coverage
     - pip install coveralls
-  
-script:
-  #- pytest tests/.
-  - coverage run --source='test_app.py test  
-  - coverage report
     
 script:
-    - pytest
+    - pytest test_app.py
+    
 after_success:
     - coveralls
