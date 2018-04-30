@@ -4,25 +4,25 @@
 #Order
 
 class User(object):
-    
-    def __init__(self, email, password):
+    app_users = []
+    def __init__(self, email, password, admin):
         self.email = email
         self.password = password
+        self.admin = admin
 
 class Meal(object):
-
+    app_meals = []
     def __init__(self, meal, price):
         self.meal = meal
         self.price = price
 
 class Menu(object):
+    app_menu = []
+    def __init__(self, Meal):
+        self.meal = Meal
 
-    def __init__(self, meals, vendor):
-        self.meals = meals
-        self.vendor = vendor
-
-class Orders(object):
-
-    def __init__(self, user, meal):
-        self.user = user
-        self.meal = meal
+class Order(object):
+    app_orders = []
+    def __init__(self, User, Meal):
+        self.user = User
+        self.meal = Meal
