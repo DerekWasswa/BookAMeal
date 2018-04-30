@@ -1,6 +1,5 @@
 # API ENDPOINTS
 from flask import Flask, render_template, session, request, redirect, url_for, jsonify, make_response
-from flask_socketio import SocketIO
 from flask_api import FlaskAPI, status
 import json
 from validate_email import validate_email
@@ -10,8 +9,6 @@ from models import User, Meal, Menu, Order
  # Initialize the Flask application
 app = FlaskAPI(__name__, instance_relative_config=True)
 asyncMode = None
-socketio  = SocketIO(app, async_mode=asyncMode)
-
 
 #Initialise the Data structures to be used to Capture Data
 app_users = []
