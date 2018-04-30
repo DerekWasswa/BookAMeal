@@ -1,0 +1,17 @@
+language: python
+python:
+    - "3.6"
+    
+install:
+  - pip install -r requirements.txt
+   
+before_install:
+    - pip install pytest pytest-cov
+    - pip install coverage
+    - pip install coveralls
+    
+script:
+    - pytest test_app.py
+    
+after_success:
+- coveralls

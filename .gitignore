@@ -1,7 +1,10 @@
 __pycache
+*$py.class
+
 .pytest_cache
 .pytest_cache/v/cache
+
 .vscode
 app_tests.py
-
+env
 app.pyc
