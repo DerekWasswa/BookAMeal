@@ -1,6 +1,7 @@
 __pycache
 .pytest_cache
-
+.pytest_cache/v/cache
+.vscode
 app_tests.py
 
 app.pyc
