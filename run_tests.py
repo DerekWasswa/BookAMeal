@@ -1,20 +1,22 @@
 import os
 import unittest
-from flask import Flask, current_app
-from flask_api import FlaskAPI
+from flask_script import Manager
+from flask import Flask
 
 # initialize the app with all its configurations
-app = FlaskAPI(__name__, instance_relative_config=True)
+app = Flask(__name__)
 app(config_name=os.getenv('APP_SETTINGS'))
+manager = Manager(app)
 
-
+# Usage: python test_app.py test
 @manager.command
 def test():
     """Runs the unit tests without test coverage."""
     tests = unittest.TestLoader().discover('v1', pattern='test_app.py')
     result = unittest.TextTestRunner(verbosity=2).run(tests)
-    
     return not result.wasSuccessful()
 
+
+
 if __name__ == '__main__':
-    app.run()
+    manager.run()
