@@ -9,9 +9,9 @@ virtualenv:
 install:
   - pip install -r requirements.txt
 
-#script:
-#- pytest v1/test_app.py
-#- coverage report
+script:
+- coverage run --source=run_tests.py test 
+- coverage report
 
 after_script:
 #- codeclimate-test-reporter
