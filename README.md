@@ -2,9 +2,13 @@
 
 An application that allows a user to make meal orders from various vendors
 
+
 [![Build Status](https://travis-ci.org/DerekWasswa/BookAMeal.svg?branch=master)](https://travis-ci.org/DerekWasswa/BookAMeal)
 
 [![Coverage Status](https://coveralls.io/repos/github/DerekWasswa/BookAMeal/badge.svg?branch=master)](https://coveralls.io/github/DerekWasswa/BookAMeal?branch=tests_amends)
+
+
+
 
 ## UI Designs
 
@@ -26,7 +30,9 @@ Under the UI directory on the feature branch, there are various various HTML pag
 * [Github-Pages](https://derekwasswa.github.io/BookAMeal/orderhistory.html)
 
 
-## Application API endpoints (Documentation)
+
+
+## Application API endpoints ([Documentation](https://app.swaggerhub.com/apis/DerekWasswa/BookAMealAPI/1.0.0))
 
 | EndPoint                | Method |
 | ----------------------- | ------ |
