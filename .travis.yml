@@ -14,7 +14,7 @@ install:
 #- coverage report
 
 after_script:
-- codeclimate-test-reporter
+#- codeclimate-test-reporter
 - coveralls
     
 after_success:
