@@ -10,6 +10,8 @@
 
 /env/*
 
+/venv/*
+
 /v1/app.pyc
 
 /v1/test_app.pyc

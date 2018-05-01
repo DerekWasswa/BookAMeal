@@ -1,77 +1,98 @@
-# API ENDPOINTS
-from flask import Flask, render_template, session, request, redirect, url_for, jsonify, make_response
+# Book A Meal API 
+from flask import Flask, session, request, redirect, url_for, jsonify, make_response, current_app
 from flask_api import FlaskAPI, status
 import json
-from validate_email import validate_email
+from werkzeug.security import generate_password_hash, check_password_hash
 from models import User, Meal, Menu, Order
+import models
+import datetime
+import jwt
+import auth_decorator
 
 
  # Initialize the Flask application
 app = FlaskAPI(__name__, instance_relative_config=True)
+app.config['SECRET_KEY'] = "boOk-a-MeAL"
 asyncMode = None
 
-#Initialise the Data structures to be used to Capture Data
-app_users = []
-app_vendor_admins = {}
-app_meals = {}
-app_menu = {}
-app_orders = {}
-# meal = Meal('Goat Luwombo with All Foods', '23000')
-# menu = Menu(meal)
-# order = Order(user, meal)
 
 
 
-# API ENDPOINTS
-#Sign up a user either as a customer or vendor admin
+
+# API AUTHENTICATION ENDPOINTS
 @app.route('/auth/signup', methods=['POST'])
 def sign_up():
+    #Sign up a user either as a customer or vendor admin
+    user_name = request.get_json(force=True)['user_name']
     user_email = request.get_json(force=True)['email']
     user_password = request.get_json(force=True)['password']
     user_admin = request.get_json(force=True)['admin']
     if len(user_email) > 0 and len(user_password) > 0:
-        # for user in app_users:
-        #     if user.email == user_email:
-        #         return make_response(jsonify({'message': 'User already exists. Please login.'})), 200
 
-        user = User(user_email, user_password, user_admin)
-        app_users.append(user)
-        return make_response(jsonify({'message': 'Successfully Registered. Please login'})), 201   
+        user = User(user_name, user_email, generate_password_hash(user_password), user_admin)
+        check_user_exists = user.check_exists(user_email)
+        
+        if check_user_exists:
+            return make_response(jsonify({'message': 'User already exists. Please login.'})), 200
+        else:
+            user.save()
+            return make_response(jsonify({
+                'message': 'Successfully Registered. Please login',
+                'data': user.get_user_object_as_dict()
+                })), 201 
     else:
         return make_response(jsonify({'message': 'Missing Credentials'})), 400
  
 
-
-#authenticate customers or admin
 @app.route('/auth/login', methods=['POST'])
 def login():
+    #authenticate customers or admin
     user_email = request.get_json(force=True)['email']
     user_password = request.get_json(force=True)['password']
-    #check if user data exists
-    if len(user_email) > 0 and len(user_password) > 0:
-        for user in app_users:
-            if user.email == user_email:
-                return make_response(jsonify({'message': 'Logged in succcessfully'})), 200
-        return make_response(jsonify({'message': 'Invalid Email or Password'})), 200        
-    else:
-        return make_response(jsonify({'message': 'Missing Credentials'})), 200
+    user_admin = request.get_json(force=True)['admin']
+    
+    if len(user_email) <= 0 and len(user_password) <= 0:
+        return make_response(jsonify({'message': 'Could not verify. Login credentials required.'})), 401
+
+    user = User('', user_email, user_password, user_admin)
+    if not user.check_exists(user_email):
+        make_response(jsonify({'message': 'Invalid Email or Password'})), 401 
+
+    app_user = user.get_user_by_email(user_email)
+    if check_password_hash(app_user.password, user_password):
+        # CREATE TOKEN: leverage isdangerous to create the token
+        encoded_jwt_token = jwt.encode({
+            'admin': user_admin, 
+            'email': user_email
+            }, app.config['SECRET_KEY'], algorithm='HS256')
+        return make_response(jsonify({
+            'token': encoded_jwt_token.decode('UTF-8'),
+            'message': 'Logged in successfully'})), 200
+        
+    return make_response(jsonify({'message': 'Invalid Email or Password'})), 401 
 
 
 
 
-
-#Return all the available meals to the vendor admin
+# API MEALS ENDPOINTS
 @app.route('/meals/', methods=['GET'])
-def get_all_meals():
+@auth_decorator.token_required_to_authenticate
+def get_all_meals(current_user):
+    #Verify If User is admin
+    if not current_user:
+        return jsonify({'message': 'You need to login as Admin to perform this operation.'})
+
+    #Return all the available meals to the vendor admin
     return make_response(jsonify({
-        'data': app_meals
+        'data': models.app_meals
     })), 200
 
-# Return a meal for a particular ID
+
 @app.route('/meals/<mealId>', methods=['GET'])
 def get_meal_by_id(mealId):
-    if len(app_meals) > 0:
-        if mealId in app_meals:
+    # Return a meal for a particular ID
+    if len(models.app_meals) > 0:
+        if mealId in models.app_meals:
             return make_response(jsonify({
                 'message': 'Meal Exists',
             })), 200
@@ -80,41 +101,59 @@ def get_meal_by_id(mealId):
                 'message': 'Meal not Found',
             })), 404
     else:
-        return make_response(jsonify({'message': 'Meal are empty.'})), 200    
+        return make_response(jsonify({'message': 'Meal are empty.'})), 404    
 
-#Allow the vendor admin to add another meal option
+
 @app.route('/meals/', methods=['POST'])
-def add_meal():
-    # retrieve the meal option submitted
-    meal = request.get_json(force=True)['meal']
-    mealPrice = request.get_json(force=True)['price']
+@auth_decorator.token_required_to_authenticate
+def add_meal(current_user):
+    #Verify If User is admin
+    if not current_user:
+        return jsonify({'message': 'You need to login as Admin to perform this operation.'})
 
-    app_meals[str(meal)] = str(mealPrice)
+    #Allow the vendor admin to add another meal option
+    meal = request.get_json(force=True)['meal']
+    meal_price = request.get_json(force=True)['price']
+
+    models.app_meals[meal] = meal_price
     return make_response(jsonify({
         'message': 'Meal Added Successfully',
-        'meal': meal
+        'meal': meal,
+        'meals': models.app_meals
     })), 201
 
-#Allow the ADMIN to edit a particular meal option
+
 @app.route('/meals/<mealId>', methods=['PUT'])
-def update_a_meal(mealId):
-    if len(app_meals) > 0:
-        mealUpdate = request.get_json(force=True)['meal_update']
-        mealPrice = app_meals[mealId]
-        app_meals.pop(mealId, None) #REMOVE THE PREVIOUS ENTRY
-        app_meals[mealUpdate] = mealPrice #Add the New Entry
+@auth_decorator.token_required_to_authenticate
+def update_a_meal(current_user, mealId):
+    #Verify If User is admin
+    if not current_user:
+        return jsonify({'message': 'You need to login as Admin to perform this operation.'})
+
+    #Allow the ADMIN to edit a particular meal option
+    if len(models.app_meals) > 0:
+        meal_update = request.get_json(force=True)['meal_update']
+        meal_price = models.app_meals[mealId]
+        models.app_meals.pop(mealId, None) # REMOVE THE PREVIOUS ENTRY
+        models.app_meals[meal_update] = meal_price # ADD THE NEW ENTRY
         return make_response(jsonify({
             'message': 'Meal Updated successfully',
-            'data': app_meals
+            'data': models.app_meals
         })), 200
     else:
         return make_response(jsonify({'message': 'You can not modify empty meals'})), 200
 
-#Allow the admin to delete a particular meal option
+
 @app.route('/meals/<mealId>', methods=['DELETE'])
-def delete_a_meal(mealId):
-    if len(app_meals) > 0:
-        del app_meals[mealId]
+@auth_decorator.token_required_to_authenticate
+def delete_a_meal(current_user, mealId):
+    #Verify If User is admin
+    if not current_user:
+        return jsonify({'message': 'You need to login as Admin to perform this operation.'})
+
+    #Allow the admin to delete a particular meal option
+    if len(models.app_meals) > 0:
+        del models.app_meals[mealId]
         return make_response(jsonify({
             'message': 'Meal Deleted successfully'
         })), 200
@@ -124,56 +163,77 @@ def delete_a_meal(mealId):
 
 
 
-#Allow the admin an operation to the set the menu of the day
+
+# API MENU ENDPOINTS
 @app.route('/menu/', methods=['POST'])
-def set_menu_of_the_day():
+@auth_decorator.token_required_to_authenticate
+def set_menu_of_the_day(current_user):
+    #Verify If User is admin
+    if not current_user:
+        return jsonify({'message': 'You need to login as Admin to perform this operation.'})
+
+    #Allow the admin an operation to the set the menu of the day
     meal = request.get_json(force=True)['meal']
     price = request.get_json(force=True)['price']
-    app_menu[meal] = price
-    return make_response(jsonify({'data': app_menu})), 201
+    
+    menu = Menu()
+    menu.add_meal_to_menu(meal, price)
+    return make_response(jsonify({'data': models.app_menu})), 201
 
-#Allow the authenticated users to view menu of the day
+
 @app.route('/menu/', methods=['GET'])
-def get_menu_of_the_day():
+@auth_decorator.token_required_to_authenticate
+def get_menu_of_the_day(current_user):
+    #Verify If User is admin
+    if not current_user:
+        return jsonify({'message': 'You need to login as Admin to perform this operation.'})
+
+    #Allow the authenticated users to view menu of the day
     return make_response(jsonify({
-        'data': app_menu
+        'data': models.app_menu
     })), 200
 
 
 
 
-#Allow the authenticated users to make orders from the menu of the day
+
+# API ORDER ENDPOINTS
 @app.route('/orders/', methods=['POST'])
 def make_order():
-    meal = request.get_json(force=True)['meal']
-    userId = request.get_json(force=True)['user']
-    app_orders[userId] = meal
+    #Allow the authenticated users to make orders from the menu of the day
+    meal_id = request.get_json(force=True)['meal']
+    user_id = request.get_json(force=True)['user']
+
+    order = Order(user_id, meal_id)
+    order.make_order()
     return make_response(jsonify({
         'message': 'Order Made successfully',
-        'orderId': userId,
-        'data': app_orders
+        'orderId': user_id,
+        'data': models.app_orders
         })), 201
 
-#Allow the user to modify an order they've already made
+
 @app.route('/orders/<orderId>', methods=['PUT'])
 def modify_order(orderId):
-    if len(app_orders) > 0:
+    #Allow the user to modify an order they've already made
+    if len(models.app_orders) > 0:
         order_update = request.get_json(force=True)['order_to_update']
-        app_orders[orderId] = app_orders.pop(orderId)
-        app_orders.pop(orderId, None) #REMOVE THE PREVIOUS ORDER ENTRY
-        app_orders[orderId] = order_update #Add the New Entry
+        order = Order('', '')
+        order.update_order_by_id(orderId, order_update)
         return make_response(jsonify({'message': 'Order Updated successfully'})), 200
     else:
         return make_response(jsonify({'message': 'Orders are Empty'})), 200
 
-#Allow the Admin return all the Orders users have made
+
 @app.route('/orders/', methods=['GET'])
 def  get_all_orders():
-    return make_response(jsonify({'data': app_orders})), 200
+    #Allow the Admin return all the Orders users have made
+    return make_response(jsonify({'data': models.app_orders})), 200
+
+
+
 
 
 # Run the app :)
 if __name__ == '__main__':
-    app.run(debug=True)
-	# socketio.run(app, host="127.0.0.1", port=int("5556"), debug=True)
-  
+    app.run(debug=True)  

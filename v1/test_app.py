@@ -7,37 +7,45 @@ class AppTest(unittest.TestCase):
 	def setUp(self):
 		#Set up the globally used variables for use
 		self.client = app.test_client()
+		self.headers = {
+			'Content-Type': 'application/json',
+			'Authorization': 'Basic auth',
+			'app-access-token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhZG1pbiI6dHJ1ZSwiZW1haWwiOiJhbm5hYmVsbGFAZ21haWwuY29tIn0.23Dp0dP3TSYMCZIEfSEmKyD4kxSZU867cRXYDjzZ0AI'
+		}
 
 	""" USER REGISTRATION TESTS """
 	def test_registration(self):
 		#User registration should complete successfully
 		user_data = json.dumps({
+			'user_name': 'example',
 			'email': 'test@example.com',
 			'password': '12345',
-			'admin': False
+			'admin': True
 		})
 		response = self.client.post('/auth/signup', data = user_data)
 		result = json.loads(response.data.decode())
 		self.assertEqual(response.status_code, 201)
 		self.assertIn(result['message'], 'Successfully Registered. Please login')
 
-	# def test_registration_with_existing_user(self):
-	# 	#A user with the same email can not register more than once
-	# 	user_data = json.dumps({
-	# 		'email': 'test@example.com',
-	# 		'password': '12345'
-	# 	})
-	# 	response_post = self.client.post('/auth/signup', data = user_data)
-	# 	self.assertEqual(response_post.status_code, 201)
-	# 	response_post_two = self.client.post('/auth/signup', data = user_data)
-	# 	self.assertEqual(response_post_two.status_code, 200)
-	# 	result = json.loads(response_post_two.data.decode())
-	# 	self.assertEqual(result['message'], "User already exists. Please login.")
-
+	def test_registration_with_existing_user(self):
+		#A user with the same email can not register more than once
+		user_data = json.dumps({
+			'user_name': 'Wasswa Derick',
+			'email': 'wasswadero@gmail.com',
+			'password': '12345',
+			'admin': False
+		})
+		response_post = self.client.post('/auth/signup', data = user_data)
+		self.assertEqual(response_post.status_code, 201)
+		response_post_two = self.client.post('/auth/signup', data = user_data)
+		self.assertEqual(response_post_two.status_code, 200)
+		result = json.loads(response_post_two.data.decode())
+		self.assertEqual(result['message'], "User already exists. Please login.")
 
 	def test_user_registration_with_empty_credentials(self):
 		#User should not register with missing credentials
 		user_data = json.dumps({
+			'user_name': '',
 			'email': '',
 			'password': '',
 			'admin': ''
@@ -49,44 +57,37 @@ class AppTest(unittest.TestCase):
 
 
 
-	""" USER LOGIN TESTS """
-	def test_user_login_with_invalid_email(self):
-		#User should login with the correct format of an email
-		user_data = json.dumps({
-			'email': 'test',
-			'password': '12345',
-			'admin': False
-		})
-		response = self.client.post('/auth/login', data = user_data)
-		self.assertEqual(response.status_code, 200)
-		result = json.loads(response.data.decode())
-		self.assertEqual(result['message'], "Invalid Email or Password")
 
+	""" USER LOGIN TESTS """
 	def test_user_login_with_empty_credentials(self):
 		#User should not login with missing credentials
 		user_data = json.dumps({
+			'user_name': '',
 			'email': '',
-			'password': ''
+			'password': '',
+			'admin': ''
 		})
 		response = self.client.post('/auth/login', data = user_data)
-		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response.status_code, 401)
 		result = json.loads(response.data.decode())
-		self.assertEqual(result['message'], "Missing Credentials")		
+		self.assertEqual(result['message'], "Could not verify. Login credentials required.")		
 
 	def test_user_login(self):
 		#Test a registered user can be able to login
 		user_data = json.dumps({
-			'email': 'test@example.com',
+			'user_name': 'Derreck',
+			'email': 'derrekwasswa@gmail.com',
 			'password': '12345',
-			'admin': False
+			'admin': True
 		})
 		response = self.client.post('/auth/signup', data = user_data)
 		self.assertEqual(response.status_code, 201)
 
 		user_login_response = self.client.post('/auth/login', data = user_data)
-		result = json.loads(user_login_response.data.decode())
+		result = json.loads(user_login_response.get_data(as_text=True))
 		self.assertEqual(user_login_response.status_code, 200)		
-		self.assertEqual(result['message'], 'Logged in succcessfully')
+		self.assertEqual(result['message'], 'Logged in successfully')
+
 
 
 
@@ -98,9 +99,10 @@ class AppTest(unittest.TestCase):
 			'meal': 'Beef with Chicken',
 			'price': '20000'
 		})
-		response_add = self.client.post('/meals/', data = app_meals)
+
+		response_add = self.client.post('/meals/', data = app_meals, headers = self.headers)
 		self.assertEqual(response_add.status_code, 201)
-		response_get = self.client.get('/meals/')
+		response_get = self.client.get('/meals/', headers = self.headers)
 		self.assertEqual(response_get.status_code, 200)
 		self.assertIn('Beef with Chicken', str(response_get.data))
 
@@ -111,7 +113,7 @@ class AppTest(unittest.TestCase):
 			'price': '25000'
 		})
 
-		response = self.client.post('/meals/', data = app_meal)
+		response = self.client.post('/meals/', data = app_meal, headers = self.headers)
 		self.assertEqual(response.status_code, 201)
 		self.assertIn("Fish with All foods", str(response.data))
 		self.assertIn('Meal Added Successfully', str(response.data))		
@@ -125,17 +127,19 @@ class AppTest(unittest.TestCase):
 		update_meal = json.dumps({
 			'meal_update': 'Luwombo with All Local Foods'
 		})
-		response = self.client.post('/meals/', data = app_meal)
+		response = self.client.post('/meals/', data = app_meal, headers = self.headers)
 		self.assertEqual(response.status_code, 201)
 
 		posted_data = json.loads(response.get_data(as_text=True))
 
 		response_edit_meal = self.client.put(
 			'/meals/{}' . format(posted_data['meal']),
-			data = update_meal)
+			data = update_meal, 
+			headers = self.headers
+			)
 		self.assertEqual(response_edit_meal.status_code, 200)
 
-		results_get_meals = self.client.get('/meals/')
+		results_get_meals = self.client.get('/meals/', headers = self.headers)
 		self.assertIn("Luwombo with All", str(results_get_meals.data))		
 
 	def test_deleting_a_meal_option(self):
@@ -145,17 +149,18 @@ class AppTest(unittest.TestCase):
 			'price': '25000'
 		})
 
-		response = self.client.post('/meals/', data = app_meal)
+		response = self.client.post('/meals/', data = app_meal, headers = self.headers)
 		self.assertEqual(response.status_code, 201)
 
 		posted_data = json.loads(response.get_data(as_text=True))	
 
-		response_delete_meal = self.client.delete('/meals/{}' . format(posted_data['meal']))
+		response_delete_meal = self.client.delete('/meals/{}' . format(posted_data['meal']), headers = self.headers)
 		self.assertEqual(response_delete_meal.status_code, 200)
 
 		#Now retrieve to see to it exists: Should Return Not Found - 404
-		response_get = self.client.get('/meals/{}' . format(posted_data['meal']))
+		response_get = self.client.get('/meals/{}' . format(posted_data['meal']), headers = self.headers)
 		self.assertEqual(response_get.status_code, 404)
+
 
 
 
@@ -168,7 +173,7 @@ class AppTest(unittest.TestCase):
 			'price': '25000'
 		})
 
-		response = self.client.post('/menu/', data = app_meal)
+		response = self.client.post('/menu/', data = app_meal, headers = self.headers)
 		self.assertEqual(response.status_code, 201)
 		self.assertIn("Fish with All foods", str(response.data))
 
@@ -178,11 +183,13 @@ class AppTest(unittest.TestCase):
 			'meal': 'Beef with Gnuts',
 			'price': '15000'
 		})
-		response_add = self.client.post('/menu/', data = app_menu)
+		response_add = self.client.post('/menu/', data = app_menu, headers = self.headers)
 		self.assertEqual(response_add.status_code, 201)
-		response_get = self.client.get('/menu/')
+		response_get = self.client.get('/menu/', headers = self.headers)
 		self.assertEqual(response_get.status_code, 200)
 		self.assertIn('Beef with Gnuts', str(response_get.data))
+
+
 
 
 
@@ -237,6 +244,7 @@ class AppTest(unittest.TestCase):
 		response_get_orders = self.client.get('/orders/')
 		self.assertEqual(response_get_orders.status_code, 200)
 		self.assertIn('Beef with Chicken', str(response_get_orders.data))
+
 
 if __name__ == '__main__':
 	unittest.main()

@@ -2,16 +2,22 @@ language: python
 python:
     - "3.6"
     
+virtualenv:
+    system_site_package: true
+
 install:
   - pip install -r requirements.txt
    
-before_install:
-    - pip install pytest pytest-cov
-    - pip install coverage
-    - pip install coveralls
-    
+install:
+    make build
+
 script:
-    - pytest test_app.py
+- pytest v1/test_app.py
+- coverage report
+
+after_script:
+- codeclimate-test-reporter
+- coveralls
     
 after_success:
 - coveralls
