@@ -8,6 +8,8 @@ virtualenv:
 
 install:
   - pip install -r requirements.txt
+  - pip install coverage
+  - pip install coveralls
 
 script:
 - pytest v1/test_app.py
