@@ -6,7 +6,7 @@
 		<title>BookAMeal</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="../css/book_a_meal.css" />
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/book_a_meal.css') }}" />
 	</head>
 
 	<body>
@@ -35,7 +35,7 @@
 						<div class="action_block">
 
 							<button id="menu_of_the_day_button">Menu of the Day</button>
-							<button id="order_history_button">Order History</button>
+							<button id="order_history_button">Orders</button>
 
 						</div>
 
@@ -110,7 +110,7 @@
 
 
 		<!-- SCRIPTS -->
-		<script src="../js/book_a_meal.js"></script>
+		<script src="{{url_for('static', filename='js/book_a_meal.js')}}"></script>
 		<script>
 			
 			document.getElementById('menu_of_the_day_button').onclick = menuOfTheDay;

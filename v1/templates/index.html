@@ -6,7 +6,7 @@
 		<title>BookAMeal</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="../css/book_a_meal.css" />
+		<link rel="stylesheet" type="text/css"  href="{{ url_for('static', filename='css/book_a_meal.css') }}"  />
 	</head>
 
 	<body>
@@ -61,12 +61,12 @@
 								</div>
 
 								<div class="field">
-									<input type="radio" id="Customer" class="customer" name="customer" >
+									<input type="radio" id="Customer" class="customer" name="customer" />
 									<label for="customer">Customer</label>
 								</div>
 
 								<div class="field">
-									<input type="radio" id="vendor" class="vendor" name="vendor">
+									<input type="radio" id="vendor" class="vendor" name="vendor" />
 									<label for="vendor">Vendor</label>
 								</div>
 
@@ -99,7 +99,7 @@
 			</div>
 
 		<!-- JS SCRIPTS -->
-		<script src="../js/book_a_meal.js"></script>
+		<script src="{{url_for('static', filename='js/book_a_meal.js')}}"></script>
 		<script>
 			
 			document.getElementById('signin_button').onclick = signIn;
