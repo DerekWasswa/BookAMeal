@@ -19,7 +19,7 @@ install:
 
 script:
 - pytest v1/test_app.py
-- coverage run --source=run_tests.py test 
+- coverage run --source='v1/' run_tests.py test 
 - coverage report
     
 after_script:
