@@ -12,7 +12,7 @@ manager = Manager(app)
 @manager.command
 def test():
     """Runs the unit tests without test coverage."""
-    tests = unittest.TestLoader().discover('/v1', pattern='test_app.py'
+    tests = unittest.TestLoader().discover('v1', pattern='test_*.py')
     result = unittest.TextTestRunner(verbosity=2).run(tests)
     return not result.wasSuccessful()
 
