@@ -177,7 +177,8 @@ def set_menu_of_the_day(current_user):
     price = request.get_json(force=True)['price']
     
     menu = Menu()
-    menu.add_meal_to_menu(meal, price)
+    meal = Meal(meal, price)
+    menu.add_meal_to_menu(meal.meal, meal.price)
     return make_response(jsonify({'data': models.app_menu})), 201
 
 

@@ -5,7 +5,6 @@ from flask import Flask
 
 # initialize the app with all its configurations
 app = Flask(__name__)
-app(config_name=os.getenv('APP_SETTINGS'))
 manager = Manager(app)
 
 # Usage: python test_app.py test
