@@ -32,7 +32,7 @@ Under the UI directory on the feature branch, there are various various HTML pag
 
 
 
-## Application API endpoints ([Documentation](https://app.swaggerhub.com/apis/DerekWasswa/BookAMealAPI/1.0.0))
+## Application API endpoints ([Documentation](https://bookamealapi1.docs.apiary.io/#)
 
 | EndPoint                | Method |
 | ----------------------- | ------ |
