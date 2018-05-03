@@ -5,7 +5,7 @@ import json
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import User, Meal, Menu, Order
 import models
-import datetime
+from validate_email import validate_email
 import jwt
 import auth_decorator
 
@@ -36,6 +36,12 @@ def sign_up():
 
         user = User(username, user_email, generate_password_hash(user_password), user_admin)
         check_user_exists = user.check_exists(user_email)
+
+        #CHECK IF EMAIL IS VALID
+        is_valid = validate_email(user_email)
+        if not is_valid:
+            return make_response(jsonify({'message': 'Email is Invalid'})), 401
+
         
         if check_user_exists:
             return make_response(jsonify({'message': 'User already exists. Please login.'})), 200
@@ -60,6 +66,11 @@ def login():
     
     if len(user_email) <= 0 and len(user_password) <= 0:
         return make_response(jsonify({'message': 'Could not verify. Login credentials required.'})), 401
+
+    #CHECK IF EMAIL IS VALID
+    is_valid = validate_email(user_email)
+    if not is_valid:
+        return make_response(jsonify({'message': 'Email is Invalid'})), 401
 
     user = User(username, user_email, user_password, user_admin)
     if not User.check_exists(user_email):
