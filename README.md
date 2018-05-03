@@ -54,14 +54,13 @@ Under the UI directory on the feature branch, there are various various HTML pag
 2.  To test the endpoints in Terminal shell (Use either pytest test_app.py, nosetests test_app.py, python test_app.py)
 
 
-##Deploying the Application on your device
-* First change to a directory you want to would like the application to be then clone the GitHub (https://github.com/DerekWasswa/BookAMeal.git) repository by the command: git clone https://github.com/DerekWasswa/BookAMeal.git
-* Install a virtual environment on your device (run the command: pip install virtualenv)
+## Deploying the Application on your device
+* First change to a directory you want to would like the application to be then clone the GitHub (https://github.com/DerekWasswa/BookAMeal.git) repository by the command: **git clone** https://github.com/DerekWasswa/BookAMeal.git
+* Install a virtual environment on your device (run the command: **pip install virtualenv**)
 * Change your current directory to the application you have just cloned.
-* Start the virtual environment on to the application by running the command: source venv/bin/activate
-* Run the following command to install the application modules and resources: pip install -r requirements.txt
-* Run the application by hitting the command: python v1/app.py
-
+* Start the virtual environment on to the application by running the command: **source venv/bin/activate**
+* Run the following command to install the application modules and resources: **pip install -r requirements.txt**
+* Run the application by hitting the command: **python v1/app.py**
 
 
 
