@@ -153,7 +153,7 @@ def update_a_meal(current_user, mealId):
                     
     for i in range(len(models.app_meals)):
         if str(models.app_meals[i]['meal_id']) == str(mealId):
-            models.app_meals[i]['meal_id'] = meal_update
+            models.app_meals[i]['meal'] = meal_update
             break     
 
     meal_as_dict = {}
