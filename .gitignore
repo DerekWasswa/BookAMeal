@@ -1,19 +1,13 @@
 /v1/__pycache__
-
 *$py.class
 
 .pytest_cache
-
 /v1/.pytest_cache/*
-
 /.vscode/*
-
 /env/*
-
 /venv/*
 
 /v1/app.pyc
-
+/v1/auth_decorator.pyc
 /v1/test_app.pyc
-
 /v1/models.pyc
