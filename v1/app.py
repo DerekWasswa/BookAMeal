@@ -1,5 +1,5 @@
 # Book A Meal API 
-from flask import Flask, session, request, redirect, url_for, jsonify, make_response, current_app
+from flask import Flask, session, render_template, request, redirect, url_for, jsonify, make_response, current_app
 from flask_api import FlaskAPI, status
 import json
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -19,7 +19,7 @@ asyncMode = None
 
 
 #DOCUMENTATION ROUTE
-@app.route('/')
+@app.route('/api/v1')
 def show_app_home():
     return render_template('app_home.html')
 
