@@ -19,7 +19,7 @@ asyncMode = None
 
 
 #DOCUMENTATION ROUTE
-@app.route('/api/v1')
+@app.route('/')
 def show_app_home():
     return render_template('app_home.html')
 
