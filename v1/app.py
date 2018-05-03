@@ -28,10 +28,11 @@ def show_app_home():
 @app.route('/api/v1/auth/signup', methods=['POST'])
 def sign_up():
     #Sign up a user either as a customer or vendor admin
-    username = request.get_json(force=True)['username']
-    user_email = request.get_json(force=True)['email']
-    user_password = request.get_json(force=True)['password']
-    user_admin = request.get_json(force=True)['admin']
+    user_data = request.get_json(force=True)
+    username = user_data['username']
+    user_email = user_data['email']
+    user_password = user_data['password']
+    user_admin = user_data['admin']
     if len(user_email) > 0 and len(user_password) > 0:
 
         user = User(username, user_email, generate_password_hash(user_password), user_admin)
@@ -59,10 +60,11 @@ def sign_up():
 @app.route('/api/v1/auth/login', methods=['POST'])
 def login():
     #authenticate customers or admin
-    user_email = request.get_json(force=True)['email']
-    user_password = request.get_json(force=True)['password']
-    user_admin = request.get_json(force=True)['admin']
-    username = request.get_json(force=True)['username']
+    user_data = request.get_json(force=True)
+    user_email = user_data['email']
+    user_password = user_data['password']
+    user_admin = user_data['admin']
+    username = user_data['username']
     
     if len(user_email) <= 0 and len(user_password) <= 0:
         return make_response(jsonify({'message': 'Could not verify. Login credentials required.'})), 401
@@ -133,8 +135,9 @@ def add_meal(current_user):
         return jsonify({'message': 'You need to login as Admin to perform this operation.'})
 
     #Allow the vendor admin to add another meal option
-    meal = request.get_json(force=True)['meal']
-    price = request.get_json(force=True)['price']
+    meal_data = request.get_json(force=True)
+    meal = meal_data['meal']
+    price = meal_data['price']
 
     meal_object = Meal(meal, price)
     meal_object.add_meal() #ADD MEAL HERE
@@ -212,11 +215,11 @@ def set_menu_of_the_day(current_user):
         return jsonify({'message': 'You need to login as Admin to perform this operation.'})
 
     #Allow the admin an operation to the set the menu of the day
-    
-    date = request.get_json(force=True)['date']
-    description = request.get_json(force=True)['description']
-    meal_id = request.get_json(force=True)['meal_id']
-    menu_name = request.get_json(force=True)['menu_name']
+    menu_data = request.get_json(force=True)
+    date = menu_data['date']
+    description = menu_data['description']
+    meal_id = menu_data['meal_id']
+    menu_name = menu_data['menu_name']
 
     meal = Meal.get_meal_by_id(meal_id)
 
@@ -267,8 +270,9 @@ def get_menu_of_the_day(current_user):
 @app.route('/api/v1/orders/', methods=['POST'])
 def make_order():
     #Allow the authenticated users to make orders from the menu of the day
-    meal_id = request.get_json(force=True)['meal']
-    user_id = request.get_json(force=True)['user']
+    order_data = request.get_json(force=True)
+    meal_id = order_data['meal']
+    user_id = order_data['user']
     
     order = Order(user_id, meal_id)
     order.make_order()
