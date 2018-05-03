@@ -26,11 +26,12 @@ class User(object):
         return user
 
     #check if a certain user object exists in the app users
-    def check_exists(self, user_email):
+    @staticmethod
+    def check_exists(user_email):
         for user in app_users:
             if user.email == user_email:
-                return user.get_user_object_as_dict
-        return None  
+                return True
+        return False  
 
     #Check if the password the user is submitting matches the one they registered with
     def verify_user_password(self, user_password):
