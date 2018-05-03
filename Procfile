@@ -1,0 +1,1 @@
+web: sh -c 'cd ./v1/ && gunicorn app:app'

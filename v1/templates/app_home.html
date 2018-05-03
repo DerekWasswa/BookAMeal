@@ -1,0 +1,46 @@
+<!DOCTYPE HTML>
+
+<html>
+
+	<head>
+		<title>BookAMeal</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" type="text/css"  href="{{ url_for('static', filename='css/book_a_meal.css') }}"  />
+	</head>
+
+	<body>
+
+		<!-- APP WRAPPER -->
+			<div id="app_wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<div class="content">
+							<div class="inner">
+                                <h1>Book A Meal API</h1>
+                            </div>
+						</div>
+					</header>
+
+				<!-- Main -->
+					<div id="app_block">
+
+                        <p>An application that allows a user to make meal orders from various vendors. The Vendors are able to make a menu from a set of meals they've added for a specific day. The vendors admins can edit the meals as well as deleting meal options.</p>
+                        <p><a href="https://bookamealapi1.docs.apiary.io/">API Documentation</a></p>
+
+					</div>
+
+				<!-- Footer -->
+					<footer id="footer">
+						<p class="copyright">&copy; Book A Meal Uganda. Developed: <a href="#">Andela Bootcamp VII</a>.</p>
+					</footer>
+
+			</div>
+
+		<!-- JS SCRIPTS -->
+		<script src="{{url_for('static', filename='js/book_a_meal.js')}}"></script>
+
+	</body>
+</html>
+
