@@ -88,7 +88,19 @@ class AppTest(unittest.TestCase):
 		self.assertEqual(user_login_response.status_code, 200)		
 		self.assertEqual(result['message'], 'Logged in successfully')
 
+	def test_user_login_with_user_who_does_not_exist(self):
+		#Test a registered user can be able to login
+		user_data = json.dumps({
+			'username': 'invasionworld',
+			'email': 'invasionworld@gmail.com',
+			'password': '12345',
+			'admin': True
+		})
 
+		user_login_response = self.client.post('/api/v1/auth/login', data = user_data)
+		result = json.loads(user_login_response.get_data(as_text=True))
+		self.assertEqual(user_login_response.status_code, 401)		
+		self.assertEqual(result['message'], 'User email not found!!')
 
 
 

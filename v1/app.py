@@ -56,13 +56,14 @@ def login():
     user_email = request.get_json(force=True)['email']
     user_password = request.get_json(force=True)['password']
     user_admin = request.get_json(force=True)['admin']
+    username = request.get_json(force=True)['username']
     
     if len(user_email) <= 0 and len(user_password) <= 0:
         return make_response(jsonify({'message': 'Could not verify. Login credentials required.'})), 401
 
-    user = User('', user_email, user_password, user_admin)
-    if not user.check_exists(user_email):
-        make_response(jsonify({'message': 'Invalid Email or Password'})), 401 
+    user = User(username, user_email, user_password, user_admin)
+    if not User.check_exists(user_email):
+        return make_response(jsonify({'message': 'User email not found!!'})), 401 
 
     app_user = user.get_user_by_email(user_email)
     if check_password_hash(app_user.password, user_password):
