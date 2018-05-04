@@ -86,7 +86,7 @@ class AppTest(unittest.TestCase):
 	def test_user_login(self):
 		#Test a registered user can be able to login
 		user_data = json.dumps({
-			'username': 'Derreck',
+			'username': 'derreckwasswa',
 			'email': 'derrekwasswa@gmail.com',
 			'password': '12345',
 			'admin': True
@@ -127,22 +127,25 @@ class AppTest(unittest.TestCase):
 		self.assertIn(result['message'], 'Email is Invalid')
 
 
+
+
 	""" MEALS OPERATIONS TESTS """
 	def test_modifying_a_meal_option(self):
-		#Test that the API allows modification of a meal option by its ID
+		#Test that the API allows modification of a meal option by its ID should modify the meal by both the meal name and price
 		app_meal = json.dumps({
 			'meal': 'Luwombo with Matooke',
-			'price': '25000'
+			'price': 25000
 		})
 		update_meal = json.dumps({
-			'meal_update': 'Luwombo with All Local Foods'
+			'meal_update': 'Luwombo with All Local Foods',
+			'price_update': 20000
 		})
 		response = self.client.post('/api/v1/meals/', data = app_meal, headers = self.headers)
 		self.assertEqual(response.status_code, 201)
 
 		posted_data = json.loads(response.get_data(as_text=True))
 		
-		response_edit_meal = self.client.put('/api/v1/meals/{}' . format(posted_data['meal_id']),
+		response_edit_meal = self.client.put('/api/v1/meals/{}' . format(posted_data['meal']['meal_id']),
 			data = update_meal,
 			headers = self.headers
 		)
@@ -152,10 +155,10 @@ class AppTest(unittest.TestCase):
 		self.assertIn('Luwombo with All', str(results_get_meals.data))		
 
 	def test_deleting_a_meal_option(self):
-		#Test that the API allows for deletion of a meal option
+		#Test that the API allows for deletion of a meal option should delete a meal by the ID
 		app_meal = json.dumps({
 			'meal': 'Luwombo with Irish',
-			'price': '25000'
+			'price': 25000
 		})
 
 		response = self.client.post('/api/v1/meals/', data = app_meal, headers = self.headers)
@@ -167,14 +170,14 @@ class AppTest(unittest.TestCase):
 		self.assertEqual(response_delete_meal.status_code, 200)
 
 		#Now retrieve to see to it exists: Should Return Not Found - 404
-		response_get = self.client.get('/api/v1/meals/{}' . format(posted_data['meal']), headers = self.headers)
+		response_get = self.client.get('/api/v1/meals/{}' . format(posted_data['meal']['meal_id']), headers = self.headers)
 		self.assertEqual(response_get.status_code, 404)
 
 	def test_getting_all_meals(self):
-		#Testing for retrieving all the available meals
+		#Testing for retrieving all the available meals should return all meals
 		app_meals = json.dumps({
 			'meal': 'Beef with Chicken',
-			'price': '20000'
+			'price': 20000
 		})
 
 		response_add = self.client.post('/api/v1/meals/', data = app_meals, headers = self.headers)
@@ -184,10 +187,10 @@ class AppTest(unittest.TestCase):
 		self.assertIn('Beef with Chicken', str(response_get.data))
 
 	def test_adding_a_meal_option(self):
-		#Testing addition of a meal option
+		#Testing addition of a meal option should add
 		app_meal = json.dumps({
 			'meal': 'Fish with All foods',
-			'price': '25000'
+			'price': 25000
 		})
 
 		response = self.client.post('/api/v1/meals/', data = app_meal, headers = self.headers)
@@ -195,7 +198,51 @@ class AppTest(unittest.TestCase):
 		self.assertIn("Fish with All foods", str(response.data))
 		self.assertIn('Meal Added Successfully', str(response.data))		
 
+	def test_adding_empty_meal_options(self):
+		#Testing addition of a meal option with missing content should not pass
+		app_meal = json.dumps({
+			'meal': '',
+			'price': ''
+		})
 
+		response = self.client.post('/api/v1/meals/', data = app_meal, headers = self.headers)
+		result = json.loads(response.data.decode())
+		self.assertEqual(response.status_code, 400)	
+		self.assertIn(result['message'], 'Meal Options Missing.')	
+
+	def test_adding_meal_price_that_is_not_an_int(self):
+		#Testing addition of a meal option with a price that is not empty should not pass
+		app_meal = json.dumps({
+			'meal': 'Bananas',
+			'price': '12asu'
+		})
+
+		response = self.client.post('/api/v1/meals/', data = app_meal, headers = self.headers)
+		result = json.loads(response.data.decode())
+		self.assertEqual(response.status_code, 400)		
+		self.assertIn(result['message'], 'Meal Price has to be an Integer.')	
+
+	def test_modifying_a_meal_with_empty_meal_options(self):
+		#MODIFYING A MEAL OPTIONS WITH EMPTY DATA SHOULD NOT ACCEPT
+		app_meal = json.dumps({
+			'meal': 'Luwombo with Matooke',
+			'price': 25000
+		})
+		update_meal = json.dumps({
+			'meal_update': '',
+			'price_update': ''
+		})
+		response = self.client.post('/api/v1/meals/', data = app_meal, headers = self.headers)
+		self.assertEqual(response.status_code, 201)
+
+		posted_data = json.loads(response.get_data(as_text=True))
+		
+		response_edit_meal = self.client.put('/api/v1/meals/{}' . format(posted_data['meal']['meal_id']),
+			data = update_meal,
+			headers = self.headers
+		)
+		self.assertEqual(response_edit_meal.status_code, 400)
+		self.assertIn('Can not update meal with empty meal options.', str(response_edit_meal.data))
 
 
 
@@ -205,7 +252,7 @@ class AppTest(unittest.TestCase):
 		#Testing setting the menu of the day with meals
 		app_meal_one = json.dumps({
 			'meal': 'Fish with All foods',
-			'price': '25000'
+			'price': 25000
 		})
 
 		response_one = self.client.post('/api/v1/meals/', data = app_meal_one, headers = self.headers)
@@ -237,7 +284,27 @@ class AppTest(unittest.TestCase):
 		self.assertEqual(response_get.status_code, 200)
 		self.assertIn('"Fish with All foods', str(response_get.data))
 
+	def test_setting_empty_menu(self):
+		#Testing setting the menu of the day with meals
+		app_meal_one = json.dumps({
+			'meal': 'Fish with All foods',
+			'price': 25000
+		})
 
+		response_one = self.client.post('/api/v1/meals/', data = app_meal_one, headers = self.headers)
+		self.assertEqual(response_one.status_code, 201)
+
+
+		app_menu = json.dumps({
+			'menu_name': '',
+			'date': '',
+			'description': '',
+			'meal_id': ''
+		})
+
+		response = self.client.post('/api/v1/menu/', data = app_menu, headers = self.headers)
+		self.assertEqual(response.status_code, 400)
+		self.assertIn("Empty Menu Details.", str(response.data))
 
 
 
@@ -247,7 +314,7 @@ class AppTest(unittest.TestCase):
 		#Testing making an order from the menu
 		app_menu = json.dumps({
 			'meal': 'Fish with All foods',
-			'price': '25000',
+			'price': 25000,
 			'user': 'wasswadero@gmail.com'
 		})
 
@@ -260,7 +327,7 @@ class AppTest(unittest.TestCase):
 		app_order = json.dumps({
 			'user': 'wasswadero@gmail',
 			'meal': 'Luwombo with Matooke',
-			'price': '25000'
+			'price': 25000
 		})
 
 		order_update = json.dumps({
@@ -291,6 +358,44 @@ class AppTest(unittest.TestCase):
 		response_get_orders = self.client.get('/api/v1/orders/', headers = self.headers)
 		self.assertEqual(response_get_orders.status_code, 200)
 		self.assertIn('1', str(response_get_orders.data))
+
+	def test_making_order_with_empty_fields(self):
+		#Testing making an order from the menu with empty content
+		app_menu = json.dumps({
+			'meal': '',
+			'price': '',
+			'user': ''
+		})
+
+		response = self.client.post('/api/v1/orders/', data = app_menu)
+		result = json.loads(response.data.decode())
+		self.assertEqual(response.status_code, 400)
+		self.assertEqual(result['message'], 'Can not order with empty content.')
+
+	def test_modifying_order_with_empty_order_content(self):
+		#Test modifying an order with empty order content
+		app_order = json.dumps({
+			'user': 'wasswadero@gmail',
+			'meal': 'Luwombo with Matooke',
+			'price': 25000
+		})
+
+		order_update = json.dumps({
+			'order_to_update': ''
+		})
+		response = self.client.post('/api/v1/orders/', data = app_order)
+		self.assertEqual(response.status_code, 201)
+
+		posted_data = json.loads(response.get_data(as_text=True))
+
+		response_edit_order = self.client.put(
+			'/api/v1/orders/{}' . format(posted_data['orderId']),
+			data = order_update
+		)
+
+		result = json.loads(response_edit_order.data.decode())
+		self.assertEqual(response_edit_order.status_code, 400)
+		self.assertEqual(result['message'], 'Can not modify an order with empty content.')
 
 
 if __name__ == '__main__':

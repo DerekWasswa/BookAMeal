@@ -21,7 +21,6 @@ class User(object):
         user = {}
         user['username'] = self.username
         user['email'] = self.email
-        user['password'] = self.password
         user['admin'] = self.admin
         return user
 
