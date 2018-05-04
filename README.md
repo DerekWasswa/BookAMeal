@@ -30,7 +30,7 @@ Under the UI directory on the feature branch, there are various various HTML pag
 * [Github-Pages](https://derekwasswa.github.io/BookAMeal/orderhistory.html)
 
 
-## Application dependancies
+## Technologies used.
 
 * [Flask API](https://www.flaskapi.org/)
 * [python 3.6](https://www.python.org/downloads/release/python-360/)
@@ -64,12 +64,17 @@ Under the UI directory on the feature branch, there are various various HTML pag
 
 ## Running the Application on your device
 1. First change to a directory you want to would like the application to be then clone the GitHub repository.
-    * Run the command: `git clone https://github.com/DerekWasswa/BookAMeal.git`
-2. Install a virtual environment on your device (run the command: `pip install virtualenv`)
+    * Run the command.
+    > `$ git clone https://github.com/DerekWasswa/BookAMeal.git`
+2. Install a virtual environment on your device.
+> `$ pip install virtualenv`
 3. Change your current directory to the application you have just cloned.
-6. Start the virtual environment on to the application by running the command: `source venv/bin/activate*`
-4. Run the following command to install the application modules and resources: `pip install -r requirements.txt`
-5. Run the application by hitting the command: `python v1/app.py`
+6. Start the virtual environment on to the application by running the command.
+> `source venv/bin/activate*`
+4. Run the following command to install the application modules and resources.
+> `pip install -r requirements.txt`
+5. Run the application by hitting the command.
+> `python v1/app.py`
 
 
 
