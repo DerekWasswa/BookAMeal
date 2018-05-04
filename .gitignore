@@ -11,3 +11,7 @@
 /v1/auth_decorator.pyc
 /v1/test_app.pyc
 /v1/models.pyc
+
+/v1/config.pyc
+/v1/__pycache__/
+/v1/__init__.pyc
