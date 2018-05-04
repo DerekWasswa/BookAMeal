@@ -16,8 +16,6 @@ def token_required_to_authenticate(admin_status):
             payload = jwt.decode(token, current_app.config['SECRET_KEY'])   
             user_admin = payload['admin']
             print(user_admin)
-
-
         except:
             return jsonify({'message': 'Token is Invalid.'}), 401 
 

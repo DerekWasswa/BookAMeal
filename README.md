@@ -23,44 +23,53 @@ Under the UI directory on the feature branch, there are various various HTML pag
 * An HTML page that allows admins (caterers) a home to perform their operations (i.e. add meal, edit meal, delete meal, set up a menu for the day)
 * An HTML page that allows the admins and users to view their order history
 
-##UI Pages hosted on GitHub Pages
+## UI Pages hosted on GitHub Pages
 * [Github-Pages](https://derekwasswa.github.io/BookAMeal/index.html)
 * [Github-Pages](https://derekwasswa.github.io/BookAMeal/admin.html)
 * [Github-Pages](https://derekwasswa.github.io/BookAMeal/customer.html)
 * [Github-Pages](https://derekwasswa.github.io/BookAMeal/orderhistory.html)
 
 
+## Application dependancies
+
+* [Flask API](https://www.flaskapi.org/)
+* [python 3.6](https://www.python.org/downloads/release/python-360/)
+* [flask](flask.pocoo.org/)
+* [virtualenv](https://virtualenv.pypa.io/en/stable/)
+* [PyJWT](https://pypi.org/project/PyJWT/)
 
 
-## Application API endpoints ([Documentation](https://bookamealapi1.docs.apiary.io/#)
+## Application API endpoints [Documentation](https://bookamealapi1.docs.apiary.io/#)
 
-| EndPoint                | Method |
-| ----------------------- | ------ |
-| `/auth/signup`          | POST   |
-| `/auth/login`           | POST   |
-| `/meals/`               | GET    |
-| `/meals/`               | POST   |
-| `/meals/<mealId>`       | DELETE |
-| `/meals/<mealId>`       | GET    |
-| `/meals/<mealId>`       | PUT    |
-| `/menu/`                | GET    |
-| `/menu/`                | POST   |
-| `/orders/`              | GET    |
-| `/orders/`              | POST   |
-| `/orders/<orderId>`     | GET    |
-| `/orders/<orderId>`     | PUT    |
+| EndPoint                       | Method |
+| ------------------------------ | ------ |
+| `/api/v1/auth/signup`          | POST   |
+| `/api/v1/auth/login`           | POST   |
+| `/api/v1/meals/`               | GET    |
+| `/api/v1/meals/`               | POST   |
+| `/api/v1/meals/<mealId>`       | DELETE |
+| `/api/v1/meals/<mealId>`       | GET    |
+| `/api/v1/meals/<mealId>`       | PUT    |
+| `/api/v1/menu/`                | GET    |
+| `/api/v1/menu/`                | POST   |
+| `/api/v1/orders/`              | GET    |
+| `/api/v1/orders/`              | POST   |
+| `/api/v1/orders/<orderId>`     | GET    |
+| `/api/v1/orders/<orderId>`     | PUT    |
 
-1.  Test the api endpoints using [Postman](https://www.getpostman.com/)
-2.  To test the endpoints in Terminal shell (Use either pytest test_app.py, nosetests test_app.py, python test_app.py)
+* Test the api endpoints using [Postman](https://www.getpostman.com/)
+* To test the endpoints in Terminal shell (Use either pytest test_app.py, nosetests test_app.py, python test_app.py)
+* Test the AI endpoints using [Heroku](https://bookamealapi1.docs.apiary.io/) 
 
 
-## Deploying the Application on your device
-* First change to a directory you want to would like the application to be then clone the GitHub (https://github.com/DerekWasswa/BookAMeal.git) repository by the command: **git clone** https://github.com/DerekWasswa/BookAMeal.git
-* Install a virtual environment on your device (run the command: **pip install virtualenv**)
-* Change your current directory to the application you have just cloned.
-* Start the virtual environment on to the application by running the command: **source venv/bin/activate**
-* Run the following command to install the application modules and resources: **pip install -r requirements.txt**
-* Run the application by hitting the command: **python v1/app.py**
+## Running the Application on your device
+1. First change to a directory you want to would like the application to be then clone the GitHub repository.
+    * Run the command: `git clone https://github.com/DerekWasswa/BookAMeal.git`
+2. Install a virtual environment on your device (run the command: `pip install virtualenv`)
+3. Change your current directory to the application you have just cloned.
+6. Start the virtual environment on to the application by running the command: `source venv/bin/activate*`
+4. Run the following command to install the application modules and resources: `pip install -r requirements.txt`
+5. Run the application by hitting the command: `python v1/app.py`
 
 
 

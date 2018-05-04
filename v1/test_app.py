@@ -55,7 +55,18 @@ class AppTest(unittest.TestCase):
 		result = json.loads(response.data.decode())
 		self.assertEqual(result['message'], "Missing Credentials")		
 
-
+	def test_registration_for_invalid_emails(self):
+		#User registration with invalid emails should show invalid email
+		user_data = json.dumps({
+			'username': 'example',
+			'email': 'test',
+			'password': '12345',
+			'admin': True
+		})
+		response = self.client.post('/api/v1/auth/signup', data = user_data)
+		result = json.loads(response.data.decode())
+		self.assertEqual(response.status_code, 401)
+		self.assertIn(result['message'], 'Email is Invalid')
 
 
 	""" USER LOGIN TESTS """
@@ -102,6 +113,18 @@ class AppTest(unittest.TestCase):
 		self.assertEqual(user_login_response.status_code, 401)		
 		self.assertEqual(result['message'], 'User email not found!!')
 
+	def test_login_for_invalid_emails(self):
+		#User login with invalid emails should show invalid email
+		user_data = json.dumps({
+			'username': 'example',
+			'email': 'tests',
+			'password': '12345',
+			'admin': True
+		})
+		response = self.client.post('/api/v1/auth/login', data = user_data)
+		result = json.loads(response.data.decode())
+		self.assertEqual(response.status_code, 401)
+		self.assertIn(result['message'], 'Email is Invalid')
 
 
 	""" MEALS OPERATIONS TESTS """
