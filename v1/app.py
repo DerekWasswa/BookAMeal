@@ -202,9 +202,9 @@ def update_a_meal(current_user, mealId):
 
     return make_response(jsonify({
         'message': 'Meal Updated successfully',
-        'status_code': 200,
+        'status_code': 202,
         'data': meal_as_dict
-    })), 200
+    })), 202
 
 
 @app.route('/api/v1/meals/<mealId>', methods=['DELETE'])
@@ -221,8 +221,8 @@ def delete_a_meal(current_user, mealId):
         if delete_status:
             return make_response(jsonify({
                 'message': 'Meal Deleted successfully',
-                'status_code': 200
-            })), 200
+                'status_code': 202
+            })), 202
         else:
              return make_response(jsonify({
                 'message': 'Something went wrong!! Meal not deleted.',
@@ -277,11 +277,8 @@ def set_menu_of_the_day(current_user):
 
 
 @app.route('/api/v1/menu/', methods=['GET'])
-@auth_decorator.token_required_to_authenticate
-def get_menu_of_the_day(current_user):
+def get_menu_of_the_day():
     #Verify If User is admin
-    if not current_user:
-        return jsonify({'message': 'You need to login as Admin to perform this operation.'})
 
     appmenu = []
     for menus in models.app_menu:
@@ -351,7 +348,7 @@ def modify_order(orderId):
             return make_response(jsonify({'message': 'Can not modify an order with empty content.'})), 400
 
         Order.update_order_by_id(orderId, order_update)
-        return make_response(jsonify({'message': 'Order Updated successfully'})), 200
+        return make_response(jsonify({'message': 'Order Updated successfully'})), 202
     else:
         return make_response(jsonify({'message': 'Orders are Empty', 'status_code': 200})), 200
 
