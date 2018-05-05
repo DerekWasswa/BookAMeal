@@ -188,8 +188,12 @@ def update_a_meal(current_user, mealId):
     price_update = meal_data['price_update']
 
     if len(str(meal_update)) <= 0 or len(str(price_update)) <= 0:
-        return make_response(jsonify({'message': 'Can not update meal with empty meal options.'})), 400    
+        return make_response(jsonify({'message': 'Can not update meal with empty meal options'})), 400    
                     
+
+    if not isinstance(price_update, int):
+        return make_response(jsonify({'message': 'Can not update meal with non integer price'})), 400    
+        
     for i in range(len(models.app_meals)):
         if str(models.app_meals[i]['meal_id']) == str(mealId):
             models.app_meals[i]['meal'] = meal_update

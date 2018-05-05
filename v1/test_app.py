@@ -286,7 +286,7 @@ class AppTest(unittest.TestCase):
 			headers = self.headers
 		)
 		self.assertEqual(response_edit_meal.status_code, 400)
-		self.assertIn('Can not update meal with empty meal options.', str(response_edit_meal.data))
+		self.assertIn('Can not update meal with empty meal options', str(response_edit_meal.data))
 
 	def test_adding_a_meal_with_empty_request_parameters(self):
 		#Meal Addition with Empty Request parameters should not go ahead to execute
@@ -323,7 +323,29 @@ class AppTest(unittest.TestCase):
 		self.assertEqual(response_edit_meal.status_code, 400)
 		self.assertEqual(result['message'], 'Meal Update expects MEAL_UPDATE and PRICE_UPDATE, either of them is not provided.')
 
+	def test_meal_update_with_non_integer_price(self):
+		#Test that the API allows modification of a meal option by its ID should modify the meal by both the meal name and price
+		app_meal = json.dumps({
+			'meal': 'Luwombo with Matooke',
+			'price': 25000
+		})
+		update_meal = json.dumps({
+			'meal_update': 'Luwombo with Chips',
+			'price_update': "20000"
+		})
+		response = self.client.post('/api/v1/meals/', data = app_meal, headers = self.headers)
+		self.assertEqual(response.status_code, 201)
 
+		posted_data = json.loads(response.get_data(as_text=True))
+		
+		response_edit_meal = self.client.put('/api/v1/meals/{}' . format(posted_data['meal']['meal_id']),
+			data = update_meal,
+			headers = self.headers
+		)
+		self.assertEqual(response_edit_meal.status_code, 400)
+		result = json.loads(response_edit_meal.get_data(as_text=True))
+		self.assertEqual(result['message'], 'Can not update meal with non integer price')
+	
 
 
 	""" MENU OPERATION TESTS """
