@@ -193,7 +193,7 @@ class AppTest(unittest.TestCase):
 			data = update_meal,
 			headers = self.headers
 		)
-		self.assertEqual(response_edit_meal.status_code, 200)
+		self.assertEqual(response_edit_meal.status_code, 202)
 
 		results_get_meals = self.client.get('/api/v1/meals/', headers = self.headers)
 		self.assertIn('Luwombo with All', str(results_get_meals.data))		
@@ -211,7 +211,7 @@ class AppTest(unittest.TestCase):
 		posted_data = json.loads(response.get_data(as_text=True))	
 
 		response_delete_meal = self.client.delete('/api/v1/meals/{}' . format(posted_data['meal']['meal_id']), headers = self.headers)
-		self.assertEqual(response_delete_meal.status_code, 200)
+		self.assertEqual(response_delete_meal.status_code, 202)
 
 		#Now retrieve to see to it exists: Should Return Not Found - 404
 		response_get = self.client.get('/api/v1/meals/{}' . format(posted_data['meal']['meal_id']), headers = self.headers)
@@ -444,7 +444,7 @@ class AppTest(unittest.TestCase):
 			'/api/v1/orders/{}' . format(posted_data['order']['order_id']),
 			data = order_update
 		)
-		self.assertEqual(response_edit_order.status_code, 200)
+		self.assertEqual(response_edit_order.status_code, 202)
 
 		results_get_order_by_id = self.client.get('/api/v1/orders/', headers = self.headers)
 		self.assertIn(str(posted_data['order']['order_id']), str(results_get_order_by_id.data))
