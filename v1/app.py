@@ -29,6 +29,9 @@ def show_app_home():
 def sign_up():
     #Sign up a user either as a customer or vendor admin
     user_data = request.get_json(force=True)
+    if 'username' not in user_data or 'email' not in user_data or 'password' not in user_data or 'admin' not in user_data:
+        return make_response(jsonify({'message': 'Signup expects username, email, password, admin value, either of them is not provided.'})), 400
+
     username = user_data['username']
     user_email = user_data['email']
     user_password = user_data['password']
@@ -63,6 +66,9 @@ def sign_up():
 def login():
     #authenticate customers or admin
     user_data = request.get_json(force=True)
+    if 'email' not in user_data or 'password' not in user_data or 'admin' not in user_data:
+        return make_response(jsonify({'message': 'Logged requests expects email, password, and admin value. Either of them id not provided.'})), 400
+
     user_email = user_data['email']
     user_password = user_data['password']
     user_admin = user_data['admin']
@@ -136,7 +142,10 @@ def add_meal(current_user):
         return jsonify({'message': 'You need to login as Admin to perform this operation.'})
 
     #Allow the vendor admin to add another meal option
-    meal_data = request.get_json(force=True)
+    meal_data = request.get_json(force=True)    
+    if 'meal' not in meal_data or 'price' not in meal_data:
+        return make_response(jsonify({'message': 'Meal addition request expects a MEAL and its PRICE, either of them is not provided'})), 400
+
     meal = meal_data['meal']
     price = meal_data['price']
 
@@ -171,8 +180,12 @@ def update_a_meal(current_user, mealId):
         return jsonify({'message': 'You need to login as Admin to perform this operation.'})
 
     #Allow the ADMIN to edit a particular meal option
-    meal_update = request.get_json(force=True)['meal_update']
-    price_update = request.get_json(force=True)['price_update']
+    meal_data = request.get_json(force=True)
+    if 'meal_update' not in meal_data or 'price_update' not in meal_data:
+        return make_response(jsonify({'message': 'Meal Update expects MEAL_UPDATE and PRICE_UPDATE, either of them is not provided.'})), 400
+
+    meal_update = meal_data['meal_update']
+    price_update = meal_data['price_update']
 
     if len(str(meal_update)) <= 0 or len(str(price_update)) <= 0:
         return make_response(jsonify({'message': 'Can not update meal with empty meal options.'})), 400    
@@ -203,13 +216,19 @@ def delete_a_meal(current_user, mealId):
 
     #Allow the admin to delete a particular meal option
     if len(models.app_meals) > 0:
-        
-        Meal.delete_meal_by_id(mealId)
+        delete_status = Meal.delete_meal_by_id(mealId)  
 
-        return make_response(jsonify({
-            'message': 'Meal Deleted successfully',
-            'status_code': 200
-        })), 200
+        if delete_status:
+            return make_response(jsonify({
+                'message': 'Meal Deleted successfully',
+                'status_code': 200
+            })), 200
+        else:
+             return make_response(jsonify({
+                'message': 'Something went wrong!! Meal not deleted.',
+                'status_code': 404
+            })), 404          
+
     else:
         return make_response(jsonify({'message': 'Meals are Empty'})), 200
 
@@ -226,7 +245,10 @@ def set_menu_of_the_day(current_user):
         return jsonify({'message': 'You need to login as Admin to perform this operation.'})
 
     #Allow the admin an operation to the set the menu of the day
-    menu_data = request.get_json(force=True)
+    menu_data = request.get_json(force=True)    
+    if 'date' not in menu_data or 'description' not in menu_data or 'menu_name' not in menu_data or 'meal_id' not in menu_data:
+        return make_response(jsonify({'message': 'Setting a Menu expects Menu name, date, description, and meal Id to add to the menu, either of them is not provided.'})), 400
+
     date = menu_data['date']
     description = menu_data['description']
     meal_id = menu_data['meal_id']
@@ -286,11 +308,17 @@ def get_menu_of_the_day(current_user):
 def make_order():
     #Allow the authenticated users to make orders from the menu of the day
     order_data = request.get_json(force=True)
+    if 'meal' not in order_data or 'user' not in order_data:
+        return make_response(jsonify({'message': 'Making Order expects user email, meal id and either of them is not provided.'})), 400
+
     meal_id = order_data['meal']
     user_id = order_data['user']
 
     if len(str(meal_id)) <= 0 or len(str(user_id)) <= 0:
         return make_response(jsonify({'message': 'Can not order with empty content.'})), 400
+    
+    if not validate_email(user_id):
+        return make_response(jsonify({'message': 'User Email not valid.'})), 400
     
     order = Order(user_id, meal_id)
     order.make_order()
@@ -304,7 +332,6 @@ def make_order():
     return make_response(jsonify({
         'message': 'Order Made successfully',
         'status_code': 201,
-        'orderId': order_id,
         'order': order_as_dict
         })), 201
 
@@ -313,7 +340,12 @@ def make_order():
 def modify_order(orderId):
     #Allow the user to modify an order they've already made
     if len(models.app_orders) > 0:
-        order_update = request.get_json(force=True)['order_to_update']
+
+        order_data = request.get_json(force=True)
+        if 'order_to_update' not in order_data:
+            return make_response(jsonify({'message': 'Modifying order expects the order id to edit with which is not provided.'})), 400
+
+        order_update = order_data['order_to_update']
 
         if len(str(order_update)) <= 0:
             return make_response(jsonify({'message': 'Can not modify an order with empty content.'})), 400
