@@ -277,11 +277,8 @@ def set_menu_of_the_day(current_user):
 
 
 @app.route('/api/v1/menu/', methods=['GET'])
-@auth_decorator.token_required_to_authenticate
-def get_menu_of_the_day(current_user):
+def get_menu_of_the_day():
     #Verify If User is admin
-    if not current_user:
-        return jsonify({'message': 'You need to login as Admin to perform this operation.'})
 
     appmenu = []
     for menus in models.app_menu:
