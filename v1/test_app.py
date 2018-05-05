@@ -21,7 +21,7 @@ class AppTest(unittest.TestCase):
 		#User registration should complete successfully
 		user_data = json.dumps({
 			'username': 'example',
-			'email': 'tests@example.com',
+			'email': 'tests23@example.com',
 			'password': '12345',
 			'admin': True
 		})
@@ -75,7 +75,7 @@ class AppTest(unittest.TestCase):
 		#User Registration with Empty Request parameters should not go ahead to execute
 		user_data = json.dumps({
 			'user': 'example',
-			'ema': 'test@example.com',
+			'ema': 'tester@example.com',
 			'passwo': '12345',
 			'admi': True
 		})
@@ -107,7 +107,7 @@ class AppTest(unittest.TestCase):
 		#Test a registered user can be able to login
 		user_data = json.dumps({
 			'username': 'derreckwasswa',
-			'email': 'derrekwasswa@gmail.com',
+			'email': 'derrekwasswa256@gmail.com',
 			'password': '12345',
 			'admin': True
 		})
@@ -123,7 +123,7 @@ class AppTest(unittest.TestCase):
 		#Test a registered user can be able to login
 		user_data = json.dumps({
 			'username': 'invasionworld',
-			'email': 'invasionworld@gmail.com',
+			'email': 'invasionworlds@gmail.com',
 			'password': '12345',
 			'admin': True
 		})
@@ -150,14 +150,14 @@ class AppTest(unittest.TestCase):
 		#User Login with Empty Request parameters should not go ahead to execute
 		user_data = json.dumps({
 			'username': 'example',
-			'email': 'test@example.com',
+			'email': 'testament@example.com',
 			'password': '12345',
 			'admin': True
 		})
 
 		login_data = json.dumps({
 			'use': 'example',
-			'em': 'test@example.com',
+			'em': 'testament@example.com',
 			'passd': '12345',
 			'ain': True
 		})		
