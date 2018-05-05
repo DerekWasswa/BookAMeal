@@ -21,7 +21,6 @@ class User(object):
         user = {}
         user['username'] = self.username
         user['email'] = self.email
-        user['password'] = self.password
         user['admin'] = self.admin
         return user
 
@@ -43,15 +42,6 @@ class User(object):
                 return user
         return None  
 
-class Caterer(object):
-
-    def __init__(self, vendor_name, email, password):
-        self.vendor_name = vendor_name
-        self.email = email
-        self.password = password
-        self.meals = []
-        self.menu = []
-        self.orders = []
 
 class Meal(object):
 
@@ -83,9 +73,12 @@ class Meal(object):
 
     @staticmethod
     def delete_meal_by_id(mealId):
-        for meal in app_meals:
-            if meal['meal_id'] == mealId:
-                app_meals.remove(meal)
+        for i in range(len(app_meals)):
+            if str(app_meals[i]['meal_id']) == str(mealId):
+                del app_meals[i]
+                return True
+        return False     
+
     
     @staticmethod
     def get_meal_by_id(meal_id):
@@ -143,9 +136,10 @@ class Order(object):
 
     @staticmethod
     def update_order_by_id(order_id, order_to_update):
-        
-        for order in app_orders:
-            if order_id == order['order_id']:
-                order["meal_id"] = order_to_update
-                break
+        for i in range(len(app_orders)):
+            if str(app_orders[i]['order_id']) == str(order_id):
+                app_orders[i]["meal_id"] = order_to_update
+                return True
+        return False 
+
          
