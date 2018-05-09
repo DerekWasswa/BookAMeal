@@ -18,7 +18,7 @@ install:
   - pip install coveralls
 
 script:
-- pytest v1/test_app.py
+- pytest v1/tests
 - coverage run --source='v1/' run_tests.py test 
 - coverage report
     
