@@ -74,7 +74,7 @@ Under the UI directory on the feature branch, there are various various HTML pag
 4. Run the following command to install the application modules and resources.
 > `pip install -r requirements.txt`
 5. Run the application by hitting the command.
-> `python v1/app.py`
+> `python run.py`
 
 
 
