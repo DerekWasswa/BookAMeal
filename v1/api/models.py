@@ -70,6 +70,12 @@ class Meal(object):
                 app_meals.append(new_meal)
                 break
 
+    @staticmethod
+    def check_if_meal_exists(meal):
+        for i in range(len(app_meals)):
+            if str(app_meals[i]['meal']) == str(meal):
+                return True
+        return False  
 
     @staticmethod
     def delete_meal_by_id(mealId):
