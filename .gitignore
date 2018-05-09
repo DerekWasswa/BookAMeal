@@ -15,3 +15,9 @@
 /v1/config.pyc
 /v1/__pycache__/
 /v1/__init__.pyc
+/__pycache__/*
+
+/v1/tests/__pycache__/*
+/v1/api/endpoints/__pycache__/*
+/v1/api/endpoints/__pycache__/views.cpython-35.pyc
+/v1/tests/__pycache__/test_meals.cpython-35-PYTEST.pyc

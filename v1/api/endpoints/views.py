@@ -96,7 +96,7 @@ class Login(MethodView):
 
 
 
-class GetAllMeals(MethodView):
+class MealsViews(MethodView):
 
     @auth_decorator.token_required_to_authenticate
     def get(current_user, self):
@@ -110,23 +110,6 @@ class GetAllMeals(MethodView):
             'status_code': 200,
             'data': models.app_meals
         })), 200        
-
-class GetMealById(MethodView):
-
-    def get(self, mealId):
-        # Return a meal for a particular ID
-        if len(models.app_meals) > 0:
-
-            for meal in models.app_meals:
-                if mealId == meal['meal_id']:
-                    return make_response(jsonify({ 'message': 'Meal Exists' })), 200
-
-            return make_response(jsonify({ 'message': 'Meal not Found' })), 404
-
-        else:
-            return make_response(jsonify({'message': 'Meal are empty.'})), 404            
-
-class AddMeal(MethodView):
 
     @auth_decorator.token_required_to_authenticate
     def post(current_user, self):
@@ -164,8 +147,6 @@ class AddMeal(MethodView):
             'meal': meal_as_dict
         })), 201
 
-class UpdateAMeal(MethodView):
-
     @auth_decorator.token_required_to_authenticate
     def put(current_user, self, mealId):         
         #Verify If User is admin
@@ -201,9 +182,7 @@ class UpdateAMeal(MethodView):
             'message': 'Meal Updated successfully',
             'status_code': 202,
             'data': meal_as_dict
-        })), 202        
-
-class DeleteAMeal(MethodView):
+        })), 202          
 
     @auth_decorator.token_required_to_authenticate
     def delete(current_user, self, mealId):  
@@ -228,6 +207,23 @@ class DeleteAMeal(MethodView):
 
         else:
             return make_response(jsonify({'message': 'Meals are Empty'})), 200
+
+class GetMealById(MethodView):
+
+    def get(self, mealId):
+        # Return a meal for a particular ID
+        if len(models.app_meals) > 0:
+
+            for meal in models.app_meals:
+                if mealId == meal['meal_id']:
+                    return make_response(jsonify({ 'message': 'Meal Exists' })), 200
+
+            return make_response(jsonify({ 'message': 'Meal not Found' })), 404
+
+        else:
+            return make_response(jsonify({'message': 'Meal are empty.'})), 404            
+
+
 
 
 
@@ -379,11 +375,8 @@ class ModifyOrder(MethodView):
 signup = SignUp.as_view('signup_view')
 login = Login.as_view('login_view')
 
-get_all_meals = GetAllMeals.as_view('get_all_meal')
+meals_views = MealsViews.as_view('meals_views')
 get_meal_by_id = GetMealById.as_view('get_meal_by_id')
-add_meal = AddMeal.as_view('add_meal')
-update_meal = UpdateAMeal.as_view('update_meal')
-delete_meal = DeleteAMeal.as_view('delete_meal')
 
 get_menu_of_the_day = GetMenuOfTheDay.as_view('get_menu_of_the_day')
 set_menu_the_day = SetMenuOfTheDay.as_view('set_menu_of_the_day')
@@ -397,11 +390,10 @@ modify_order = ModifyOrder.as_view('modify_order')
 endpoints_blueprint.add_url_rule('/auth/signup', view_func=signup, methods=['POST'])
 endpoints_blueprint.add_url_rule('/auth/login', view_func=login, methods=['POST'])
 
-endpoints_blueprint.add_url_rule('/meals/', view_func=add_meal, methods=['POST'])
-endpoints_blueprint.add_url_rule('/meals/', view_func=get_all_meals, methods=['GET'])
-endpoints_blueprint.add_url_rule('/meals/<mealId>', defaults={'mealId': None}, view_func=get_meal_by_id,methods=['GET'])
-endpoints_blueprint.add_url_rule('/meals/<mealId>',defaults={'mealId': None}, view_func=update_meal,methods=['PUT'])
-endpoints_blueprint.add_url_rule('/meals/<mealId>', defaults={'mealId': None}, view_func=delete_meal,methods=['DELETE'])
+endpoints_blueprint.add_url_rule('/meals/', view_func=meals_views, methods=['POST'])
+endpoints_blueprint.add_url_rule('/meals/', view_func=meals_views, methods=['GET'])
+endpoints_blueprint.add_url_rule('/meals/<mealId>', view_func=get_meal_by_id,methods=['GET'])
+endpoints_blueprint.add_url_rule('/meals/<mealId>', view_func=meals_views,methods=['PUT', 'DELETE'])
 
 
 endpoints_blueprint.add_url_rule('/menu/', view_func=get_menu_of_the_day, methods=['GET'])
@@ -409,4 +401,4 @@ endpoints_blueprint.add_url_rule('/menu/', view_func=set_menu_the_day, methods=[
 
 endpoints_blueprint.add_url_rule('/orders/', view_func=make_order, methods=['POST'])
 endpoints_blueprint.add_url_rule('/orders/', view_func=get_all_orders, methods=['GET'])
-endpoints_blueprint.add_url_rule('/orders/<orderId>', defaults={'orderId': None}, view_func=modify_order,methods=['PUT'])
+endpoints_blueprint.add_url_rule('/orders/<orderId>', view_func=modify_order,methods=['PUT'])
