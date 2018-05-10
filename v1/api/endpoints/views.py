@@ -11,6 +11,7 @@ from v1.api import auth_decorator
 from flask.views import MethodView
 from .import endpoints_blueprint
 from v1.api import create_app
+from v1.api import db
 
 
 class SignUp(MethodView):
@@ -40,7 +41,10 @@ class SignUp(MethodView):
             if check_user_exists:
                 return make_response(jsonify({'message': 'User already exists. Please login.'})), 200
             else:
-                user.save()
+
+                #ADD THE USER TO THE DB SESSION
+                db.session.add(user)
+                db.session.commit()
 
                 return make_response(jsonify({
                     'message': 'Successfully Registered. Please login',
@@ -70,12 +74,11 @@ class Login(MethodView):
         if not is_valid:
             return make_response(jsonify({'message': 'Email is Invalid'})), 401
 
-        user = User('', user_email, user_password, user_admin)
-        if not User.check_exists(user_email):
+        user = User.query.filter_by(email=user_email).first()
+        if user is None:
             return make_response(jsonify({'message': 'User email not found!!'})), 401 
 
-        app_user = user.get_user_by_email(user_email)
-        if check_password_hash(app_user.password, user_password):
+        if user.check_password_hash(user_password):
             #Create the app instance to use to generate the token
             app = create_app()
             # CREATE TOKEN: leverage isdangerous to create the token

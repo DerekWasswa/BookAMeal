@@ -4,6 +4,7 @@ from flask_api import FlaskAPI, status
 import json
 from flask_sqlalchemy import SQLAlchemy
 
+db = SQLAlchemy(app)
 
 def create_app():
     # Initialize the Flask application
@@ -12,7 +13,7 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/book_a_meal_db'
     asyncMode = None
 
-    db = SQLAlchemy(app)
+    db.init_app(app)
 
     from v1.api.endpoints import endpoints_blueprint
     app.register_blueprint(endpoints_blueprint, url_prefix='/api/v1')
