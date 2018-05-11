@@ -30,15 +30,15 @@ class SignUp(MethodView):
         if len(str(user_email)) > 0 or len(str(user_password)) > 0 or len(str(username)) > 0 or len(str(user_admin)) > 0:
 
             user = User(username, user_email, generate_password_hash(user_password), user_admin)
-            check_user_exists = user.check_exists(user_email)
 
             #CHECK IF EMAIL IS VALID
             is_valid = validate_email(user_email)
             if not is_valid:
                 return make_response(jsonify({'message': 'Email is Invalid'})), 401
 
-            
-            if check_user_exists:
+            # CHECK IF USER ALREADY EXISTS
+            user = User.query.filter_by(email=user_email).first()
+            if user is not None:    
                 return make_response(jsonify({'message': 'User already exists. Please login.'})), 200
             else:
 
@@ -78,7 +78,7 @@ class Login(MethodView):
         if user is None:
             return make_response(jsonify({'message': 'User email not found!!'})), 401 
 
-        if user.check_password_hash(user_password):
+        if user.verify_user_password(user_password):
             #Create the app instance to use to generate the token
             app = create_app()
             # CREATE TOKEN: leverage isdangerous to create the token

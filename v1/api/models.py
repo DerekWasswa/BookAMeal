@@ -10,7 +10,7 @@ class User(db.Model):
     """ User Object to define users """
 
     __tablename__ = 'users'
-    user_id = db.Column('user_id', db.Integer, primary_key = True)
+    user_id = db.Column(db.Integer, primary_key = True)
     username = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False, unique=True)  
     password = db.Column(db.String(200), nullable=False)
@@ -52,7 +52,7 @@ class User(db.Model):
         return None  
 
     def __repr__(self):
-        return "<User(username ='%s', password='%s', email='%s', admin='%s')>" % (self.username, self.password, self.email, self.admin)
+        return "<User(user_id = '%s', username ='%s', password='%s', email='%s', admin='%s')>" % (self.user_id, self.username, self.password, self.email, self.admin)
 
 
 
@@ -125,8 +125,7 @@ class Menu(db.Model):
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
     date = db.Column(db.Date, nullable=False)  
-    meals = db.relationship('Meal', secondary=menu_meals, lazy='subquery',
-                            backref=db.backref('menu', lazy=True))
+    
 
     def __init__(self, name, date, description):
         self.name = name
