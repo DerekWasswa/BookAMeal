@@ -160,22 +160,23 @@ class Menu(db.Model):
 
 
 
-associate_meals_to_an_order = db.Table('order_meals',
-    db.Column('order_id', db.Integer, db.ForeignKey('orders.order_id'), primary_key=True),
-    db.Column('meal_id', db.Integer, db.ForeignKey('meals.meal_id'), primary_key=True))
+
 
 class Order(db.Model):
     """ Order Object to define the Order in the db """
     __tablename__ = 'orders'
     order_id = db.Column(db.Integer, primary_key = True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    menu_id = db.Column(db.Integer, db.ForeignKey('menus.menu_id'))
     meal_id = db.Column(db.Integer, db.ForeignKey('meals.meal_id'))
-
-    def __init__(self, user_id, meal_id):
-        self.order_id = len(app_orders) + 1
-        self.user_id = user_id
+    user = db.Column(db.String(100), db.ForeignKey('users.email'))
+    date = db.Column(db.Date, nullable=False) 
+   
+    def __init__(self, user, meal_id, menu_id, date):
+        self.user = user
         self.meal_id = meal_id
+        self.menu_id = menu_id
         self.expiry_time = None
+        self.date = date
 
     def make_order(self):
         order = {}
