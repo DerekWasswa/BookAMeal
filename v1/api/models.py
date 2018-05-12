@@ -115,6 +115,9 @@ class Meal(db.Model):
 
 
 
+associate_meals_to_menu = db.Table('menu_meals',
+    db.Column('menu_id', db.Integer, db.ForeignKey('menus.menu_id'), primary_key=True),
+    db.Column('meal_id', db.Integer, db.ForeignKey('meals.meal_id'), primary_key=True))
 
 class Menu(db.Model):
     """ Menu object that defines the menu in the db """
@@ -123,15 +126,20 @@ class Menu(db.Model):
     vendor_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
-    date = db.Column(db.Date, nullable=False)  
+    meals = db.relationship('Meal', 
+    secondary= associate_meals_to_menu, 
+    lazy='subquery',
+    backref=db.backref('menu', lazy=True)
+    )
+    date = db.Column(db.Date, nullable=False, unique=True)  
     
 
-    def __init__(self, name, date, description):
+    def __init__(self, name, date, description, vendor_id):
         self.name = name
         self.date = date
         self.meals = []
         self.description = description
-        self.caterer = None
+        self.vendor_id = vendor_id
         
     @staticmethod    
     def add_meal_to_menu(meal_object, date, menu_object):
@@ -150,6 +158,11 @@ class Menu(db.Model):
     def set_menu_of_the_day(self):
         app_menu.append(self)
 
+
+
+associate_meals_to_an_order = db.Table('order_meals',
+    db.Column('order_id', db.Integer, db.ForeignKey('orders.order_id'), primary_key=True),
+    db.Column('meal_id', db.Integer, db.ForeignKey('meals.meal_id'), primary_key=True))
 
 class Order(db.Model):
     """ Order Object to define the Order in the db """
