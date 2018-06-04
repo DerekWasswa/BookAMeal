@@ -17,7 +17,7 @@ class MenuTests(BaseCaseTest):
 
 		app_menu = json.dumps({
 			'menu_name': 'Jojo Restaurant Special Friday',
-			'date': 'Monday',
+			'date': '2018-05-12',
 			'description': 'For our special friday, enjoy the menu with a free dessert',
 			'meal_id': 1
 		})
@@ -30,7 +30,7 @@ class MenuTests(BaseCaseTest):
 		#Testing for retrieving the menu of the day
 		app_menu = json.dumps({
 			'menu_name': 'Jojo Restaurant Special Friday',
-			'date': 'Monday',
+			'date': '2018-05-12',
 			'description': 'For our special friday, enjoy the menu with a free dessert',
 			'meal_id': 1
 		})

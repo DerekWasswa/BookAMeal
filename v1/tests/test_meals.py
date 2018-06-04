@@ -66,7 +66,6 @@ class MealTests(BaseCaseTest):
 			'meal': 'Fish with All foods',
 			'price': 25000
 		})
-
 		response = self.client.post('/api/v1/meals/', data = app_meal, headers = self.headers)
 		self.assertEqual(response.status_code, 201)
 		self.assertIn("Fish with All foods", str(response.data))

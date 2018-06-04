@@ -1,31 +1,32 @@
 import json
 from v1.tests.base_case_test import BaseCaseTest
 
-class MealTests(BaseCaseTest):
+class OrderTests(BaseCaseTest):
 
 	""" ORDER OPERATION TESTS """
 	def test_make_order(self):
 		#Testing making an order from the menu
 		app_order = json.dumps({
 			'user': 'wasswadero@gmail',
-			'meal': 'Fish with All foods',
-			'price': 24000
+			'meal': 1,
+			'date': '20180515',
+			'menu_id': 1
 		})
 
 		response = self.client.post('/api/v1/orders/', data = app_order)
 		self.assertEqual(response.status_code, 201)
-		self.assertIn("Fish with All foods", str(response.data))
 
 	def test_modifying_an_order(self):
 		#Test that the API allows modification of an order
 		app_order = json.dumps({
 			'user': 'wasswadero@gmail',
-			'meal': 'Luwombo with Matooke',
-			'price': 25000
+			'meal': 1,
+			'date': '20180515',
+			'menu_id': 1
 		})
 
 		order_update = json.dumps({
-			'order_to_update': 'Luwombo with All foods'
+			'order_to_update': 2
 		})
 		response = self.client.post('/api/v1/orders/', data = app_order)
 		self.assertEqual(response.status_code, 201)
@@ -45,8 +46,9 @@ class MealTests(BaseCaseTest):
 		#Testing for retrieving all the ORDERS
 		app_orders = json.dumps({
 			'user': 'test@example.com',
-			'meal': "Kalo",
-			"price": 4500
+			'meal': 1,
+			'date': '20180515',
+			'menu_id': 1
 		})
 		response_add = self.client.post('/api/v1/orders/', data = app_orders)
 		self.assertEqual(response_add.status_code, 201)
@@ -58,8 +60,9 @@ class MealTests(BaseCaseTest):
 		#Testing making an order from the menu with empty content
 		app_menu = json.dumps({
 			'meal': '',
-			'price': '',
-			'user': ''
+			'date': '',
+			'user': '',
+			'menu_id': ''
 		})
 
 		response = self.client.post('/api/v1/orders/', data = app_menu)
@@ -71,8 +74,9 @@ class MealTests(BaseCaseTest):
 		#Test modifying an order with empty order content
 		app_order = json.dumps({
 			'user': 'wasswadero@gmail',
-			'meal': 'Luwombo with Matooke',
-			'price': 25000
+			'meal': 1,
+			'date': '20180515',
+			'menu_id': 1
 		})
 
 		order_update = json.dumps({
@@ -97,7 +101,8 @@ class MealTests(BaseCaseTest):
 		app_menu = json.dumps({
 			'meal': "Luwombo",
 			'user': 'wasswadero',
-			"price": 5600
+			'date': '20180515',
+			'menu_id': 1
 		})
 
 		response = self.client.post('/api/v1/orders/', data = app_menu)
@@ -109,8 +114,9 @@ class MealTests(BaseCaseTest):
 		#Making an order with Empty Request parameters should not go ahead to execute
 		app_order = json.dumps({
 			'us': 'wasswadero@gmail',
-			'me': 'Fish with All foods',
-			'pri': 24000
+			'me': 1,
+			'da': '20180515',
+			'menu_': 1
 		})
 		response = self.client.post('/api/v1/orders/', data = app_order)
 		result = json.loads(response.data.decode())
@@ -121,8 +127,9 @@ class MealTests(BaseCaseTest):
 		#Order modification with Empty Request parameters should not go ahead to execute
 		app_order = json.dumps({
 			'user': 'wasswadero@gmail',
-			'meal': 'Luwombo with Matooke',
-			'price': 25000
+			'meal': 1,
+			'date': '20150515',
+			'menu_id': 1
 		})
 
 		order_update = json.dumps({

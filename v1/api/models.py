@@ -6,6 +6,7 @@ app_meals = []
 app_menu = []
 app_orders = []
 
+
 class User(db.Model):
     """ User Object to define users """
 
@@ -131,7 +132,7 @@ class Menu(db.Model):
     lazy='subquery',
     backref=db.backref('menu', lazy=True)
     )
-    date = db.Column(db.Date, nullable=False, unique=True)  
+    date = db.Column(db.Date, nullable=False)  
     
 
     def __init__(self, name, date, description, vendor_id):
