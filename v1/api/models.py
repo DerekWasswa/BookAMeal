@@ -14,7 +14,7 @@ class User(db.Model):
     user_id = db.Column(db.Integer, primary_key = True)
     username = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False, unique=True)  
-    password = db.Column(db.String(200), nullable=False)
+    password = db.Column(db.String(1000), nullable=False)
     admin = db.Column(db.Boolean, nullable=False)
 
     def __init__(self, username, email, password, admin):
@@ -25,7 +25,8 @@ class User(db.Model):
 
     #Save a user object to the users as a dict 
     def save(self):
-        app_users.append(self)
+        db.session.add(self)
+        db.session.commit()
 
     def get_user_object_as_dict(self):
         user = {}
@@ -72,12 +73,20 @@ class Meal(db.Model):
         self.price = price
         self.vendor_id = vendor_id
 
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
     def add_meal(self):
         meal = {}
         meal['meal_id'] = self.meal_id
         meal['meal'] = self.meal
         meal['price'] = self.price
         app_meals.append(meal)
+
+    @staticmethod
+    def delete_meal():
+        db.session.commit() 
 
     @staticmethod
     def update_meal_by_id(mealId, meal_update):
@@ -113,6 +122,13 @@ class Meal(db.Model):
             if meal_id == meal['meal_id']:
                 return meal
         return None      
+
+    def get_meal_as_dict(self):
+        meal_as_dict = {}
+        meal_as_dict['meal_id'] = self.meal_id
+        meal_as_dict['meal'] = self.meal
+        meal_as_dict['price'] = self.price
+        return meal_as_dict
 
 
 
@@ -156,9 +172,13 @@ class Menu(db.Model):
                 menu_object.meals.append(meal)
                 break
         
+    @staticmethod
+    def add_meals_to_menu():
+        db.session.commit()
 
-    def set_menu_of_the_day(self):
-        app_menu.append(self)
+    def create_menu(self):
+        db.session.add(self)
+        db.session.commit()
 
 
 
@@ -179,6 +199,27 @@ class Order(db.Model):
         self.menu_id = menu_id
         self.expiry_time = None
         self.date = date
+
+    def save_order(self):
+        db.session.add(self)
+        db.session.commit()
+
+    @staticmethod
+    def update_order():
+        db.session.commit()     
+
+    @staticmethod
+    def get_all_orders(orders_from_db):
+        orders_list = []
+        for order in orders_from_db:
+            order_dict = {}
+            order_dict['order_id'] = order.order_id
+            order_dict['user'] = order.user
+            order_dict['meal_id'] = order.meal_id
+            order_dict['menu_id'] = order.menu_id
+            order_dict['date'] = order.date
+            orders_list.append(order_dict)   
+        return orders_list         
 
     def make_order(self):
         order = {}

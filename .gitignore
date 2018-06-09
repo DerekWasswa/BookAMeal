@@ -20,6 +20,8 @@
 /v1/tests/__pycache__/*
 /v1/api/__pycache__/
 /v1/api/__init__.pyc
+v1/api/endpoints/views.pyc
+v1/api/models.pyc
 /v1/api/endpoints/__pycache__/*
 /v1/api/endpoints/__pycache__/views.cpython-35.pyc
 /v1/tests/__pycache__/test_meals.cpython-35-PYTEST.pyc
