@@ -116,6 +116,7 @@ class Meal(db.Model):
 
 
 
+
 associate_meals_to_menu = db.Table('menu_meals',
     db.Column('menu_id', db.Integer, db.ForeignKey('menus.menu_id'), primary_key=True),
     db.Column('meal_id', db.Integer, db.ForeignKey('meals.meal_id'), primary_key=True))
