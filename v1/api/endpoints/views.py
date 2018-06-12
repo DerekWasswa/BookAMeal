@@ -12,6 +12,7 @@ from flask.views import MethodView
 from .import endpoints_blueprint
 from v1.api import create_app
 from v1.api import db
+import datetime
 
 
 class SignUp(MethodView):
@@ -244,7 +245,7 @@ class GetMealById(MethodView):
         meals = db.session.query(Meal).count()
         if meals > 0:      
 
-            mealdb = Meal.query.filter_by(meal=meal).first()
+            mealdb = Meal.query.filter_by(meal_id=mealId).first()
             if mealdb is not None:    
                 return make_response(jsonify({ 'message': 'Meal Exists' })), 200
 
@@ -261,25 +262,40 @@ class GetMealById(MethodView):
 
 
 class GetMenuOfTheDay(MethodView):
-
+    """ Have customers retrieve the menu of the day """
     def get(self):   
-        #Verify If User is admin
-
-        appmenu = []
-        for menus in models.app_menu:
-            menu = {}
-            menu['name'] = menus.name
-            menu['date'] = menus.date
-            menu['description'] = menus.description
-            menu['meals'] = menus.meals
-            appmenu.append(menu)
 
         #Allow the authenticated users to view menu of the day
-        return make_response(jsonify({
-            'message': 'success',
-            'status_code': 200,
-            'data': appmenu
-        })), 200        
+        today = datetime.date.today()
+        menudb = Menu.query.filter_by(date=today).first()
+
+        if menudb is not None:  
+            menu_dict = {}
+            meals_list = []
+
+            menu_dict['menu_id'] = menudb.menu_id 
+            menu_dict['name'] = menudb.name
+            menu_dict['description'] = menudb.description
+            menu_dict['vendor_id'] = menudb.vendor_id
+
+            for meal in menudb.meals:
+                meals_dict = {}
+                meals_dict['meal_id'] = meal.meal_id
+                meals_dict['meal'] = meal.meal
+                meals_dict['price'] = meal.price
+                meals_list.append(meals_dict)
+            
+            menu_dict['meals'] = meals_list
+            
+            return make_response(jsonify({
+                'message': 'success',
+                'status_code': 200,
+                'data': menu_dict
+            })), 200  
+
+        else:
+            return make_response(jsonify({'message': 'No menu set for the day ' + today, 'status_code': 200})), 200
+      
 
 class SetMenuOfTheDay(MethodView):
 
@@ -302,23 +318,23 @@ class SetMenuOfTheDay(MethodView):
         if len(str(menu_name)) <= 0 or len(str(description)) <= 0 or len(str(date)) <= 0 or len(str(meal_id)) <= 0:
             return make_response(jsonify({'message': 'Empty Menu Details.'})), 400
     
+        #CHECK IF THE MEAL ID EXISTS
+        mealdb = Meal.query.filter_by(meal_id=meal_id).first()
+        if mealdb is None:    
+            return make_response(jsonify({ 'message': 'Meal with id ' + meal_id + ' does not exist.' })), 400
 
-        meal = Meal.get_meal_by_id(meal_id)
+        #CHECK IF THE MENU OF THE DAY ALREADY EXISTS
+        menudb = Menu.query.filter_by(vendor_id=session['user_id'], date=date).first()
+        if menudb is not None:
+            menudb.meals.append(mealdb)
+            db.session.commit()
+        else:
+            create_new_menu = Menu(menu_name, date, description, session['user_id'])
+            create_new_menu.meals.append(mealdb)
+            db.session.add(create_new_menu)
+            db.session.commit()
 
-        menu_exists = False
-        for menu_object in models.app_menu:
-            if date == menu_object.date:
-                menu_object.meals.append(meal)
-                menu_exists = True
-            else:
-                continue
-                
-        if not menu_exists:
-            menu = Menu(menu_name, date, description)
-            menu.meals.append(meal)
-            menu.set_menu_of_the_day()
-
-        return make_response(jsonify({'status_code': 201, 'data': 'success'})), 201        
+        return make_response(jsonify({'status_code': 201, 'message': 'success'})), 201        
 
 
 
