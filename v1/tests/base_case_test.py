@@ -57,6 +57,13 @@ class BaseCaseTest(unittest.TestCase):
 			'price': 25000
 		}
 		self.client.post('/api/v1/meals/', data = meals_mock_data, headers = self.headers)
+		meal_object = Meal('Fish with Macs', 23000, 1)
+		meal_object1 = Meal('Fish with Flies', 25000, 1)
+		db.session.add(meal_object)
+		db.session.commit()
+		db.session.add(meal_object1)
+		db.session.commit()			
+
 		app_menu = json.dumps({
 			'menu_name': 'Jojo Restaurant Special Friday',
 			'date': '2018-05-12',
@@ -64,6 +71,15 @@ class BaseCaseTest(unittest.TestCase):
 			'meal_id': 2
 		})
 		self.client.post('/api/v1/menu/', data = app_menu, headers = self.headers)
+
+		app_menu_two = json.dumps({
+			'menu_name': 'Jojo Restaurant Special Friday',
+			'date': '2018-05-12',
+			'description': 'For our special friday, enjoy the menu with a free dessert',
+			'meal_id': 3
+		})
+		self.client.post('/api/v1/menu/', data = app_menu_two, headers = self.headers)
+
 
 	def add_mock_menu(self):
 		self.mock_signup()
@@ -82,14 +98,7 @@ class BaseCaseTest(unittest.TestCase):
 			'description': 'For our special friday, enjoy the menu with a free dessert',
 			'meal_id': 1
 		})
-		self.client.post('/api/v1/menu/', data = app_menu, headers = self.headers)
-
-	def add_mock_meals(self):
-		meal_object = Meal('Fish with Macs', 23000, 1)
-		meal_object1 = Meal('Fish with Flies', 25000, 1)
-		meal_object2 = Meal('Fish with Spags', 27000, 1)
-		db.session.add(meal_object)
-		db.session.commit()
+		self.client.post('/api/v1/menu/', data = app_menu, headers = self.headers)		
 
 	def tearDown(self):
 		db.session.remove()

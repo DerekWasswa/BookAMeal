@@ -353,7 +353,6 @@ class MakeOrder(MethodView):
         if not validate_email(user):
             return make_response(jsonify({'message': 'User Email not valid.'})), 400
         
-        
         #check if they user is a registered user and is logged
         userdb = User.query.filter_by(email=user).first()
         if userdb is None and g.user_id is not None:
@@ -366,13 +365,13 @@ class MakeOrder(MethodView):
             return make_response(jsonify({'message': 'Menu ID does not exist.'})), 400
         else:
             for meal in menudb.meals:
-                if meal.meal_id == meal_id:
+                if str(meal.meal_id) == str(meal_id):
                     meal_available = True
                     break
         #if false then meal does not exist
         if not meal_available:
             return make_response(jsonify({'message': 'Meal ID does not exist in the menu of the day'})), 400
-
+        
         # MEAL EXISTS IN THE MENU -> Make the Order to the db
         order = Order(user, meal_id, menu_id, date)
         order.save_order()
@@ -398,7 +397,6 @@ class GetAllOrders(MethodView):
 
         orderdb = Order.query.all()
         orders = Order.get_all_orders(orderdb)
-        print(orders)
         orders_response = {
             'message': 'success',
             'status_code': 200,

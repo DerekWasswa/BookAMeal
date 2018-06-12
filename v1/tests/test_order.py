@@ -9,10 +9,11 @@ class OrderTests(BaseCaseTest):
 		self.mock_signup()
 		self.mock_login()
 		self.add_mock_menu()
+		self.add_mock_meals_to_menu()
 
 		app_order = json.dumps({
 			'user': 'derrekwasswa256@gmail.com',
-			'meal': 1,
+			'meal': 2,
 			'date': '2018-05-12',
 			'menu_id': 1
 		})
@@ -26,20 +27,19 @@ class OrderTests(BaseCaseTest):
 		self.mock_login()
 		self.add_mock_menu()
 		self.add_mock_meals_to_menu()
-		self.add_mock_meals()
 
 		app_order = json.dumps({
 			'user': 'derrekwasswa256@gmail.com',
-			'meal': 1,
+			'meal': 2,
 			'date': '2018-05-12',
 			'menu_id': 1
 		})
 
 		order_update = json.dumps({
-			'order_to_update': 2,
+			'order_to_update': 3,
 			'user': 'derrekwasswa256@gmail.com',
 			'menu_id': 1,
-			'meal_id': 1
+			'meal_id': 2
 		})
 		response = self.client.post('/api/v1/orders/', data = app_order)
 		self.assertEqual(response.status_code, 201)
@@ -77,11 +77,10 @@ class OrderTests(BaseCaseTest):
 		self.mock_login()
 		self.add_mock_menu()
 		self.add_mock_meals_to_menu()
-		self.add_mock_meals()
 
 		app_order = json.dumps({
 			'user': 'derrekwasswa256@gmail.com',
-			'meal': 1,
+			'meal': 3,
 			'date': '20180515',
 			'menu_id': 1
 		})
@@ -145,11 +144,10 @@ class OrderTests(BaseCaseTest):
 		self.mock_login()
 		self.add_mock_menu()
 		self.add_mock_meals_to_menu()
-		self.add_mock_meals()
 
 		app_order = json.dumps({
 			'user': 'derrekwasswa256@gmail.com',
-			'meal': 1,
+			'meal': 3,
 			'date': '2015-05-15',
 			'menu_id': 1
 		})
@@ -177,10 +175,11 @@ class OrderTests(BaseCaseTest):
 		self.mock_signup()
 		self.mock_login()
 		self.add_mock_menu()
+		self.add_mock_meals_to_menu()
 
 		app_order = json.dumps({
 			'user': 'derrekwasswa256@gmail.com',
-			'meal': 1,
+			'meal': 2,
 			'date': '2018-05-12',
 			'menu_id': 1
 		})
@@ -188,4 +187,4 @@ class OrderTests(BaseCaseTest):
 		self.assertEqual(response_add.status_code, 201)
 		response_get_orders = self.client.get('/api/v1/orders/', headers = self.headers)
 		self.assertEqual(response_get_orders.status_code, 200)
-		self.assertIn('1', str(response_get_orders.data))
+		self.assertIn('2', str(response_get_orders.data))

@@ -38,3 +38,7 @@ v1/api/__init__.pyc
 migrations/versions/__pycache__/*
 migrations/versions/__pycache__/ca2d7673c55c_.cpython-35.pyc
 migrations/versions/__pycache__/447081da9629_.cpython-35.pyc
+
+v1/tests/test_order.pyc
+v1/tests/base_case_test.pyc
+v1/api/endpoints/views.pyc
