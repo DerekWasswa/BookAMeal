@@ -444,7 +444,7 @@ class ModifyOrder(MethodView):
             if not meal_available:
                 return make_response(jsonify({'message': 'Meal ID (order_update) does not exist in the menu of the day'})), 400
             
-            Order.query.filter_by(order_id=orderId, menu_id=menu_id).update(dict(meal_id=order_update))
+            Order.query.filter_by(order_id=orderId, menu_id=menu_id).update(dict(meal_id=meal_id_to_update))
             Order.update_order()
         
             return make_response(jsonify({'message': 'Order Updated successfully'})), 202
