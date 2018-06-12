@@ -11,7 +11,6 @@ from v1.api import auth_decorator
 from flask.views import MethodView
 from .import endpoints_blueprint
 from v1.api import create_app
-from v1.api import db
 
 
 class SignUp(MethodView):
@@ -30,21 +29,18 @@ class SignUp(MethodView):
         if len(str(user_email)) > 0 or len(str(user_password)) > 0 or len(str(username)) > 0 or len(str(user_admin)) > 0:
 
             user = User(username, user_email, generate_password_hash(user_password), user_admin)
+            check_user_exists = user.check_exists(user_email)
 
             #CHECK IF EMAIL IS VALID
             is_valid = validate_email(user_email)
             if not is_valid:
                 return make_response(jsonify({'message': 'Email is Invalid'})), 401
 
-            # CHECK IF USER ALREADY EXISTS
-            userdb = User.query.filter_by(email=user_email).first()
-            if userdb is not None:    
+            
+            if check_user_exists:
                 return make_response(jsonify({'message': 'User already exists. Please login.'})), 200
             else:
-
-                #ADD THE USER TO THE DB SESSION
-                db.session.add(user)
-                db.session.commit()
+                user.save()
 
                 return make_response(jsonify({
                     'message': 'Successfully Registered. Please login',
@@ -74,24 +70,19 @@ class Login(MethodView):
         if not is_valid:
             return make_response(jsonify({'message': 'Email is Invalid'})), 401
 
-        user = User.query.filter_by(email=user_email).first()
-        if user is None:
+        user = User('', user_email, user_password, user_admin)
+        if not User.check_exists(user_email):
             return make_response(jsonify({'message': 'User email not found!!'})), 401 
 
-        if user.verify_user_password(user_password):
+        app_user = user.get_user_by_email(user_email)
+        if check_password_hash(app_user.password, user_password):
             #Create the app instance to use to generate the token
             app = create_app()
-
             # CREATE TOKEN: leverage isdangerous to create the token
             encoded_jwt_token = jwt.encode({
                 'admin': user_admin, 
                 'email': user_email
                 }, app.config['SECRET_KEY'], algorithm='HS256')
-
-            #ADD USER ID TO THE CURRENT USER DATA
-            print(user.user_id)
-            session['user_id'] = user.user_id
-
             return make_response(jsonify({
                 'message': 'Logged in successfully',
                 'status_code': 200,
@@ -113,21 +104,11 @@ class MealsViews(MethodView):
         if not current_user:
             return jsonify({'message': 'You need to login as Admin to perform this operation.'})
 
-        # Return all meals from the db
-        meals = Meal.query.all()
-        meals_list = []
-        for meal in meals:
-            meal_dict = {}
-            meal_dict['meal_id'] = meal.meal_id
-            meal_dict['meal'] = meal.meal
-            meal_dict['price'] = meal.price
-            meal_dict['vendor_id'] = meal.vendor_id
-            meals_list.append(meal_dict)
-
+        #Return all the available meals to the vendor admin
         return make_response(jsonify({
             'message': 'success',
             'status_code': 200,
-            'data': meals_list
+            'data': models.app_meals
         })), 200        
 
     @auth_decorator.token_required_to_authenticate
@@ -143,7 +124,6 @@ class MealsViews(MethodView):
 
         meal = meal_data['meal']
         price = meal_data['price']
-        vendor_id = session['user_id']
 
         if len(str(meal)) <= 0 or  len(str(price)) <= 0:
             return make_response(jsonify({'message': 'Meal Options Missing.'})), 400
@@ -151,17 +131,10 @@ class MealsViews(MethodView):
         #Try parsing the Price, If doesnot pass the try then cast error
         if not isinstance(price, int):
             return make_response(jsonify({'message': 'Meal Price has to be an Integer.'})), 400
-        
-        # check if the meal has already been entered
-        mealdb = Meal.query.filter_by(meal=meal).first()
-        if mealdb is not None:    
-            return jsonify({'message': 'Meal already exists.'}), 400
+            
 
-        meal_object = Meal(meal, price, vendor_id)
-        
-        #ADD THE USER TO THE DB SESSION
-        db.session.add(meal_object)
-        db.session.commit()
+        meal_object = Meal(meal, price)
+        meal_object.add_meal() #ADD MEAL HERE
 
         meal_as_dict = {}
         meal_as_dict['meal_id'] = meal_object.meal_id
@@ -195,9 +168,11 @@ class MealsViews(MethodView):
         if not isinstance(price_update, int):
             return make_response(jsonify({'message': 'Can not update meal with non integer price'})), 400    
             
-
-        meal_update = Meal.query.filter_by(meal_id=mealId, vendor_id=session['user_id']).update(dict(meal=meal_update, price=price_update))
-        db.session.commit()
+        for i in range(len(models.app_meals)):
+            if str(models.app_meals[i]['meal_id']) == str(mealId):
+                models.app_meals[i]['meal'] = meal_update
+                models.app_meals[i]['price'] = price_update
+                break     
 
         meal_as_dict = {}
         meal_as_dict['meal_id'] = mealId
@@ -216,11 +191,8 @@ class MealsViews(MethodView):
             return jsonify({'message': 'You need to login as Admin to perform this operation.'})
 
         #Allow the admin to delete a particular meal option
-        meals = db.session.query(Meal).count()
-        if meals > 0:
-
-            delete_status = Meal.query.filter_by(meal_id=mealId, vendor_id=session['user_id']).delete()
-            db.session.commit() 
+        if len(models.app_meals) > 0:
+            delete_status = Meal.delete_meal_by_id(mealId)  
 
             if delete_status:
                 return make_response(jsonify({
@@ -236,17 +208,15 @@ class MealsViews(MethodView):
         else:
             return make_response(jsonify({'message': 'Meals are Empty'})), 200
 
-
 class GetMealById(MethodView):
 
     def get(self, mealId):
         # Return a meal for a particular ID
-        meals = db.session.query(Meal).count()
-        if meals > 0:      
+        if len(models.app_meals) > 0:
 
-            mealdb = Meal.query.filter_by(meal=meal).first()
-            if mealdb is not None:    
-                return make_response(jsonify({ 'message': 'Meal Exists' })), 200
+            for meal in models.app_meals:
+                if mealId == meal['meal_id']:
+                    return make_response(jsonify({ 'message': 'Meal Exists' })), 200
 
             return make_response(jsonify({ 'message': 'Meal not Found' })), 404
 
