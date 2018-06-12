@@ -17,6 +17,10 @@ install:
   - pip install coverage
   - pip install coveralls
 
+#create the database
+before_script:
+  - psql -c 'create database book_a_meal_test_db;' -U postgres
+
 script:
 - pytest v1/tests
 - coverage run --source='v1/' manage.py test 
