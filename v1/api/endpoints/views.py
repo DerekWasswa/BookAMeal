@@ -1,5 +1,5 @@
 # Book A Meal API 
-from flask import Flask, session, render_template, request, redirect, url_for, jsonify, make_response, current_app
+from flask import Flask, g, session, render_template, request, redirect, url_for, jsonify, make_response, current_app
 from flask_api import FlaskAPI, status
 import json
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -22,36 +22,34 @@ class SignUp(MethodView):
         user_data = request.get_json(force=True)
         if 'username' not in user_data or 'email' not in user_data or 'password' not in user_data or 'admin' not in user_data:
             return make_response(jsonify({'message': 'Signup expects username, email, password, admin value, either of them is not provided.'})), 400
-
+        
         username = user_data['username']
         user_email = user_data['email']
-        user_password = user_data['password']
+        user_password = str(user_data['password'])
         user_admin = user_data['admin']
 
         if len(str(user_email)) > 0 or len(str(user_password)) > 0 or len(str(username)) > 0 or len(str(user_admin)) > 0:
-
-            user = User(username, user_email, generate_password_hash(user_password), user_admin)
-
+            
             #CHECK IF EMAIL IS VALID
             is_valid = validate_email(user_email)
             if not is_valid:
                 return make_response(jsonify({'message': 'Email is Invalid'})), 401
-
+            
             # CHECK IF USER ALREADY EXISTS
             userdb = User.query.filter_by(email=user_email).first()
-            if userdb is not None:    
+            if userdb is not None:  
                 return make_response(jsonify({'message': 'User already exists. Please login.'})), 200
             else:
 
                 #ADD THE USER TO THE DB SESSION
-                db.session.add(user)
-                db.session.commit()
+                user = User(username, user_email, generate_password_hash(user_password), user_admin)
+                user.save()
 
                 return make_response(jsonify({
                     'message': 'Successfully Registered. Please login',
                     'status_code': 201,
                     'data': user.get_user_object_as_dict()
-                    })), 201 
+                })), 201 
         else:
             return make_response(jsonify({'message': 'Missing Credentials'})), 400
 
@@ -81,16 +79,13 @@ class Login(MethodView):
 
         if user.verify_user_password(user_password):
             #Create the app instance to use to generate the token
-            app = create_app()
-
             # CREATE TOKEN: leverage isdangerous to create the token
             encoded_jwt_token = jwt.encode({
                 'admin': user_admin, 
-                'email': user_email
-                }, app.config['SECRET_KEY'], algorithm='HS256')
+                'user_id': user.user_id
+                }, 'boOk-a-MeAL', algorithm='HS256')
 
             #ADD USER ID TO THE CURRENT USER DATA
-            print(user.user_id)
             session['user_id'] = user.user_id
 
             return make_response(jsonify({
@@ -144,7 +139,8 @@ class MealsViews(MethodView):
 
         meal = meal_data['meal']
         price = meal_data['price']
-        vendor_id = session['user_id']
+
+        vendor_id = g.user_id
 
         if len(str(meal)) <= 0 or  len(str(price)) <= 0:
             return make_response(jsonify({'message': 'Meal Options Missing.'})), 400
@@ -158,21 +154,14 @@ class MealsViews(MethodView):
         if mealdb is not None:    
             return jsonify({'message': 'Meal already exists.'}), 400
 
-        meal_object = Meal(meal, price, vendor_id)
-        
         #ADD THE USER TO THE DB SESSION
-        db.session.add(meal_object)
-        db.session.commit()
-
-        meal_as_dict = {}
-        meal_as_dict['meal_id'] = meal_object.meal_id
-        meal_as_dict['meal'] = meal_object.meal
-        meal_as_dict['price'] = meal_object.price
+        meal_object = Meal(meal, price, vendor_id)
+        meal_object.save()
 
         return make_response(jsonify({
             'message': 'Meal Added Successfully',
             'status_code': 201,
-            'meal': meal_as_dict
+            'meal': meal_object.get_meal_as_dict()
         })), 201
 
     @auth_decorator.token_required_to_authenticate
@@ -196,8 +185,8 @@ class MealsViews(MethodView):
         if not isinstance(price_update, int):
             return make_response(jsonify({'message': 'Can not update meal with non integer price'})), 400    
             
-
-        Meal.query.filter_by(meal_id=mealId, vendor_id=session['user_id']).update(dict(meal=meal_update, price=price_update))
+        vendor_id = g.user_id
+        Meal.query.filter_by(meal_id=mealId, vendor_id=vendor_id).update(dict(meal=meal_update, price=price_update))
         db.session.commit()
 
         meal_as_dict = {}
@@ -220,8 +209,9 @@ class MealsViews(MethodView):
         meals = db.session.query(Meal).count()
         if meals > 0:
 
-            delete_status = Meal.query.filter_by(meal_id=mealId, vendor_id=session['user_id']).delete()
-            db.session.commit() 
+            vendor_id = g.user_id
+            delete_status = Meal.query.filter_by(meal_id=mealId, vendor_id=vendor_id).delete()
+            Meal.delete_meal()
 
             if delete_status:
                 return make_response(jsonify({
@@ -266,8 +256,11 @@ class GetMenuOfTheDay(MethodView):
     def get(self):   
 
         #Allow the authenticated users to view menu of the day
-        today = datetime.date.today()
-        menudb = Menu.query.filter_by(date=today).first()
+        menu_data = request.get_json(force=True)
+        date_selected = menu_data['date']
+        # today = datetime.date.today()
+
+        menudb = Menu.query.filter_by(date=date_selected).first()
 
         if menudb is not None:  
             menu_dict = {}
@@ -294,7 +287,7 @@ class GetMenuOfTheDay(MethodView):
             })), 200  
 
         else:
-            return make_response(jsonify({'message': 'No menu set for the day ' + today, 'status_code': 200})), 200
+            return make_response(jsonify({'message': 'No menu set for the day ', 'status_code': 200})), 200
       
 
 class SetMenuOfTheDay(MethodView):
@@ -321,18 +314,17 @@ class SetMenuOfTheDay(MethodView):
         #CHECK IF THE MEAL ID EXISTS
         mealdb = Meal.query.filter_by(meal_id=meal_id).first()
         if mealdb is None:    
-            return make_response(jsonify({ 'message': 'Meal with id ' + meal_id + ' does not exist.' })), 400
+            return make_response(jsonify({ 'message': 'Meal with id ' + str(meal_id) + ' does not exist.' })), 400
 
         #CHECK IF THE MENU OF THE DAY ALREADY EXISTS
-        menudb = Menu.query.filter_by(vendor_id=session['user_id'], date=date).first()
+        vendor_id = g.user_id
+        menudb = Menu.query.filter_by(vendor_id=vendor_id, date=date).first()
         if menudb is not None:
             menudb.meals.append(mealdb)
-            db.session.commit()
+            Menu.add_meals_to_menu()
         else:
-            create_new_menu = Menu(menu_name, date, description, session['user_id'])
-            create_new_menu.meals.append(mealdb)
-            db.session.add(create_new_menu)
-            db.session.commit()
+            create_new_menu = Menu(menu_name, date, description, g.user_id)
+            create_new_menu.create_menu()
 
         return make_response(jsonify({'status_code': 201, 'message': 'success'})), 201        
 
@@ -355,17 +347,18 @@ class MakeOrder(MethodView):
         menu_id = order_data['menu_id']
         date = order_data['date']
 
-        if len(str(meal_id)) <= 0 or len(str(user)) <= 0:
+        if len(str(meal_id)) <= 0 or len(str(user)) <= 0 or len(str(menu_id)) <= 0 or len(str(date)) <= 0:
             return make_response(jsonify({'message': 'Can not order with empty content.'})), 400
         
         if not validate_email(user):
             return make_response(jsonify({'message': 'User Email not valid.'})), 400
         
+        
         #check if they user is a registered user and is logged
         userdb = User.query.filter_by(email=user).first()
-        if userdb is None and session['user_id'] is not None:
+        if userdb is None and g.user_id is not None:
             return make_response(jsonify({ 'message': 'User with email ' + user + ' doesnot exist or user is not logged in.'})), 400
-
+        
         # verify if menu id exists and has the meal id specified
         menudb = Menu.query.filter_by(menu_id=menu_id).first()
         meal_available = False
@@ -382,8 +375,7 @@ class MakeOrder(MethodView):
 
         # MEAL EXISTS IN THE MENU -> Make the Order to the db
         order = Order(user, meal_id, menu_id, date)
-        db.session.add(order)
-        db.session.commit()
+        order.save_order()
        
         order_as_dict = {}
         order_as_dict['order_id'] = order.order_id
@@ -405,21 +397,12 @@ class GetAllOrders(MethodView):
         #Allow the Admin return all the Orders users have made
 
         orderdb = Order.query.all()
-        print(orderdb)
-        orders_list = []
-        for order in orderdb:
-            order_dict = {}
-            order_dict['order_id'] = order.order_id
-            order_dict['user'] = order.user
-            order_dict['meal_id'] = order.meal_id
-            order_dict['menu_id'] = order.menu_id
-            order_dict['date'] = order.date
-            orders_list.append(order_dict)
-
+        orders = Order.get_all_orders(orderdb)
+        print(orders)
         orders_response = {
             'message': 'success',
             'status_code': 200,
-            'orders': orders_list
+            'orders': orders
         }
         return make_response(jsonify(orders_response)), 200
 
@@ -429,41 +412,41 @@ class ModifyOrder(MethodView):
         #Allow the user to modify an order they've already made
         orders_count = db.session.query(Order).count()
         if orders_count > 0:
-
             order_data = request.get_json(force=True)
             if 'order_to_update' not in order_data or 'user' not in order_data or 'menu_id' not in order_data:
-                return make_response(jsonify({'message': 'Modifying order expects the order id, user, menu id to edit with which is not provided.'})), 400
+                return make_response(jsonify({'message': 'Modifying order expects the order id, user, menu id, meal id to edit with which is not provided.'})), 400
 
             order_update = order_data['order_to_update']
             user = order_data['user']
             menu_id = order_data['menu_id']
+            meal_id_to_update = order_data['meal_id']
 
-            if len(str(order_update)) <= 0:
+            if len(str(order_update)) <= 0 or len(str(user)) <= 0 or len(str(order_update)) <= 0 or len(str(meal_id_to_update)) <= 0:
                 return make_response(jsonify({'message': 'Can not modify an order with empty content.'})), 400
 
             #check if they user is a registered user and is logged
             userdb = User.query.filter_by(email=user).first()
-            if userdb is None and session['user_id'] is not None:
+            if userdb is None and g.user_id is not None:
                 return make_response(jsonify({ 'message': 'User with email ' + user + ' doesnot exist or user is not logged in.'})), 400
-
+            
             # verify if menu id exists and has the meal id specified
             menudb = Menu.query.filter_by(menu_id=menu_id).first()
             meal_available = False
-            if menudb is None:    
+            if menudb is None:   
                 return make_response(jsonify({'message': 'Menu ID does not exist.'})), 400
             else:
                 for meal in menudb.meals:
-                    if meal.meal_id == order_update:
+                    if str(meal.meal_id) == str(meal_id_to_update):
                         meal_available = True
                         break
+
             #if false then meal does not exist
             if not meal_available:
                 return make_response(jsonify({'message': 'Meal ID (order_update) does not exist in the menu of the day'})), 400
-
-            Order.query.filter_by(order_id=orderId).update(dict(meal_id=order_update))
-            db.session.commit()
-
-            Order.update_order_by_id(orderId, order_update)
+            
+            Order.query.filter_by(order_id=orderId, menu_id=menu_id).update(dict(meal_id=order_update))
+            Order.update_order()
+        
             return make_response(jsonify({'message': 'Order Updated successfully'})), 202
         else:
             return make_response(jsonify({'message': 'Orders are Empty', 'status_code': 200})), 200                

@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import request, jsonify, current_app
+from flask import Flask, request, g, jsonify, current_app
 import jwt
 
 def token_required_to_authenticate(admin_status):
@@ -15,7 +15,8 @@ def token_required_to_authenticate(admin_status):
         try:
             payload = jwt.decode(token, current_app.config['SECRET_KEY'])   
             user_admin = payload['admin']
-            print(user_admin)
+            user_id = payload['user_id']
+            g.user_id = user_id
         except:
             return jsonify({'message': 'Token is Invalid.'}), 401 
 
