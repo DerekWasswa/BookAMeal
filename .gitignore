@@ -18,13 +18,6 @@
 /__pycache__/*
 
 /v1/tests/__pycache__/*
-/v1/api/__pycache__/
 /v1/api/endpoints/__pycache__/*
 /v1/api/endpoints/__pycache__/views.cpython-35.pyc
 /v1/tests/__pycache__/test_meals.cpython-35-PYTEST.pyc
-/v1/tests/__pycache__/test_auth.cpython-35-PYTEST.pyc
-/v1/tests/__pycache__/test_menu.cpython-35-PYTEST.pyc
-/v1/tests/__pycache__/test_order.cpython-35-PYTEST.pyc
-
-
-migrations/versions/__pycache__/ca2d7673c55c_.cpython-35.pyc
