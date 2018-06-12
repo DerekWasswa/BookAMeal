@@ -61,14 +61,15 @@ class Meal(db.Model):
     """ Meal Object to define a meal in the database """
 
     __tablename__ = 'meals'
-    meal_id = db.Column('meal_id', db.Integer, primary_key = True)
-    meal = db.Column(db.String(100), nullable=False, unique=True)
+    meal_id = db.Column(db.Integer, primary_key = True)
+    meal = db.Column(db.Text, nullable=False, unique=True)
     price = db.Column(db.Integer, nullable=False)  
+    vendor_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
 
-    def __init__(self, meal, price):
-        self.meal_id = len(app_meals) + 1
+    def __init__(self, meal, price, vendor_id):
         self.meal = meal
         self.price = price
+        self.vendor_id = vendor_id
 
     def add_meal(self):
         meal = {}
@@ -104,7 +105,6 @@ class Meal(db.Model):
                 del app_meals[i]
                 return True
         return False     
-
     
     @staticmethod
     def get_meal_by_id(meal_id):
@@ -116,11 +116,10 @@ class Meal(db.Model):
 
 
 
-
 class Menu(db.Model):
     """ Menu object that defines the menu in the db """
     __tablename__ = 'menus'
-    menu_id = db.Column('menu_id', db.Integer, primary_key = True)
+    menu_id = db.Column(db.Integer, primary_key = True)
     vendor_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
@@ -155,7 +154,7 @@ class Menu(db.Model):
 class Order(db.Model):
     """ Order Object to define the Order in the db """
     __tablename__ = 'orders'
-    order_id = db.Column('order_id', db.Integer, primary_key = True)
+    order_id = db.Column(db.Integer, primary_key = True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     meal_id = db.Column(db.Integer, db.ForeignKey('meals.meal_id'))
 
