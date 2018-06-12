@@ -1,11 +1,20 @@
 from werkzeug.security import check_password_hash
+from . import db
 
 app_users = []
 app_meals = []
 app_menu = []
 app_orders = []
 
-class User(object):
+class User(db.Model):
+    """ User Object to define users """
+
+    __tablename__ = 'users'
+    user_id = db.Column(db.Integer, primary_key = True)
+    username = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), nullable=False, unique=True)  
+    password = db.Column(db.String(200), nullable=False)
+    admin = db.Column(db.Boolean, nullable=False)
 
     def __init__(self, username, email, password, admin):
         self.email = email
@@ -42,8 +51,19 @@ class User(object):
                 return user
         return None  
 
+    def __repr__(self):
+        return "<User(user_id = '%s', username ='%s', password='%s', email='%s', admin='%s')>" % (self.user_id, self.username, self.password, self.email, self.admin)
 
-class Meal(object):
+
+
+
+class Meal(db.Model):
+    """ Meal Object to define a meal in the database """
+
+    __tablename__ = 'meals'
+    meal_id = db.Column('meal_id', db.Integer, primary_key = True)
+    meal = db.Column(db.String(100), nullable=False, unique=True)
+    price = db.Column(db.Integer, nullable=False)  
 
     def __init__(self, meal, price):
         self.meal_id = len(app_meals) + 1
@@ -97,7 +117,15 @@ class Meal(object):
 
 
 
-class Menu(object):
+class Menu(db.Model):
+    """ Menu object that defines the menu in the db """
+    __tablename__ = 'menus'
+    menu_id = db.Column('menu_id', db.Integer, primary_key = True)
+    vendor_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text)
+    date = db.Column(db.Date, nullable=False)  
+    
 
     def __init__(self, name, date, description):
         self.name = name
@@ -124,12 +152,16 @@ class Menu(object):
         app_menu.append(self)
 
 
-class Order(object):
+class Order(db.Model):
+    """ Order Object to define the Order in the db """
+    __tablename__ = 'orders'
+    order_id = db.Column('order_id', db.Integer, primary_key = True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    meal_id = db.Column(db.Integer, db.ForeignKey('meals.meal_id'))
 
     def __init__(self, user_id, meal_id):
         self.order_id = len(app_orders) + 1
         self.user_id = user_id
-        self.caterer_id = None
         self.meal_id = meal_id
         self.expiry_time = None
 
