@@ -7,7 +7,7 @@ from flask_migrate import Migrate, MigrateCommand
 
 
 # initialize the app with all its configurations
-app = create_app()
+app = create_app('testing')
 manager = Manager(app)
 migrate = Migrate(app, db)
 
@@ -23,7 +23,7 @@ def upgrade_changes():
 @manager.command
 def test():
     """Runs the unit tests without test coverage."""
-    tests = unittest.TestLoader().discover('./v1/tests', pattern='test*.py')
+    tests = unittest.TestLoader().discover('./v1/tests', pattern='*.py')
     result = unittest.TextTestRunner(verbosity=2).run(tests)
     return not result.wasSuccessful()
 
