@@ -263,27 +263,13 @@ class GetMenuOfTheDay(MethodView):
         menudb = Menu.query.filter_by(date=date_selected).first()
 
         if menudb is not None:  
-            menu_dict = {}
-            meals_list = []
 
-            menu_dict['menu_id'] = menudb.menu_id 
-            menu_dict['name'] = menudb.name
-            menu_dict['description'] = menudb.description
-            menu_dict['vendor_id'] = menudb.vendor_id
-
-            for meal in menudb.meals:
-                meals_dict = {}
-                meals_dict['meal_id'] = meal.meal_id
-                meals_dict['meal'] = meal.meal
-                meals_dict['price'] = meal.price
-                meals_list.append(meals_dict)
-            
-            menu_dict['meals'] = meals_list
+            menu_as_dict = Menu.get_menu_as_dict(menudb)
 
             return make_response(jsonify({
                 'message': 'success',
                 'status_code': 200,
-                'data': menu_dict
+                'data': menu_as_dict
             })), 200  
 
         else:

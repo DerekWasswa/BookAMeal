@@ -1,11 +1,6 @@
 from werkzeug.security import check_password_hash
 from . import db
 
-app_users = []
-app_meals = []
-app_menu = []
-app_orders = []
-
 
 class User(db.Model):
     """ User Object to define users """
@@ -180,7 +175,24 @@ class Menu(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    @staticmethod
+    def get_menu_as_dict(menudb):
+        menu_dict = {}
+        meals_list = []
+        menu_dict['menu_id'] = menudb.menu_id 
+        menu_dict['name'] = menudb.name
+        menu_dict['description'] = menudb.description
+        menu_dict['vendor_id'] = menudb.vendor_id
 
+        for meal in menudb.meals:
+            meals_dict = {}
+            meals_dict['meal_id'] = meal.meal_id
+            meals_dict['meal'] = meal.meal
+            meals_dict['price'] = meal.price
+            meals_list.append(meals_dict)
+            
+        menu_dict['meals'] = meals_list
+        return menu_dict
 
 
 
