@@ -14,9 +14,9 @@ def create_app(configuration):
     asyncMode = None
 
     if configuration == 'development':
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/book_a_meal_db'
-        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-        db.init_app(app)    
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/book_a_meal_db'#pragma:no cover
+        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False#pragma:no cover
+        db.init_app(app)#pragma:no cover
     
     if configuration == 'testing':
         app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/book_a_meal_test_db'

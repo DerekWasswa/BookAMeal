@@ -14,8 +14,6 @@ virtualenv:
 
 install:
   - pip install -r requirements.txt
-  - pip install coverage
-  - pip install coveralls
 
 #create the database
 before_script:
@@ -23,7 +21,7 @@ before_script:
 
 script:
 - coverage run --source='v1/' manage.py test 
-- coverage report
+- coverage report 
     
 after_script:
 - codeclimate-test-reporter

@@ -1,11 +1,6 @@
 from werkzeug.security import check_password_hash
 from . import db
 
-app_users = []
-app_meals = []
-app_menu = []
-app_orders = []
-
 
 class User(db.Model):
     """ User Object to define users """
