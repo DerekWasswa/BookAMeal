@@ -1,44 +1,106 @@
-/v1/__pycache__
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
 *$py.class
+*.pyc
 
-.pytest_cache
-/v1/.pytest_cache/*
-/.vscode/*
-/env/*
-/venv/*
+# C extensions
+*.so
 
-/v1/app.pyc
-/v1/auth_decorator.pyc
-/v1/test_app.pyc
-/v1/models.pyc
+# Distribution / packaging
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
 
-/v1/config.pyc
-/v1/__pycache__/
-/v1/__init__.pyc
-/__pycache__/*
-/__pycache__
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
 
-/v1/tests/__pycache__/*
-/v1/api/__pycache__/
-/v1/api/__init__.pyc
-v1/api/endpoints/views.pyc
-/v1/api/endpoints/views.pyc
-v1/api/models.pyc
-/v1/api/endpoints/__pycache__/*
-/v1/api/endpoints/__pycache__/views.cpython-35.pyc
-/v1/tests/__pycache__/test_meals.cpython-35-PYTEST.pyc
-/v1/tests/__pycache__/test_auth.cpython-35-PYTEST.pyc
-/v1/tests/__pycache__/test_menu.cpython-35-PYTEST.pyc
-/v1/tests/__pycache__/test_order.cpython-35-PYTEST.pyc
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
 
-__pycache__/config.cpython-35.pyc
-v1/api/__init__.pyc
+# Translations
+*.mo
+*.pot
 
-migrations/versions/__pycache__/*
-migrations/versions/__pycache__/ca2d7673c55c_.cpython-35.pyc
-migrations/versions/__pycache__/447081da9629_.cpython-35.pyc
+# Django stuff:
+*.log
+local_settings.py
 
-v1/tests/test_order.pyc
-v1/tests/base_case_test.pyc
-v1/api/endpoints/views.pyc
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+.vscode
+.pytest_cache/
+# celery beat schedule file
+celerybeat-schedule
+
+# SageMath parsed files
+*.sage.py
+
+# dotenv
+.env
+
+# virtualenv
+.venv
+venv/
+ENV/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+medias
+
+.DS_STORE

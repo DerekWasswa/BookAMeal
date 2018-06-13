@@ -221,6 +221,16 @@ class Order(db.Model):
             orders_list.append(order_dict)   
         return orders_list         
 
+    @staticmethod
+    def order_as_dict(order):
+        order_as_dict = {}
+        order_as_dict['order_id'] = order.order_id
+        order_as_dict['user'] = order.user
+        order_as_dict['meal_id'] = order.meal_id
+        order_as_dict['menu_id'] = order.menu_id
+        order_as_dict['date'] = order.date
+        return order_as_dict
+
     def make_order(self):
         order = {}
         order['order_id'] = self.order_id

@@ -375,14 +375,8 @@ class MakeOrder(MethodView):
         # MEAL EXISTS IN THE MENU -> Make the Order to the db
         order = Order(user, meal_id, menu_id, date)
         order.save_order()
+        order_as_dict = Order.order_as_dict(order)
        
-        order_as_dict = {}
-        order_as_dict['order_id'] = order.order_id
-        order_as_dict['user'] = order.user
-        order_as_dict['meal_id'] = order.meal_id
-        order_as_dict['menu_id'] = order.menu_id
-        order_as_dict['date'] = order.date
-
         return make_response(jsonify({
             'message': 'Order Made successfully',
             'status_code': 201,
@@ -419,7 +413,7 @@ class ModifyOrder(MethodView):
             menu_id = order_data['menu_id']
             meal_id_to_update = order_data['meal_id']
 
-            if len(str(order_update)) <= 0 or len(str(user)) <= 0 or len(str(order_update)) <= 0 or len(str(meal_id_to_update)) <= 0:
+            if len(str(order_update)) <= 0 or len(str(user)) <= 0 or len(str(menu_id)) <= 0 or len(str(meal_id_to_update)) <= 0:
                 return make_response(jsonify({'message': 'Can not modify an order with empty content.'})), 400
 
             #check if they user is a registered user and is logged
