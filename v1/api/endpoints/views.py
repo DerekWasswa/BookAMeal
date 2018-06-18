@@ -80,10 +80,7 @@ class Login(MethodView):
         if user.verify_user_password(user_password):
             #Create the app instance to use to generate the token
             # CREATE TOKEN: leverage isdangerous to create the token
-            encoded_jwt_token = jwt.encode({
-                'admin': user_admin, 
-                'user_id': user.user_id
-                }, 'boOk-a-MeAL', algorithm='HS256')
+            encoded_jwt_token = jwt.encode({'admin': user_admin, 'user_id': user.user_id}, 'boOk-a-MeAL', algorithm='HS256')
 
             #ADD USER ID TO THE CURRENT USER DATA
             session['user_id'] = user.user_id
@@ -363,11 +360,7 @@ class MakeOrder(MethodView):
         order.save_order()
         order_as_dict = Order.order_as_dict(order)
        
-        return make_response(jsonify({
-            'message': 'Order Made successfully',
-            'status_code': 201,
-            'order': order_as_dict
-            })), 201
+        return make_response(jsonify({'message': 'Order Made successfully', 'status_code': 201, 'order': order_as_dict})), 201
 
 class GetAllOrders(MethodView):
 
