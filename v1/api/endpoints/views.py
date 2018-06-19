@@ -20,7 +20,7 @@ class SignUp(MethodView):
     def post(self):
         #Sign up a user either as a customer or vendor admin
         user_data = request.get_json(force=True)
-        if 'username' not in user_data or 'email' not in user_data or 'password' not in user_data or 'admin' not in user_data:
+        if not User.user_request_headers_exist(user_data, 'signup'):
             return make_response(jsonify({'message': 'Signup expects username, email, password, admin value, either of them is not provided.'})), 400
         
         username = user_data['username']
@@ -28,7 +28,7 @@ class SignUp(MethodView):
         user_password = str(user_data['password'])
         user_admin = user_data['admin']
 
-        if len(str(user_email)) > 0 or len(str(user_password)) > 0 or len(str(username)) > 0 or len(str(user_admin)) > 0:
+        if not User.user_request_data_empty(user_email, user_password, user_admin, username):
             
             #CHECK IF EMAIL IS VALID
             is_valid = validate_email(user_email)
@@ -58,14 +58,14 @@ class Login(MethodView):
     def post(self):
         #authenticate customers or admin
         user_data = request.get_json(force=True)
-        if 'email' not in user_data or 'password' not in user_data or 'admin' not in user_data:
+        if not User.user_request_headers_exist(user_data):
             return make_response(jsonify({'message': 'Logged requests expects email, password, and admin value. Either of them id not provided.'})), 400
 
         user_email = user_data['email']
         user_password = user_data['password']
         user_admin = user_data['admin']
         
-        if len(str(user_email)) <= 0 or len(str(user_password)) <= 0 or len(str(user_admin)) <= 0:
+        if User.user_request_data_empty(user_email, user_password, user_admin):
             return make_response(jsonify({'message': 'Could not verify. Login credentials required.'})), 401
 
         #CHECK IF EMAIL IS VALID
@@ -103,8 +103,7 @@ class MealsViews(MethodView):
     @auth_decorator.token_required_to_authenticate
     def get(current_user, self):
         #Verify If User is admin
-        if not current_user:
-            return jsonify({'message': 'You need to login as Admin to perform this operation.'})
+        User.user_is_logged_in(current_user)
 
         # Return all meals from the db
         meals = Meal.query.all()
@@ -126,8 +125,7 @@ class MealsViews(MethodView):
     @auth_decorator.token_required_to_authenticate
     def post(current_user, self):
         #Verify If User is admin
-        if not current_user:
-            return jsonify({'message': 'You need to login as Admin to perform this operation.'})
+        User.user_is_logged_in(current_user)
 
         #Allow the vendor admin to add another meal option
         meal_data = request.get_json(force=True)    
@@ -164,8 +162,7 @@ class MealsViews(MethodView):
     @auth_decorator.token_required_to_authenticate
     def put(current_user, self, mealId):         
         #Verify If User is admin
-        if not current_user:
-            return jsonify({'message': 'You need to login as Admin to perform this operation.'})
+        User.user_is_logged_in(current_user)
 
         #Allow the ADMIN to edit a particular meal option
         meal_data = request.get_json(force=True)
@@ -199,8 +196,7 @@ class MealsViews(MethodView):
     @auth_decorator.token_required_to_authenticate
     def delete(current_user, self, mealId):  
         #Verify If User is admin
-        if not current_user:
-            return jsonify({'message': 'You need to login as Admin to perform this operation.'})
+        User.user_is_logged_in(current_user)
 
         #Allow the admin to delete a particular meal option
         meals = db.session.query(Meal).count()
@@ -278,8 +274,7 @@ class SetMenuOfTheDay(MethodView):
     @auth_decorator.token_required_to_authenticate
     def post(current_user, self):    
         #Verify If User is admin
-        if not current_user:
-            return jsonify({'message': 'You need to login as Admin to perform this operation.'})
+        User.user_is_logged_in(current_user)
 
         #Allow the admin an operation to the set the menu of the day
         menu_data = request.get_json(force=True)    
@@ -366,7 +361,8 @@ class GetAllOrders(MethodView):
 
     @auth_decorator.token_required_to_authenticate
     def get(current_user, self):
-        #Allow the Admin return all the Orders users have made
+        #Allow the Authorized Admin return all the Orders users have made
+        User.user_is_logged_in(current_user)
 
         orderdb = Order.query.all()
         orders = Order.get_all_orders(orderdb)

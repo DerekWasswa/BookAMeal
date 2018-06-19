@@ -1,4 +1,5 @@
 from werkzeug.security import check_password_hash
+from flask import jsonify
 from . import db
 
 
@@ -34,6 +35,41 @@ class User(db.Model):
     def verify_user_password(self, user_password):
         return check_password_hash(self.password, user_password)     
 
+    # verify if request headers exist
+    @staticmethod
+    def user_request_headers_exist(user_data=None, invoke_from=None):
+        if invoke_from=='signup':
+            if 'username' not in user_data or 'email' not in user_data or 'password' not in user_data or 'admin' not in user_data:
+                return False
+            else:
+                return True
+        else:
+            if 'email' not in user_data or 'password' not in user_data or 'admin' not in user_data:
+                return False
+            else:
+                return True
+
+    #verify whether the request data parameters are not empty
+    @staticmethod
+    def user_request_data_empty(email=None, password=None, admin=True, username=True):
+        if username is not None:
+            if len(str(email)) <= 0 or len(str(password)) <= 0 or len(str(username)) <= 0 or len(str(admin)) <= 0:
+                return True
+            else:
+                return False
+        else:
+            if len(str(email)) <= 0 or len(str(password)) <= 0 or len(str(admin)) <= 0:
+                return True
+            else:
+                return False
+
+    # Verify if a user is logged in or not
+    @staticmethod
+    def user_is_logged_in(current_user):
+        if not current_user:
+            return jsonify({'message': 'You need to login as Admin to perform this operation.'})
+
+
     def __repr__(self):
         return "<User(user_id = '%s', username ='%s', password='%s', email='%s', admin='%s')>" % (self.user_id, self.username, self.password, self.email, self.admin)
 
@@ -68,6 +104,20 @@ class Meal(db.Model):
         meal_as_dict['meal'] = self.meal
         meal_as_dict['price'] = self.price
         return meal_as_dict
+
+    @staticmethod
+    def meal_data_params_exist(meal_data, invoked_from):
+        if invoked_from == 'add_meal':
+            if 'meal' not in meal_data or 'price' not in meal_data:
+                return False
+            else:
+                return True
+        elif invoked_from == 'update_meal':
+            if 'meal_update' not in meal_data or 'price_update' not in meal_data:
+                return False
+            else:
+                return True
+        
 
 
 
