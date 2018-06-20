@@ -203,3 +203,101 @@ class MealTests(BaseCaseTest):
 		self.assertEqual(response_edit_meal.status_code, 400)
 		result = json.loads(response_edit_meal.get_data(as_text=True))
 		self.assertEqual(result['message'], 'Can not update meal with non integer price')
+
+	def test_add_meal_with_unauthorized_access(self):
+		#Testing addition of a meal option should add if user is unauthorized
+		app_meal = json.dumps({
+			'meal': 'Fish with All foods',
+			'price': 25000
+		})
+		response = self.client.post('/api/v1/meals/', data = app_meal, headers = self.unauthorized_user_token_headers)
+		self.assertEqual(response.status_code, 401)
+		self.assertIn("You need to login as Admin to perform this operation.", str(response.data))
+
+	def test_edit_meal_with_unauthorized_access(self):
+		self.mock_signup()
+		self.mock_login()
+		#Test that the API does not allows modification of a meal option with unauthorized access
+		app_meal = json.dumps({
+			'meal': 'Luwombo with Matooke',
+			'price': 25000
+		})
+		update_meal = json.dumps({
+			'meal_update': 'Luwombo with All Local Foods',
+			'price_update': 20000
+		})
+		response = self.client.post('/api/v1/meals/', data = app_meal, headers = self.headers)
+		self.assertEqual(response.status_code, 201)
+
+		posted_data = json.loads(response.get_data(as_text=True))
+		
+		response_edit_meal = self.client.put('/api/v1/meals/{}' . format(posted_data['meal']['meal_id']), 
+			data = update_meal, 
+			headers = self.unauthorized_user_token_headers
+		)
+		self.assertEqual(response_edit_meal.status_code, 401)
+		self.assertIn("You need to login as Admin to perform this operation.", str(response_edit_meal.data))
+
+	def test_retrieving_meals_with_unauthorized_access(self):
+		self.mock_signup()
+		self.mock_login()
+
+		#Testing for retrieving all the available meals should not return meals for unauthorized access
+		app_meals = json.dumps({
+			'meal': 'Beef with Chicken',
+			'price': 20000
+		})
+
+		response_add = self.client.post('/api/v1/meals/', data = app_meals, headers = self.headers)
+		self.assertEqual(response_add.status_code, 201)
+		response_get = self.client.get('/api/v1/meals/', headers = self.unauthorized_user_token_headers)
+		self.assertEqual(response_get.status_code, 401)
+		self.assertIn("You need to login as Admin to perform this operation.", str(response_get.data))
+
+	def test_deleting_meals_with_unauthorized_access(self):
+		self.mock_signup()
+		self.mock_login()
+
+		#Test that the API allows for deletion of a meal option should delete a meal by the ID
+		app_meal = json.dumps({
+			'meal': 'Luwombo with Irish',
+			'price': 25000
+		})
+
+		response = self.client.post('/api/v1/meals/', data = app_meal, headers = self.headers)
+		self.assertEqual(response.status_code, 201)
+
+		posted_data = json.loads(response.get_data(as_text=True))	
+
+		response_delete_meal = self.client.delete(
+			'/api/v1/meals/{}' . format(posted_data['meal']['meal_id']), 
+			headers = self.unauthorized_user_token_headers
+		)
+		self.assertEqual(response_delete_meal.status_code, 401)
+		self.assertIn("You need to login as Admin to perform this operation.", str(response_delete_meal.data))
+
+
+
+	""" TOKEN TESTS """
+	def test_add_meal_with_no_auth_token(self):
+		''' Test that without a token, one cannot add a meal '''
+		
+		app_meal = json.dumps({
+			'meal': 'Fish with All foods',
+			'price': 25000
+		})
+		response = self.client.post('/api/v1/meals/', data = app_meal, headers = self.no_token_headers)
+		self.assertEqual(response.status_code, 401)
+		self.assertIn("No token in the headers", str(response.data))
+
+
+	def test_add_meal_with_invalid_token(self):
+		''' Test that an invalid token, one cannot add a meal '''
+		
+		app_meal = json.dumps({
+			'meal': 'Fish with All foods',
+			'price': 25000
+		})
+		response = self.client.post('/api/v1/meals/', data = app_meal, headers = self.invalid_token_headers)
+		self.assertEqual(response.status_code, 401)
+		self.assertIn("Token is Invalid.", str(response.data))

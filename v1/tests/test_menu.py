@@ -89,3 +89,26 @@ class MenuTests(BaseCaseTest):
 		self.assertEqual(response_get.status_code, 200)
 		self.assertIn('1', str(response_get.data))
 
+	def test_setting_menu_with_unauthorized_access(self):
+		self.mock_signup()
+		self.mock_login()
+
+		#Testing setting the menu of the day with meals should not allow unauthorized access
+		app_meal_one = json.dumps({
+			'meal': 'Fish with All foods',
+			'price': 25000
+		})
+
+		response_one = self.client.post('/api/v1/meals/', data = app_meal_one, headers = self.headers)
+		self.assertEqual(response_one.status_code, 201)
+
+		app_menu = json.dumps({
+			'menu_name': 'Jojo Restaurant Special Friday',
+			'date': '2018-05-12',
+			'description': 'For our special friday, enjoy the menu with a free dessert',
+			'meal_id': 1
+		})
+
+		response = self.client.post('/api/v1/menu/', data = app_menu, headers = self.unauthorized_user_token_headers)
+		self.assertEqual(response.status_code, 401)
+		self.assertIn("You need to login as Admin to perform this operation.", str(response.data))

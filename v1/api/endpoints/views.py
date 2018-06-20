@@ -59,7 +59,7 @@ class Login(MethodView):
         #authenticate customers or admin
         user_data = request.get_json(force=True)
         if not User.user_request_headers_exist(user_data):
-            return make_response(jsonify({'message': 'Logged requests expects email, password, and admin value. Either of them id not provided.'})), 400
+            return make_response(jsonify({'message': 'Logged requests expects email, password, and admin value. Either of them is not provided.'})), 400
 
         user_email = user_data['email']
         user_password = user_data['password']
@@ -91,7 +91,7 @@ class Login(MethodView):
                 'token': encoded_jwt_token.decode('UTF-8')
                 })), 200
             
-        return make_response(jsonify({'message': 'Invalid Email or Password'})), 401      
+        return make_response(jsonify({'message': 'Invalid/Wrong Password'})), 401      
 
 
 
@@ -103,7 +103,8 @@ class MealsViews(MethodView):
     @auth_decorator.token_required_to_authenticate
     def get(current_user, self):
         #Verify If User is admin
-        User.user_is_logged_in(current_user)
+        if not current_user:
+            return make_response(jsonify({'message': 'You need to login as Admin to perform this operation.', 'status_code': 401})), 401
 
         # Return all meals from the db
         meals = Meal.query.all()
@@ -125,7 +126,8 @@ class MealsViews(MethodView):
     @auth_decorator.token_required_to_authenticate
     def post(current_user, self):
         #Verify If User is admin
-        User.user_is_logged_in(current_user)
+        if not current_user:
+            return make_response(jsonify({'message': 'You need to login as Admin to perform this operation.', 'status_code': 401})), 401
 
         #Allow the vendor admin to add another meal option
         meal_data = request.get_json(force=True)    
@@ -162,7 +164,8 @@ class MealsViews(MethodView):
     @auth_decorator.token_required_to_authenticate
     def put(current_user, self, mealId):         
         #Verify If User is admin
-        User.user_is_logged_in(current_user)
+        if not current_user:
+            return make_response(jsonify({'message': 'You need to login as Admin to perform this operation.', 'status_code': 401})), 401
 
         #Allow the ADMIN to edit a particular meal option
         meal_data = request.get_json(force=True)
@@ -196,7 +199,8 @@ class MealsViews(MethodView):
     @auth_decorator.token_required_to_authenticate
     def delete(current_user, self, mealId):  
         #Verify If User is admin
-        User.user_is_logged_in(current_user)
+        if not current_user:
+            return make_response(jsonify({'message': 'You need to login as Admin to perform this operation.', 'status_code': 401})), 401
 
         #Allow the admin to delete a particular meal option
         meals = db.session.query(Meal).count()
@@ -274,7 +278,8 @@ class SetMenuOfTheDay(MethodView):
     @auth_decorator.token_required_to_authenticate
     def post(current_user, self):    
         #Verify If User is admin
-        User.user_is_logged_in(current_user)
+        if not current_user:
+            return make_response(jsonify({'message': 'You need to login as Admin to perform this operation.', 'status_code': 401})), 401
 
         #Allow the admin an operation to the set the menu of the day
         menu_data = request.get_json(force=True)    
@@ -357,7 +362,8 @@ class GetAllOrders(MethodView):
     @auth_decorator.token_required_to_authenticate
     def get(current_user, self):
         #Allow the Authorized Admin return all the Orders users have made
-        User.user_is_logged_in(current_user)
+        if not current_user:
+            return make_response(jsonify({'message': 'You need to login as Admin to perform this operation.', 'status_code': 401})), 401
 
         orderdb = Order.query.all()
         orders = Order.get_all_orders(orderdb)

@@ -133,15 +133,28 @@ class Authentication(BaseCaseTest):
 		self.assertEqual(response.status_code, 401)
 		self.assertIn(result['message'], 'Email is Invalid')
 
-	def test_login_with_empty_request_parameters(self):
-		#User login with invalid emails should show invalid email
+	def test_login_with_invalid_password(self):
+		#User login with invalid password
+		self.mock_signup()
 		user_data = json.dumps({
-			'username': 'example',
-			'email': 'tests',
-			'password': '12345',
+			'email': 'derrekwasswa256@gmail.com',
+			'password': '123456',
 			'admin': True
 		})
 		response = self.client.post('/api/v1/auth/login', data = user_data)
 		result = json.loads(response.data.decode())
 		self.assertEqual(response.status_code, 401)
-		self.assertIn(result['message'], 'Email is Invalid')
+		self.assertIn(result['message'], 'Invalid/Wrong Password')				
+		
+	def test_login_with_empty_request_parameters(self):
+		#User login with invalid emails should show invalid email
+		user_data = json.dumps({
+			'user': 'example',
+			'em': 'tests',
+			'pas': '12345',
+			'adm': True
+		})
+		response = self.client.post('/api/v1/auth/login', data = user_data)
+		result = json.loads(response.data.decode())
+		self.assertEqual(response.status_code, 400)
+		self.assertIn(result['message'], 'Logged requests expects email, password, and admin value. Either of them is not provided.')
