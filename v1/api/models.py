@@ -1,5 +1,5 @@
 from werkzeug.security import check_password_hash
-from flask import jsonify
+from flask import jsonify, make_response
 from . import db
 
 
@@ -67,8 +67,7 @@ class User(db.Model):
     @staticmethod
     def user_is_logged_in(current_user):
         if not current_user:
-            return jsonify({'message': 'You need to login as Admin to perform this operation.'})
-
+            return make_response(jsonify({'message': 'You need to login as Admin to perform this operation.', 'status_code': 400})), 400
 
     def __repr__(self):
         return "<User(user_id = '%s', username ='%s', password='%s', email='%s', admin='%s')>" % (self.user_id, self.username, self.password, self.email, self.admin)

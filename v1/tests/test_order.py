@@ -188,3 +188,23 @@ class OrderTests(BaseCaseTest):
 		response_get_orders = self.client.get('/api/v1/orders/', headers = self.headers)
 		self.assertEqual(response_get_orders.status_code, 200)
 		self.assertIn('2', str(response_get_orders.data))
+
+
+	def test_getting_all_orders_with_authorized_access(self):
+		#Testing for retrieving all the ORDERS
+		self.mock_signup()
+		self.mock_login()
+		self.add_mock_menu()
+		self.add_mock_meals_to_menu()
+
+		app_order = json.dumps({
+			'user': 'derrekwasswa256@gmail.com',
+			'meal': 2,
+			'date': '2018-05-12',
+			'menu_id': 1
+		})
+		response_add = self.client.post('/api/v1/orders/', data = app_order)
+		self.assertEqual(response_add.status_code, 201)
+		response_get_orders = self.client.get('/api/v1/orders/', headers = self.unauthorized_user_token_headers)
+		self.assertEqual(response_get_orders.status_code, 401)
+		self.assertIn("You need to login as Admin to perform this operation.", str(response_get_orders.data))

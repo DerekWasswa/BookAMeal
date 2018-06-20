@@ -18,6 +18,23 @@ class BaseCaseTest(unittest.TestCase):
 			'app-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJhZG1pbiI6InRydWUifQ.W0EoWSsYbSlS8fSRWJsV77cBqbfNg8Iy2txp_9BdBzM'
 		}
 
+		self.no_token_headers = {
+			'Content-Type': 'application/json',
+			'Authorization': 'Basic auth',
+		}
+
+		self.invalid_token_headers = {
+			'Content-Type': 'application/json',
+			'Authorization': 'Basic auth',
+			'app-access-token': 'eyJ1c2VyX2lkIjoxLCJhZG1pbiI6InRydWUifQ.W0EoWSsYbSlS8fSRWJsV77cBqbfNg8Iy2txp_9BdBzM'
+		}
+
+		self.unauthorized_user_token_headers = {
+			'Content-Type': 'application/json',
+			'Authorization': 'Basic auth',
+			'app-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6ZmFsc2UsInVzZXJfaWQiOjN9.QGxTDyonxflYa8hR2UKozeiIBUF6mUyZ2z5I71bkZQ8'
+		}
+
 		self.meals_mock_data1 = {
 			'meal': 'Luwombo with Matooke',
 			'price': 25000
@@ -50,6 +67,7 @@ class BaseCaseTest(unittest.TestCase):
 			'admin': True
 		})
 		self.client.post('/api/v1/auth/login', data = user_data)
+
 
 	def add_mock_meals_to_menu(self):
 		meals_mock_data = {
