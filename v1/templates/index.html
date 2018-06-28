@@ -18,76 +18,16 @@
 					<header id="header">
 						<div class="content">
 							<div class="inner">
-								<h1>Book A Meal</h1>
-							</div>
-
+                                <h1>Book A Meal API</h1>
+                            </div>
 						</div>
 					</header>
 
 				<!-- Main -->
-					<div id="main_block">
+					<div id="app_block">
 
-						<div class="authentication_block" id="signin_block">
-
-							<form method="post" action="#">
-							<label>Signin</label>
-								<div class="field">
-									<input type="email" name="userEmail" id="userEmail" placeholder="Email" />
-								</div>
-
-								<div class="field">
-									<input type="password" name="userPassword" id="userPassword" placeholder="Password" />
-								</div><br>
-
-								<div class="field">
-									<input type="button" value="Signin" id="signin_button" />
-								</div>
-
-								<div class="field">
-									<a href="javascript:void(0);" id="signup_link">Not Registered? Signup</a>
-								</div>
-
-							</form>
-
-						</div>
-
-						<div class="authentication_block block_off_screen" id="signup_block">
-
-							<form method="post" action="#">
-
-								<label>Signup</label>
-								<div class="field">
-									<input type="text" name="customerName" id="customerName" placeholder="Full name" />
-								</div>
-
-								<div class="field">
-									<input type="radio" id="Customer" class="customer" name="customer" />
-									<label for="customer">Customer</label>
-								</div>
-
-								<div class="field">
-									<input type="radio" id="vendor" class="vendor" name="vendor" />
-									<label for="vendor">Vendor</label>
-								</div>
-
-								<div class="field">
-									<input type="email" name="email" id="customerEmail" placeholder="Email" />
-								</div>
-
-								<div class="field">
-									<input type="password" name="Password" id="customerPassword" placeholder="Password" />
-								</div><br>
-
-								<div class="field">
-									<input type="button" value="Signup" id="signup_button" />
-								</div>
-
-								<div class="field">
-									<a href="javascript:void(0);" id="signin_link">Already Registered? Signin</a>
-								</div>
-							</form>
-
-						</div>
+                        <p>An application that allows a user to make meal orders from various vendors. The Vendors are able to make a menu from a set of meals they've added for a specific day. The vendors admins can edit the meals as well as deleting meal options.</p>
+                        <p><a href="https://bookamealapi1.docs.apiary.io/">API Documentation</a></p>
 
 					</div>
 
@@ -100,16 +40,6 @@
 
 		<!-- JS SCRIPTS -->
 		<script src="{{url_for('static', filename='js/book_a_meal.js')}}"></script>
-		<script>
-
-			document.getElementById('signin_button').onclick = signIn;
-			document.getElementById('signup_link').onclick = redirectSignUp;
-
-			document.getElementById('signup_button').onclick = signUp;
-			document.getElementById('signin_link').onclick = redirectSignIn;
-
-		</script>
-
 
 	</body>
 </html>
