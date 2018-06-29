@@ -59,7 +59,7 @@ Under the UI directory on the feature branch, there are various various HTML pag
 
 * Test the api endpoints using [Postman](https://www.getpostman.com/)
 * To test the endpoints in Terminal shell (Use either pytest test_app.py, nosetests test_app.py, python test_app.py)
-* Test the AI endpoints using [Heroku](https://bookamealapi1.docs.apiary.io/) 
+* Test the AI endpoints using [Heroku](https://bookamealapi1.docs.apiary.io/)
 
 
 ## Running the Application on your device
@@ -70,13 +70,12 @@ Under the UI directory on the feature branch, there are various various HTML pag
 > `$ pip install virtualenv`
 3. Change your current directory to the application you have just cloned.
 6. Start the virtual environment on to the application by running the command.
-> `source venv/bin/activate*`
+> `source venv/bin/activate`
 4. Run the following command to install the application modules and resources.
 > `pip install -r requirements.txt`
 5. Run the application by hitting the command.
 > `python run.py`
 
 
-
 ## Production Application
-The application api is deployed on Heroku [Link](https://bookamealapi1.docs.apiary.io/) 
+The application api is deployed on Heroku [Link](https://bookamealapi1.docs.apiary.io/)
