@@ -216,13 +216,8 @@ class GetMealById(MethodView):
 
 
 
-
-
-
-
-
-class GetMenuOfTheDay(MethodView):
-
+class MenuView(MethodView):
+    """ Have customers retrieve the menu of the day """
     def get(self):
         #Verify If User is admin
 
@@ -241,8 +236,6 @@ class GetMenuOfTheDay(MethodView):
             'status_code': 200,
             'data': appmenu
         })), 200
-
-class SetMenuOfTheDay(MethodView):
 
     @auth_decorator.token_required_to_authenticate
     def post(current_user, self):
@@ -283,11 +276,7 @@ class SetMenuOfTheDay(MethodView):
 
 
 
-
-
-
-
-class MakeOrder(MethodView):
+class OrderView(MethodView):
 
     def post(self):
         #Allow the authenticated users to make orders from the menu of the day
@@ -319,8 +308,6 @@ class MakeOrder(MethodView):
             'order': order_as_dict
             })), 201
 
-class GetAllOrders(MethodView):
-
     @auth_decorator.token_required_to_authenticate
     def get(current_user, self):
         #Allow the Admin return all the Orders users have made
@@ -331,7 +318,6 @@ class GetAllOrders(MethodView):
         }
         return make_response(jsonify(orders_response)), 200
 
-class ModifyOrder(MethodView):
 
     def put(self, orderId):
         #Allow the user to modify an order they've already made
@@ -353,15 +339,6 @@ class ModifyOrder(MethodView):
 
 
 
-
-
-
-
-
-
-
-
-
 #ADD THE VIEWS
 signup = SignUp.as_view('signup_view')
 login = Login.as_view('login_view')
@@ -369,12 +346,12 @@ login = Login.as_view('login_view')
 meals_views = MealsViews.as_view('meals_views')
 get_meal_by_id = GetMealById.as_view('get_meal_by_id')
 
-get_menu_of_the_day = GetMenuOfTheDay.as_view('get_menu_of_the_day')
-set_menu_the_day = SetMenuOfTheDay.as_view('set_menu_of_the_day')
+get_menu_of_the_day = MenuView.as_view('get_menu_of_the_day')
+set_menu_the_day = MenuView.as_view('set_menu_of_the_day')
 
-make_order = MakeOrder.as_view('make_order')
-get_all_orders = GetAllOrders.as_view('all_orders')
-modify_order = ModifyOrder.as_view('modify_order')
+make_order = OrderView.as_view('make_order')
+get_all_orders = OrderView.as_view('all_orders')
+modify_order = OrderView.as_view('modify_order')
 
 
 
