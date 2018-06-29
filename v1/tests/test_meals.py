@@ -18,7 +18,7 @@ class MealTests(BaseCaseTest):
 		self.assertEqual(response.status_code, 201)
 
 		posted_data = json.loads(response.get_data(as_text=True))
-		
+
 		response_edit_meal = self.client.put('/api/v1/meals/{}' . format(posted_data['meal']['meal_id']),
 			data = update_meal,
 			headers = self.headers
@@ -26,7 +26,7 @@ class MealTests(BaseCaseTest):
 		self.assertEqual(response_edit_meal.status_code, 202)
 
 		results_get_meals = self.client.get('/api/v1/meals/', headers = self.headers)
-		self.assertIn('Luwombo with All', str(results_get_meals.data))		
+		self.assertIn('Luwombo with All', str(results_get_meals.data))
 
 	def test_deleting_a_meal_option(self):
 		#Test that the API allows for deletion of a meal option should delete a meal by the ID
@@ -38,7 +38,7 @@ class MealTests(BaseCaseTest):
 		response = self.client.post('/api/v1/meals/', data = app_meal, headers = self.headers)
 		self.assertEqual(response.status_code, 201)
 
-		posted_data = json.loads(response.get_data(as_text=True))	
+		posted_data = json.loads(response.get_data(as_text=True))
 
 		response_delete_meal = self.client.delete('/api/v1/meals/{}' . format(posted_data['meal']['meal_id']), headers = self.headers)
 		self.assertEqual(response_delete_meal.status_code, 202)
@@ -70,7 +70,7 @@ class MealTests(BaseCaseTest):
 		response = self.client.post('/api/v1/meals/', data = app_meal, headers = self.headers)
 		self.assertEqual(response.status_code, 201)
 		self.assertIn("Fish with All foods", str(response.data))
-		self.assertIn('Meal Added Successfully', str(response.data))		
+		self.assertIn('Meal Added Successfully', str(response.data))
 
 	def test_adding_empty_meal_options(self):
 		#Testing addition of a meal option with missing content should not pass
@@ -81,8 +81,8 @@ class MealTests(BaseCaseTest):
 
 		response = self.client.post('/api/v1/meals/', data = app_meal, headers = self.headers)
 		result = json.loads(response.data.decode())
-		self.assertEqual(response.status_code, 400)	
-		self.assertIn(result['message'], 'Meal Options Missing.')	
+		self.assertEqual(response.status_code, 400)
+		self.assertIn(result['message'], 'Meal Options Missing.')
 
 	def test_adding_meal_price_that_is_not_an_int(self):
 		#Testing addition of a meal option with a price that is not empty should not pass
@@ -93,8 +93,8 @@ class MealTests(BaseCaseTest):
 
 		response = self.client.post('/api/v1/meals/', data = app_meal, headers = self.headers)
 		result = json.loads(response.data.decode())
-		self.assertEqual(response.status_code, 400)		
-		self.assertIn(result['message'], 'Meal Price has to be an Integer.')	
+		self.assertEqual(response.status_code, 400)
+		self.assertIn(result['message'], 'Meal Price has to be an Integer.')
 
 	def test_modifying_a_meal_with_empty_meal_options(self):
 		#MODIFYING A MEAL OPTIONS WITH EMPTY DATA SHOULD NOT ACCEPT
@@ -110,7 +110,7 @@ class MealTests(BaseCaseTest):
 		self.assertEqual(response.status_code, 201)
 
 		posted_data = json.loads(response.get_data(as_text=True))
-		
+
 		response_edit_meal = self.client.put('/api/v1/meals/{}' . format(posted_data['meal']['meal_id']),
 			data = update_meal,
 			headers = self.headers
@@ -129,7 +129,7 @@ class MealTests(BaseCaseTest):
 		result = json.loads(response.data.decode())
 		self.assertEqual(response.status_code, 400)
 		self.assertEqual(result['message'], 'Meal addition request expects a MEAL and its PRICE, either of them is not provided')
-		
+
 	def test_meal_update_with_empty_request_parameters(self):
 		#Meal modification with Empty Request parameters should not go ahead to execute
 		app_meal = json.dumps({
@@ -144,7 +144,7 @@ class MealTests(BaseCaseTest):
 		self.assertEqual(response.status_code, 201)
 
 		posted_data = json.loads(response.get_data(as_text=True))
-		
+
 		response_edit_meal = self.client.put('/api/v1/meals/{}' . format(posted_data['meal']['meal_id']),
 			data = update_meal,
 			headers = self.headers
@@ -167,7 +167,7 @@ class MealTests(BaseCaseTest):
 		self.assertEqual(response.status_code, 201)
 
 		posted_data = json.loads(response.get_data(as_text=True))
-		
+
 		response_edit_meal = self.client.put('/api/v1/meals/{}' . format(posted_data['meal']['meal_id']),
 			data = update_meal,
 			headers = self.headers

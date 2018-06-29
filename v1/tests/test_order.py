@@ -116,7 +116,7 @@ class MealTests(BaseCaseTest):
 		result = json.loads(response.data.decode())
 		self.assertEqual(response.status_code, 400)
 		self.assertEqual(result['message'], 'Making Order expects user email, meal id and either of them is not provided.')
-		
+
 	def test_order_modification_with_empty_request_parameters(self):
 		#Order modification with Empty Request parameters should not go ahead to execute
 		app_order = json.dumps({

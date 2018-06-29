@@ -2,7 +2,7 @@ import json
 from v1.tests.base_case_test import BaseCaseTest
 
 class Authentication(BaseCaseTest):
-    
+
 	""" USER REGISTRATION TESTS """
 	def test_registration(self):
 		#User registration should complete successfully
@@ -43,7 +43,7 @@ class Authentication(BaseCaseTest):
 		response = self.client.post('/api/v1/auth/signup', data = user_data)
 		self.assertEqual(response.status_code, 400)
 		result = json.loads(response.data.decode())
-		self.assertEqual(result['message'], "Missing Credentials")		
+		self.assertEqual(result['message'], "Missing Credentials")
 
 	def test_registration_for_invalid_emails(self):
 		#User registration with invalid emails should show invalid email
@@ -88,7 +88,7 @@ class Authentication(BaseCaseTest):
 		response = self.client.post('/api/v1/auth/login', data = user_data)
 		self.assertEqual(response.status_code, 401)
 		result = json.loads(response.data.decode())
-		self.assertEqual(result['message'], "Could not verify. Login credentials required.")		
+		self.assertEqual(result['message'], "Could not verify. Login credentials required.")
 
 	def test_user_login(self):
 		#Test a registered user can be able to login
@@ -103,7 +103,7 @@ class Authentication(BaseCaseTest):
 
 		user_login_response = self.client.post('/api/v1/auth/login', data = user_data)
 		result = json.loads(user_login_response.get_data(as_text=True))
-		self.assertEqual(user_login_response.status_code, 200)		
+		self.assertEqual(user_login_response.status_code, 200)
 		self.assertEqual(result['message'], 'Logged in successfully')
 
 	def test_user_login_with_user_who_does_not_exist(self):
@@ -117,7 +117,7 @@ class Authentication(BaseCaseTest):
 
 		user_login_response = self.client.post('/api/v1/auth/login', data = user_data)
 		result = json.loads(user_login_response.get_data(as_text=True))
-		self.assertEqual(user_login_response.status_code, 401)		
+		self.assertEqual(user_login_response.status_code, 401)
 		self.assertEqual(result['message'], 'User email not found!!')
 
 	def test_login_for_invalid_emails(self):

@@ -13,7 +13,7 @@ class User(object):
         self.admin = admin
         self.username = username
 
-    #Save a user object to the users as a dict 
+    #Save a user object to the users as a dict
     def save(self):
         app_users.append(self)
 
@@ -30,17 +30,17 @@ class User(object):
         for user in app_users:
             if user.email == user_email:
                 return True
-        return False  
+        return False
 
     #Check if the password the user is submitting matches the one they registered with
     def verify_user_password(self, user_password):
-        return check_password_hash(self.password, user_password)    
+        return check_password_hash(self.password, user_password)
 
     def get_user_by_email(self, user_email):
         for user in app_users:
             if user.email == user_email:
                 return user
-        return None  
+        return None
 
 
 class Meal(object):
@@ -75,7 +75,7 @@ class Meal(object):
         for i in range(len(app_meals)):
             if str(app_meals[i]['meal']) == str(meal):
                 return True
-        return False  
+        return False
 
     @staticmethod
     def delete_meal_by_id(mealId):
@@ -83,15 +83,15 @@ class Meal(object):
             if str(app_meals[i]['meal_id']) == str(mealId):
                 del app_meals[i]
                 return True
-        return False     
+        return False
 
-    
+
     @staticmethod
     def get_meal_by_id(meal_id):
         for meal in app_meals:
             if meal_id == meal['meal_id']:
                 return meal
-        return None      
+        return None
 
 
 
@@ -105,8 +105,8 @@ class Menu(object):
         self.meals = []
         self.description = description
         self.caterer = None
-        
-    @staticmethod    
+
+    @staticmethod
     def add_meal_to_menu(meal_object, date, menu_object):
         meal = {}
         meal['meal_id'] = meal_object['meal_id']
@@ -118,7 +118,7 @@ class Menu(object):
             if date == menu['date']:
                 menu_object.meals.append(meal)
                 break
-        
+
 
     def set_menu_of_the_day(self):
         app_menu.append(self)
@@ -146,6 +146,4 @@ class Order(object):
             if str(app_orders[i]['order_id']) == str(order_id):
                 app_orders[i]["meal_id"] = order_to_update
                 return True
-        return False 
-
-         
+        return False
