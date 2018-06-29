@@ -8,7 +8,7 @@ class User(db.Model):
     """ User Object to define users """
 
     __tablename__ = 'users'
-    user_id = db.Column(db.Integer, primary_key = True)
+    user_id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False, unique=True)
     password = db.Column(db.String(1000), nullable=False)
@@ -20,12 +20,11 @@ class User(db.Model):
         self.admin = admin
         self.username = username
 
+    # Save a user object to the users as a dict
 
-    #Save a user object to the users as a dict
     def save(self):
         db.session.add(self)
         db.session.commit()
-
 
     def get_user_object_as_dict(self):
         user = {}
@@ -34,8 +33,8 @@ class User(db.Model):
         user['admin'] = self.admin
         return user
 
-
     # verify if the user data requests exist
+
     @staticmethod
     def user_data_parameters_exist(user_data):
         if 'username' in user_data:
@@ -49,19 +48,21 @@ class User(db.Model):
     @staticmethod
     def user_data_is_empty(user_data):
         if 'username' in user_data:
-            if len(str(user_data['email'])) <= 0 or len(str(user_data['password'])) <= 0 or len(str(user_data['username'])) <= 0 or len(str(user_data['admin'])) <= 0:
+            if len(str(user_data['email'])) <= 0 or len(str(user_data['password'])) <= 0 or len(
+                    str(user_data['username'])) <= 0 or len(str(user_data['admin'])) <= 0:
                 return True
         else:
-            if len(str(user_data['email'])) <= 0 or len(str(user_data['password'])) <= 0 or len(str(user_data['admin'])) <= 0:
+            if len(str(user_data['email'])) <= 0 or len(
+                    str(user_data['password'])) <= 0 or len(str(user_data['admin'])) <= 0:
                 return True
         return False
 
+    # Check if the password the user is submitting matches the one they
+    # registered with
 
-    #Check if the password the user is submitting matches the one they registered with
     def verify_user_password(self):
         userdb = User.query.filter_by(email=self.email).first()
         return check_password_hash(userdb.password, self.password)
-
 
     @staticmethod
     def is_email_valid(email):
@@ -69,8 +70,8 @@ class User(db.Model):
         is_valid = validate_email(email)
         return is_valid
 
-
     # Check if a user with a specified email exists or not
+
     def check_if_user_exists(self):
         userdb = User.query.filter_by(email=self.email).first()
         if userdb is not None:
@@ -78,18 +79,16 @@ class User(db.Model):
         else:
             return False
 
-
     def __repr__(self):
-        return "<User(user_id = '%s', username ='%s', password='%s', email='%s', admin='%s')>" % (self.user_id, self.username, self.password, self.email, self.admin)
-
-
+        return "<User(user_id = '%s', username ='%s', password='%s', email='%s', admin='%s')>" % (
+            self.user_id, self.username, self.password, self.email, self.admin)
 
 
 class Meal(db.Model):
     """ Meal Object to define a meal in the database """
 
     __tablename__ = 'meals'
-    meal_id = db.Column(db.Integer, primary_key = True)
+    meal_id = db.Column(db.Integer, primary_key=True)
     meal = db.Column(db.Text, nullable=False, unique=True)
     price = db.Column(db.Integer, nullable=False)
     vendor_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
@@ -164,7 +163,7 @@ class Meal(db.Model):
     @staticmethod
     def meal_request_data_keys_exist(meal_data=None, invoke_from=None):
         ''' Verify if the api ping has the request keys provided '''
-        if invoke_from=='add_meal_option':
+        if invoke_from == 'add_meal_option':
             if 'meal' not in meal_data or 'price' not in meal_data:
                 return False
         else:
@@ -180,26 +179,28 @@ class Meal(db.Model):
         return False
 
 
-
-
 associate_meals_to_menu = db.Table('menu_meals',
-    db.Column('menu_id', db.Integer, db.ForeignKey('menus.menu_id'), primary_key=True),
-    db.Column('meal_id', db.Integer, db.ForeignKey('meals.meal_id'), primary_key=True))
+                                   db.Column(
+                                       'menu_id',
+                                       db.Integer,
+                                       db.ForeignKey('menus.menu_id'),
+                                       primary_key=True),
+                                   db.Column('meal_id', db.Integer, db.ForeignKey('meals.meal_id'), primary_key=True))
+
 
 class Menu(db.Model):
     """ Menu object that defines the menu in the db """
     __tablename__ = 'menus'
-    menu_id = db.Column(db.Integer, primary_key = True)
+    menu_id = db.Column(db.Integer, primary_key=True)
     vendor_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
     meals = db.relationship('Meal',
-    secondary= associate_meals_to_menu,
-    lazy='subquery',
-    backref=db.backref('menu', lazy=True)
-    )
+                            secondary=associate_meals_to_menu,
+                            lazy='subquery',
+                            backref=db.backref('menu', lazy=True)
+                            )
     date = db.Column(db.Date, nullable=False)
-
 
     def __init__(self, name, date, description, vendor_id):
         self.name = name
@@ -251,9 +252,11 @@ class Menu(db.Model):
         return True
 
     @staticmethod
-    def menu_request_data_empty(menu_name=None, description=None, date=None, meal_id=None):
+    def menu_request_data_empty(
+            menu_name=None, description=None, date=None, meal_id=None):
         ''' verify whether the request data parameters are not empty '''
-        if len(str(menu_name)) <= 0 or len(str(description)) <= 0 or len(str(date)) <= 0 or len(str(meal_id)) <= 0:
+        if len(str(menu_name)) <= 0 or len(str(description)) <= 0 or len(
+                str(date)) <= 0 or len(str(meal_id)) <= 0:
             return True
         return False
 
@@ -283,12 +286,10 @@ class Menu(db.Model):
         return meal_available
 
 
-
-
 class Order(db.Model):
     """ Order Object to define the Order in the db """
     __tablename__ = 'orders'
-    order_id = db.Column(db.Integer, primary_key = True)
+    order_id = db.Column(db.Integer, primary_key=True)
     menu_id = db.Column(db.Integer, db.ForeignKey('menus.menu_id'))
     meal_id = db.Column(db.Integer, db.ForeignKey('meals.meal_id'))
     user = db.Column(db.String(100), db.ForeignKey('users.email'))
@@ -354,8 +355,10 @@ class Order(db.Model):
         return True
 
     @staticmethod
-    def order_request_data_empty(meal=None, user=None, date=None, menu_id=None):
+    def order_request_data_empty(
+            meal=None, user=None, date=None, menu_id=None):
         ''' verify whether the request order data parameters are not empty '''
-        if len(str(meal)) <= 0 or len(str(user)) <= 0 or len(str(date)) <= 0 or len(str(menu_id)) <= 0:
+        if len(str(meal)) <= 0 or len(str(user)) <= 0 or len(
+                str(date)) <= 0 or len(str(menu_id)) <= 0:
             return True
         return False

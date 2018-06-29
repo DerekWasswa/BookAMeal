@@ -63,5 +63,7 @@ exclude_patterns:
 - "**/vendor/"
 - "**/*.d.ts"
 - "**/migrations/"
+- "**/UI/"
 - "**/*.js"
+- "**.js"
 - "v1/static/js/book_a_meal.js"
