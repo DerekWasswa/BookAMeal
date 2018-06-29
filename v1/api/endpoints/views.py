@@ -1,4 +1,4 @@
-# Book A Meal API 
+# Book A Meal API
 from flask import Flask, session, render_template, request, redirect, url_for, jsonify, make_response, current_app
 from flask_api import FlaskAPI, status
 import json
@@ -18,37 +18,28 @@ class SignUp(MethodView):
     def post(self):
         #Sign up a user either as a customer or vendor admin
         user_data = request.get_json(force=True)
-        if 'username' not in user_data or 'email' not in user_data or 'password' not in user_data or 'admin' not in user_data:
-            return make_response(jsonify({'message': 'Signup expects username, email, password, admin value, either of them is not provided.'})), 400
+        if not User.user_data_parameters_exist(user_data):
+            return make_response(jsonify({'message': 'Signup expects username, email, password, admin values.'})), 400
 
-        username = user_data['username']
-        user_email = user_data['email']
-        user_password = user_data['password']
-        user_admin = user_data['admin']
-
-        if len(str(user_email)) > 0 or len(str(user_password)) > 0 or len(str(username)) > 0 or len(str(user_admin)) > 0:
-
-            user = User(username, user_email, generate_password_hash(user_password), user_admin)
-            check_user_exists = user.check_exists(user_email)
-
-            #CHECK IF EMAIL IS VALID
-            is_valid = validate_email(user_email)
-            if not is_valid:
-                return make_response(jsonify({'message': 'Email is Invalid'})), 401
-
-            
-            if check_user_exists:
-                return make_response(jsonify({'message': 'User already exists. Please login.'})), 200
-            else:
-                user.save()
-
-                return make_response(jsonify({
-                    'message': 'Successfully Registered. Please login',
-                    'status_code': 201,
-                    'data': user.get_user_object_as_dict()
-                    })), 201 
-        else:
+        if User.user_data_is_empty(user_data):
             return make_response(jsonify({'message': 'Missing Credentials'})), 400
+
+        user = User(user_data['username'], user_data['email'], generate_password_hash(str(user_data['password'])), user_data['admin'])
+
+        #CHECK IF EMAIL IS VALID
+        if not User.is_email_valid(user_data['email']):
+            return make_response(jsonify({'message': 'Email is Invalid'})), 401
+
+        if user.check_exists(user_data['email']):
+            return make_response(jsonify({'message': 'User already exists. Please login.'})), 200
+        else:
+            user.save()
+            return make_response(jsonify({
+                'message': 'Successfully Registered. Please login',
+                'status_code': 201,
+                'data': user.get_user_object_as_dict()
+                })), 201
+
 
 class Login(MethodView):
 
@@ -56,12 +47,12 @@ class Login(MethodView):
         #authenticate customers or admin
         user_data = request.get_json(force=True)
         if 'email' not in user_data or 'password' not in user_data or 'admin' not in user_data:
-            return make_response(jsonify({'message': 'Logged requests expects email, password, and admin value. Either of them id not provided.'})), 400
+            return make_response(jsonify({'message': 'Logged requests expects email, password, and admin keys.'})), 400
 
         user_email = user_data['email']
         user_password = user_data['password']
         user_admin = user_data['admin']
-        
+
         if len(str(user_email)) <= 0 or len(str(user_password)) <= 0 or len(str(user_admin)) <= 0:
             return make_response(jsonify({'message': 'Could not verify. Login credentials required.'})), 401
 
@@ -72,7 +63,7 @@ class Login(MethodView):
 
         user = User('', user_email, user_password, user_admin)
         if not User.check_exists(user_email):
-            return make_response(jsonify({'message': 'User email not found!!'})), 401 
+            return make_response(jsonify({'message': 'User email not found!!'})), 401
 
         app_user = user.get_user_by_email(user_email)
         if check_password_hash(app_user.password, user_password):
@@ -80,7 +71,7 @@ class Login(MethodView):
             app = create_app()
             # CREATE TOKEN: leverage isdangerous to create the token
             encoded_jwt_token = jwt.encode({
-                'admin': user_admin, 
+                'admin': user_admin,
                 'email': user_email
                 }, app.config['SECRET_KEY'], algorithm='HS256')
             return make_response(jsonify({
@@ -88,8 +79,8 @@ class Login(MethodView):
                 'status_code': 200,
                 'token': encoded_jwt_token.decode('UTF-8')
                 })), 200
-            
-        return make_response(jsonify({'message': 'Invalid Email or Password'})), 401      
+
+        return make_response(jsonify({'message': 'Invalid Email or Password'})), 401
 
 
 
@@ -109,7 +100,7 @@ class MealsViews(MethodView):
             'message': 'success',
             'status_code': 200,
             'data': models.app_meals
-        })), 200        
+        })), 200
 
     @auth_decorator.token_required_to_authenticate
     def post(current_user, self):
@@ -118,7 +109,7 @@ class MealsViews(MethodView):
             return jsonify({'message': 'You need to login as Admin to perform this operation.'})
 
         #Allow the vendor admin to add another meal option
-        meal_data = request.get_json(force=True)    
+        meal_data = request.get_json(force=True)
         if 'meal' not in meal_data or 'price' not in meal_data:
             return make_response(jsonify({'message': 'Meal addition request expects a MEAL and its PRICE, either of them is not provided'})), 400
 
@@ -131,7 +122,7 @@ class MealsViews(MethodView):
         #Try parsing the Price, If doesnot pass the try then cast error
         if not isinstance(price, int):
             return make_response(jsonify({'message': 'Meal Price has to be an Integer.'})), 400
-            
+
 
         meal_object = Meal(meal, price)
         meal_object.add_meal() #ADD MEAL HERE
@@ -148,7 +139,7 @@ class MealsViews(MethodView):
         })), 201
 
     @auth_decorator.token_required_to_authenticate
-    def put(current_user, self, mealId):         
+    def put(current_user, self, mealId):
         #Verify If User is admin
         if not current_user:
             return jsonify({'message': 'You need to login as Admin to perform this operation.'})
@@ -162,17 +153,17 @@ class MealsViews(MethodView):
         price_update = meal_data['price_update']
 
         if len(str(meal_update)) <= 0 or len(str(price_update)) <= 0:
-            return make_response(jsonify({'message': 'Can not update meal with empty meal options'})), 400    
-                        
+            return make_response(jsonify({'message': 'Can not update meal with empty meal options'})), 400
+
 
         if not isinstance(price_update, int):
-            return make_response(jsonify({'message': 'Can not update meal with non integer price'})), 400    
-            
+            return make_response(jsonify({'message': 'Can not update meal with non integer price'})), 400
+
         for i in range(len(models.app_meals)):
             if str(models.app_meals[i]['meal_id']) == str(mealId):
                 models.app_meals[i]['meal'] = meal_update
                 models.app_meals[i]['price'] = price_update
-                break     
+                break
 
         meal_as_dict = {}
         meal_as_dict['meal_id'] = mealId
@@ -182,17 +173,17 @@ class MealsViews(MethodView):
             'message': 'Meal Updated successfully',
             'status_code': 202,
             'data': meal_as_dict
-        })), 202          
+        })), 202
 
     @auth_decorator.token_required_to_authenticate
-    def delete(current_user, self, mealId):  
+    def delete(current_user, self, mealId):
         #Verify If User is admin
         if not current_user:
             return jsonify({'message': 'You need to login as Admin to perform this operation.'})
 
         #Allow the admin to delete a particular meal option
         if len(models.app_meals) > 0:
-            delete_status = Meal.delete_meal_by_id(mealId)  
+            delete_status = Meal.delete_meal_by_id(mealId)
 
             if delete_status:
                 return make_response(jsonify({
@@ -203,7 +194,7 @@ class MealsViews(MethodView):
                 return make_response(jsonify({
                     'message': 'Something went wrong!! Meal not deleted.',
                     'status_code': 404
-                })), 404          
+                })), 404
 
         else:
             return make_response(jsonify({'message': 'Meals are Empty'})), 200
@@ -221,7 +212,7 @@ class GetMealById(MethodView):
             return make_response(jsonify({ 'message': 'Meal not Found' })), 404
 
         else:
-            return make_response(jsonify({'message': 'Meal are empty.'})), 404            
+            return make_response(jsonify({'message': 'Meal are empty.'})), 404
 
 
 
@@ -232,7 +223,7 @@ class GetMealById(MethodView):
 
 class GetMenuOfTheDay(MethodView):
 
-    def get(self):   
+    def get(self):
         #Verify If User is admin
 
         appmenu = []
@@ -249,18 +240,18 @@ class GetMenuOfTheDay(MethodView):
             'message': 'success',
             'status_code': 200,
             'data': appmenu
-        })), 200        
+        })), 200
 
 class SetMenuOfTheDay(MethodView):
 
     @auth_decorator.token_required_to_authenticate
-    def post(current_user, self):    
+    def post(current_user, self):
         #Verify If User is admin
         if not current_user:
             return jsonify({'message': 'You need to login as Admin to perform this operation.'})
 
         #Allow the admin an operation to the set the menu of the day
-        menu_data = request.get_json(force=True)    
+        menu_data = request.get_json(force=True)
         if 'date' not in menu_data or 'description' not in menu_data or 'menu_name' not in menu_data or 'meal_id' not in menu_data:
             return make_response(jsonify({'message': 'Setting a Menu expects Menu name, date, description, and meal Id to add to the menu, either of them is not provided.'})), 400
 
@@ -271,7 +262,7 @@ class SetMenuOfTheDay(MethodView):
 
         if len(str(menu_name)) <= 0 or len(str(description)) <= 0 or len(str(date)) <= 0 or len(str(meal_id)) <= 0:
             return make_response(jsonify({'message': 'Empty Menu Details.'})), 400
-    
+
 
         meal = Meal.get_meal_by_id(meal_id)
 
@@ -282,13 +273,13 @@ class SetMenuOfTheDay(MethodView):
                 menu_exists = True
             else:
                 continue
-                
+
         if not menu_exists:
             menu = Menu(menu_name, date, description)
             menu.meals.append(meal)
             menu.set_menu_of_the_day()
 
-        return make_response(jsonify({'status_code': 201, 'data': 'success'})), 201        
+        return make_response(jsonify({'status_code': 201, 'data': 'success'})), 201
 
 
 
@@ -309,10 +300,10 @@ class MakeOrder(MethodView):
 
         if len(str(meal_id)) <= 0 or len(str(user_id)) <= 0:
             return make_response(jsonify({'message': 'Can not order with empty content.'})), 400
-        
+
         if not validate_email(user_id):
             return make_response(jsonify({'message': 'User Email not valid.'})), 400
-        
+
         order = Order(user_id, meal_id)
         order.make_order()
         order_as_dict = {}
@@ -342,7 +333,7 @@ class GetAllOrders(MethodView):
 
 class ModifyOrder(MethodView):
 
-    def put(self, orderId):      
+    def put(self, orderId):
         #Allow the user to modify an order they've already made
         if len(models.app_orders) > 0:
 
@@ -358,7 +349,7 @@ class ModifyOrder(MethodView):
             Order.update_order_by_id(orderId, order_update)
             return make_response(jsonify({'message': 'Order Updated successfully'})), 202
         else:
-            return make_response(jsonify({'message': 'Orders are Empty', 'status_code': 200})), 200                
+            return make_response(jsonify({'message': 'Orders are Empty', 'status_code': 200})), 200
 
 
 
