@@ -7,7 +7,7 @@ env:
 
 python:
     - "3.6"
-    
+
 
 virtualenv:
     system_site_package: true
@@ -19,13 +19,12 @@ install:
 
 script:
 - pytest v1/tests
-- coverage run --source='v1/' run_tests.py test 
+- coverage run --source='v1/' manage.py test
 - coverage report
-    
+
 after_script:
 - codeclimate-test-reporter
 - coveralls
 
 after_success:
     - coveralls
-
