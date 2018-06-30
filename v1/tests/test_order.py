@@ -240,7 +240,7 @@ class OrderTests(BaseCaseTest):
         self.assertEqual(response_edit_order.status_code, 400)
         self.assertEqual(
             result['message'],
-            'Modifying order expects the order id, user, menu id, meal id to edit with which is not provided.')
+            'Modifying order expects the order id, user, menu id, meal id keys.')
 
     def test_getting_all_orders(self):
         # Testing for retrieving all the ORDERS

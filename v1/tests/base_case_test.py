@@ -25,6 +25,47 @@ class BaseCaseTest(unittest.TestCase):
             'app-access-token': 'eyJ1c2VyX2lkIjoxLCJhZG1pbiI6InRydWUifQ.W0EoWSsYbSlS8fSRWJsV77cBqbfNg8Iy2txp_9BdBzM'
         }
 
+        self.user_data = json.dumps({
+            'username': 'Wasswa Derick',
+            'email': 'wasswadero@gmail.com',
+            'password': '12345',
+            'admin': False
+        })
+
+        self.invalid_email_user_data = json.dumps({
+            'username': 'example',
+            'email': 'test',
+            'password': '12345',
+            'admin': True
+        })
+
+        self.wrong_request_user_params = json.dumps({
+            'us': 'example',
+            'ma': 'tester@example.com',
+            'asswo': '12345',
+            'dmi': True
+        })
+
+        self.user_does_not_exists = json.dumps({
+            'username': 'invasionworld',
+            'email': 'invasionworlds@yahoo.com',
+            'password': '12345',
+            'admin': True
+        })
+
+        self.empty_user_data = json.dumps({
+            'username': '',
+            'email': '',
+            'password': '',
+            'admin': ''
+        })
+
+        self.empty_user_data_login = json.dumps({
+            'email': '',
+            'password': '',
+            'admin': ''
+        })
+
         self.all_food_meal = json.dumps({
             'meal': 'Fish with All foods',
             'price': 25000

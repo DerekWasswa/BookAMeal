@@ -20,25 +20,18 @@ class SignUp(MethodView):
     def post(self):
         # Sign up a user either as a customer or vendor admin
         user_data = request.get_json(force=True)
+
         if not User.user_data_parameters_exist(user_data):
             return make_response(jsonify(
                 {'message': 'Signup expects username, email, password, admin values.'})), 400
 
-        if User.user_data_is_empty(user_data):
-            return make_response(
-                jsonify({'message': 'Missing Credentials'})), 400
-
-        # CHECK IF EMAIL IS VALID
-        if not User.is_email_valid(user_data['email']):
-            return make_response(jsonify({'message': 'Email is Invalid'})), 401
+        response = User.validate_user_registration_data(user_data)
+        if not response['validation_pass']:
+            return make_response(jsonify({'message': response['message'], 'status_code': response['status_code']
+            })), response['status_code']
 
         user = User(user_data['username'], user_data['email'], generate_password_hash(
             str(user_data['password'])), user_data['admin'])
-
-        # CHECK IF USER ALREADY EXISTS
-        if user.check_if_user_exists():
-            return make_response(
-                jsonify({'message': 'User already exists. Please login.'})), 200
 
         # ADD THE USER TO THE DB SESSION
         user.save()
@@ -52,30 +45,17 @@ class Login(MethodView):
     def post(self):
         # authenticate customers or admin
         user_data = request.get_json(force=True)
+
         if not User.user_data_parameters_exist(user_data):
             return make_response(jsonify(
                 {'message': 'Logged requests expects email, password, and admin values.'})), 400
 
-        if User.user_data_is_empty(user_data):
-            return make_response(
-                jsonify({'message': 'Could not verify. Login credentials required.'})), 401
+        user = User('n/a', user_data['email'], user_data['password'], user_data['admin'])
 
-        # CHECK IF EMAIL IS VALID
-        if not User.is_email_valid(user_data['email']):
-            return make_response(jsonify({'message': 'Email is Invalid'})), 401
-
-        user = User(
-            'n/a',
-            user_data['email'],
-            user_data['password'],
-            user_data['admin'])
-        if not user.check_if_user_exists():
-            return make_response(
-                jsonify({'message': 'User email not found!!'})), 401
-
-        if not user.verify_user_password():
-            return make_response(
-                jsonify({'message': 'Invalid/Wrong Password'})), 401
+        response = User.validate_user_login_data(user_data, user)
+        if not response['validation_pass']:
+            return make_response(jsonify({'message': response['message'], 'status_code': response['status_code']
+            })), response['status_code']
 
         # Create the app instance to use to generate the token
         # CREATE TOKEN: leverage isdangerous to create the token
@@ -120,19 +100,12 @@ class MealsViews(MethodView):
 
         vendor_id = g.user_id
 
-        if Meal.meal_request_data_empty(meal_data['meal'], meal_data['price']):
-            return make_response(
-                jsonify({'message': 'Meal Options Missing.'})), 400
-
-        # Try parsing the Price, If doesnot pass the try then cast error
-        if not Meal.is_price_integer(meal_data['price']):
-            return make_response(
-                jsonify({'message': 'Meal Price has to be an Integer.'})), 400
-
         meal_object = Meal(meal_data['meal'], meal_data['price'], vendor_id)
-        # check if the meal has already been entered
-        if meal_object.is_meal_already_existing():
-            return jsonify({'message': 'Meal already exists.'}), 400
+
+        response = Meal.validate_meal_data(meal_data, meal_object)
+        if not response['validation_pass']:
+            return make_response(jsonify({'message': response['message'], 'status_code': response['status_code']
+            })), response['status_code']
 
         # ADD THE USER TO THE DB SESSION
         meal_object.save()
@@ -157,18 +130,10 @@ class MealsViews(MethodView):
             return make_response(jsonify(
                 {'message': 'Meal Update expects MEAL_UPDATE and PRICE_UPDATE, either of them is not provided.'})), 400
 
-        if not Meal.is_meal_available(mealId):
-            return make_response(jsonify(
-                {'message': 'Update Incomplete! Meal does not exist.', 'status_code': 404})), 404
-
-        if Meal.meal_request_data_empty(
-                meal_data['meal_update'], meal_data['price_update']):
-            return make_response(
-                jsonify({'message': 'Can not update meal with empty meal options'})), 400
-
-        if not Meal.is_price_integer(meal_data['price_update']):
-            return make_response(
-                jsonify({'message': 'Can not update meal with non integer price'})), 400
+        response = Meal.validate_meal_update_data(meal_data['meal_update'], meal_data['price_update'], mealId)
+        if not response['validation_pass']:
+            return make_response(jsonify({'message': response['message'], 'status_code': response['status_code']
+            })), response['status_code']
 
         vendor_id = g.user_id
         Meal.query.filter_by(
@@ -215,14 +180,11 @@ class GetMealById(MethodView):
 
     def get(self, mealId):
         # Return a meal for a particular ID
-        if db.session.query(Meal).count() < 1:
-            return make_response(
-                jsonify({'message': 'Meal are empty.', 'status_code': 200})), 200
+        response = Meal.get_meal_by_id_validation(mealId)
+        if not response['validation_pass']:
+            return make_response(jsonify({'message': response['message'], 'status_code': response['status_code']
+            })), response['status_code']
 
-        mealdb = Meal.query.filter_by(meal_id=mealId).first()
-        if Meal.is_meal_available(mealId):
-            return make_response(
-                jsonify({'message': 'Meal Exists', 'status_code': 200})), 200
         return make_response(
             jsonify({'message': 'Meal not Found', 'status_code': 404})), 404
 
@@ -259,20 +221,10 @@ class MenusView(MethodView):
             return make_response(jsonify(
                 {'message': 'Setting a Menu expects Menu name, date, description, and meal Id keys.'})), 400
 
-        date = menu_data['date']
-        description = menu_data['description']
-        meal_id = menu_data['meal_id']
-        menu_name = menu_data['menu_name']
-
-        if Menu.menu_request_data_empty(
-                menu_data['menu_name'], menu_data['description'], menu_data['date'], menu_data['meal_id']):
-            return make_response(
-                jsonify({'message': 'Empty Menu Details.'})), 400
-
-        # CHECK IF THE MEAL ID EXISTS
-        if not Meal.is_meal_available(menu_data['meal_id']):
-            return make_response(jsonify(
-                {'message': 'Meal with provided ID does not exist.', 'status_code': 200})), 200
+        response = Menu.validate_menu_data(menu_data)
+        if not response['validation_pass']:
+            return make_response(jsonify({'message': response['message'], 'status_code': response['status_code']
+            })), response['status_code']
 
         # CHECK IF THE MENU OF THE DAY ALREADY EXISTS
         vendor_id = g.user_id
@@ -283,8 +235,11 @@ class MenusView(MethodView):
             menudb.meals.append(mealdb)
             Menu.add_meals_to_menu()
         else:
-            create_new_menu = Menu(menu_name, date, description, g.user_id)
+            create_new_menu = Menu(menu_data['menu_name'], menu_data['date'], menu_data['description'], g.user_id)
+            mealdb = Meal.query.filter_by(meal_id=menu_data['meal_id']).first()
+            create_new_menu.meals.append(mealdb)
             create_new_menu.create_menu()
+
 
         return make_response(
             jsonify({'status_code': 201, 'message': 'success'})), 201
@@ -300,31 +255,10 @@ class OrdersView(MethodView):
             return make_response(jsonify(
                 {'message': 'Making Order expects; user email, meal id, menu_id, and date keys.', 'status_code': 400})), 400
 
-        if Order.order_request_data_empty(
-                order_data['meal'], order_data['user'], order_data['date'], order_data['menu_id']):
-            return make_response(jsonify(
-                {'message': 'Can not order with empty content.', 'status_code': 400})), 400
-
-        if not User.is_email_valid(order_data['user']):
-            return make_response(
-                jsonify({'message': 'User Email not valid.', 'status_code': 400})), 400
-
-        # check if the user is a registered user and is logged
-        user = User('', order_data['user'], '', '')
-        if not user.check_if_user_exists():
-            return make_response(jsonify(
-                {'message': 'User doesnot exist or is not logged in.', 'status_code': 401})), 401
-
-        # verify if menu id exists and has the meal id specified
-        if not Menu.check_if_a_menu_exists(order_data['menu_id']):
-            return make_response(
-                jsonify({'message': 'Menu ID does not exist.', 'status_code': 400})), 400
-
-        # if false then meal does not exist
-        if not Menu.check_meal_exists_in_menu(
-                order_data['menu_id'], order_data['meal']):
-            return make_response(jsonify(
-                {'message': 'Meal ID does not exist in the menu of the day', 'status_code': 400})), 400
+        response = Order.validate_order_data(order_data)
+        if not response['validation_pass']:
+            return make_response(jsonify({'message': response['message'], 'status_code': response['status_code']
+            })), response['status_code']
 
         # MEAL EXISTS IN THE MENU -> Make the Order to the db
         order = Order(
@@ -363,29 +297,12 @@ class OrdersView(MethodView):
         order_data = request.get_json(force=True)
         if not Order.order_request_data_keys_exist(order_data):
             return make_response(jsonify(
-                {'message': 'Modifying order expects the order id, user, menu id, meal id to edit with which is not provided.'})), 400
+                {'message': 'Modifying order expects the order id, user, menu id, meal id keys.'})), 400
 
-        if Order.order_request_data_empty(
-                order_data['order_to_update'], order_data['user'], order_data['meal_id'], order_data['menu_id']):
-            return make_response(
-                jsonify({'message': 'Can not modify an order with empty content.'})), 400
-
-        # check if the user is a registered user
-        user = User('', order_data['user'], '', '')
-        if not user.check_if_user_exists():
-            return make_response(jsonify(
-                {'message': 'User doesnot exist or is not logged in.', 'status_code': 401})), 401
-
-        # verify if menu id exists and has the meal id specified
-        if not Menu.check_if_a_menu_exists(order_data['menu_id']):
-            return make_response(
-                jsonify({'message': 'Menu ID does not exist.', 'status_code': 400})), 400
-
-        # if false then meal does not exist
-        if not Menu.check_meal_exists_in_menu(
-                order_data['menu_id'], order_data['meal_id']):
-            return make_response(jsonify(
-                {'message': 'Meal ID does not exist in the menu of the day', 'status_code': 400})), 400
+        response = Order.validate_order_update_data(order_data)
+        if not response['validation_pass']:
+            return make_response(jsonify({'message': response['message'], 'status_code': response['status_code']
+            })), response['status_code']
 
         Order.query.filter_by(
             order_id=orderId,

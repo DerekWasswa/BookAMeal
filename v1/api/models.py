@@ -1,4 +1,4 @@
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 from flask import jsonify, make_response
 from validate_email import validate_email
 from . import db
@@ -32,6 +32,59 @@ class User(db.Model):
         user['email'] = self.email
         user['admin'] = self.admin
         return user
+
+    # Verify user registration data
+
+    @staticmethod
+    def validate_user_registration_data(user_data):
+        message, status_code, validation_pass = '', 0, True
+
+        user = User(user_data['username'], user_data['email'], generate_password_hash(
+            str(user_data['password'])), user_data['admin'])
+
+        if User.user_data_is_empty(user_data):
+            message = 'Missing Credentials'
+            status_code = 400
+            validation_pass = False
+        elif not User.is_email_valid(user_data['email']):
+            # CHECK IF EMAIL IS VALID
+            message = 'Email is Invalid'
+            status_code = 401
+            validation_pass = False
+        elif user.check_if_user_exists():
+            message = 'User already exists. Please login.'
+            status_code = 200
+            validation_pass = False
+        else:
+            pass
+        return {'message': message, 'status_code': status_code, 'validation_pass': validation_pass}
+
+    # Verify user login data
+
+    @staticmethod
+    def validate_user_login_data(user_data, user_object):
+        message, status_code, validation_pass = '', 0, True
+
+        if User.user_data_is_empty(user_data):
+            message = 'Could not verify. Login credentials required.'
+            status_code = 401
+            validation_pass = False
+        elif not User.is_email_valid(user_data['email']):
+            # CHECK IF EMAIL IS VALID
+            message = 'Email is Invalid'
+            status_code = 401
+            validation_pass = False
+        elif not user_object.check_if_user_exists():
+            message = 'User email not found!!'
+            status_code = 401
+            validation_pass = False
+        elif not user_object.verify_user_password():
+            message = 'Invalid/Wrong Password'
+            status_code = 401
+            validation_pass = False
+        else:
+            pass
+        return {'message': message, 'status_code': status_code, 'validation_pass': validation_pass}
 
     # verify if the user data requests exist
 
@@ -123,6 +176,83 @@ class Meal(db.Model):
         return meals_list
 
     @staticmethod
+    def validate_meal_data(meal_data, meal_object):
+        ''' validate the meal data '''
+        message, status_code, validation_pass = '', 0, True
+
+        if Meal.meal_request_data_empty(meal_data['meal'], meal_data['price']):
+            message = 'Meal Options Missing.'
+            status_code = 400
+            validation_pass = False
+        elif not Meal.is_price_integer(meal_data['price']):
+            # Try parsing the Price, If doesnot pass the try then cast error
+            message = 'Meal Price has to be an Integer.'
+            status_code = 400
+            validation_pass = False
+        elif meal_object.is_meal_already_existing():
+            # check if the meal has already been entered
+            message = 'Meal already exists.'
+            status_code = 400
+            validation_pass = False
+        else:
+            pass
+        return {'message': message, 'status_code': status_code, 'validation_pass': validation_pass}
+
+    @staticmethod
+    def validate_meal_update_data(meal, price, mealId):
+        ''' validate the meal data '''
+        message, status_code, validation_pass = '', 0, True
+
+        if not Meal.is_meal_available(mealId):
+            message = 'Update Incomplete! Meal does not exist.'
+            status_code = 404
+            validation_pass = False
+        elif Meal.meal_request_data_empty(meal, price):
+            message = 'Can not update meal with empty meal options'
+            status_code = 400
+            validation_pass = False
+        elif not Meal.is_price_integer(price):
+            message = 'Can not update meal with non integer price'
+            status_code = 400
+            validation_pass = False
+        else:
+            pass
+        return {'message': message, 'status_code': status_code, 'validation_pass': validation_pass}
+
+    @staticmethod
+    def validate_meal_deletion(mealId):
+        ''' validate the meal deletion checks '''
+        message, status_code, validation_pass = '', 0, True
+
+        if Meal.meals_empty():
+            message = 'Meals are Empty'
+            status_Code = 200
+            validation_pass = False
+        elif not Meal.is_meal_available(mealId):
+            message = 'Deletion Incomplete! Meal Not Found.'
+            status_code = 404
+            validation_pass = False
+        else:
+            pass
+        return {'message': message, 'status_code': status_code, 'validation_pass': validation_pass}
+
+    @staticmethod
+    def get_meal_by_id_validation(mealId):
+        message, status_code, validation_pass = '', 0, True
+
+        if db.session.query(Meal).count() < 1:
+            message = 'Meal are empty.'
+            status_code = 200
+            validation_pass = False
+
+        mealdb = Meal.query.filter_by(meal_id=mealId).first()
+        if Meal.is_meal_available(mealId):
+            message = 'Meal Exists'
+            status_code = 200
+
+        return {'message': message, 'status_code': status_code, 'validation_pass': validation_pass}
+
+    @staticmethod
     def meals_empty():
         ''' return the count of the meals in the database '''
         meals = db.session.query(Meal).count()
@@ -177,7 +307,6 @@ class Meal(db.Model):
         if len(str(meal)) <= 0 or len(str(price)) <= 0:
             return True
         return False
-
 
 associate_meals_to_menu = db.Table('menu_meals',
                                    db.Column(
@@ -285,6 +414,24 @@ class Menu(db.Model):
                 break
         return meal_available
 
+    @staticmethod
+    def validate_menu_data(menu_data):
+        ''' validate the meal data '''
+        message, status_code, validation_pass = '', 0, True
+
+        if Menu.menu_request_data_empty(
+                menu_data['menu_name'], menu_data['description'], menu_data['date'], menu_data['meal_id']):
+            message = 'Empty Menu Details.'
+            status_code = 400
+            validation_pass = False
+        elif not Meal.is_meal_available(menu_data['meal_id']):
+            message = 'Meal with provided ID does not exist.'
+            status_code = 200
+            validation_pass = False
+        else:
+            pass
+        return {'message': message, 'status_code': status_code, 'validation_pass': validation_pass}
+
 
 class Order(db.Model):
     """ Order Object to define the Order in the db """
@@ -362,3 +509,71 @@ class Order(db.Model):
                 str(date)) <= 0 or len(str(menu_id)) <= 0:
             return True
         return False
+
+    @staticmethod
+    def validate_order_data(order_data):
+        ''' validate the Order data '''
+
+        user = User('', order_data['user'], '', '')
+        message, status_code, validation_pass = '', 0, True
+
+        if Order.order_request_data_empty(
+                order_data['meal'], order_data['user'], order_data['date'], order_data['menu_id']):
+            message = 'Can not order with empty content.'
+            status_code = 400
+            validation_pass = False
+        elif not User.is_email_valid(order_data['user']):
+            message = 'User Email not valid.'
+            status_code = 400
+            validation_pass = False
+        elif not user.check_if_user_exists():
+            # check if the user is a registered user and is logged
+            message = 'User doesnot exist or is not logged in.'
+            status_code = 401
+            validation_pass = False
+        elif not Menu.check_if_a_menu_exists(order_data['menu_id']):
+            # verify if menu id exists and has the meal id specified
+            message = 'Menu ID does not exist.'
+            status_code = 400
+            validation_pass = False
+        elif not Menu.check_meal_exists_in_menu(
+                order_data['menu_id'], order_data['meal']):
+                 # if false then meal does not exist
+            message = 'Meal ID does not exist in the menu of the day'
+            status_code = 400
+            validation_pass = False
+        else:
+            pass
+        return {'message': message, 'status_code': status_code, 'validation_pass': validation_pass}
+
+    @staticmethod
+    def validate_order_update_data(order_data):
+        ''' validate the Order data '''
+
+        user = User('', order_data['user'], '', '')
+        message, status_code, validation_pass = '', 0, True
+
+        if Order.order_request_data_empty(
+                order_data['order_to_update'], order_data['user'], order_data['meal_id'], order_data['menu_id']):
+            message = 'Can not modify an order with empty content.'
+            status_code = 400
+            validation_pass = False
+        elif not user.check_if_user_exists():
+            # check if the user is a registered user
+            message = 'User doesnot exist or is not logged in.'
+            status_code = 401
+            validation_pass = False
+        elif not Menu.check_if_a_menu_exists(order_data['menu_id']):
+            # verify if menu id exists and has the meal id specified
+            message = 'Menu ID does not exist.'
+            status_code = 400
+            validation_pass = False
+        elif not Menu.check_meal_exists_in_menu(
+                order_data['menu_id'], order_data['meal_id']):
+            # if false then meal does not exist
+            message = 'Meal ID does not exist in the menu of the day'
+            status_code = 400
+            validation_pass = False
+        else:
+            pass
+        return {'message': message, 'status_code': status_code, 'validation_pass': validation_pass}
