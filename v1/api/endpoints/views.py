@@ -3,7 +3,10 @@ from flask import Flask, g, session, render_template, request, redirect, url_for
 from flask_api import FlaskAPI, status
 import json
 from werkzeug.security import generate_password_hash, check_password_hash
-from v1.api.models import User, Meal, Menu, Order
+from v1.api.models.meals import Meal
+from v1.api.models.users import User
+from v1.api.models.menu import Menu
+from v1.api.models.orders import Order
 from v1.api.utils import UtilHelper
 from v1.api import models
 from validate_email import validate_email
@@ -137,12 +140,8 @@ class MealsViews(MethodView):
             })), response['status_code']
 
         vendor_id = g.user_id
-        Meal.query.filter_by(
-            meal_id=mealId,
-            vendor_id=vendor_id).update(
-            dict(
-                meal=meal_data['meal_update'],
-                price=meal_data['price_update']))
+        Meal.query.filter_by(meal_id=mealId, vendor_id=vendor_id).update(
+            dict(meal=meal_data['meal_update'], price=meal_data['price_update']))
         Meal.commit_meal_changes()
 
         meal_as_dict = {}
@@ -231,8 +230,7 @@ class MenusView(MethodView):
         vendor_id = g.user_id
         if Menu.check_caterer_menu_exists(vendor_id, menu_data['date']):
             mealdb = Meal.query.filter_by(meal_id=menu_data['meal_id']).first()
-            menudb = Menu.query.filter_by(
-                vendor_id=vendor_id, date=menu_data['date']).first()
+            menudb = Menu.query.filter_by(vendor_id=vendor_id, date=menu_data['date']).first()
             menudb.meals.append(mealdb)
             Menu.add_meals_to_menu()
         else:
@@ -262,11 +260,7 @@ class OrdersView(MethodView):
             })), response['status_code']
 
         # MEAL EXISTS IN THE MENU -> Make the Order to the db
-        order = Order(
-            order_data['user'],
-            order_data['meal'],
-            order_data['menu_id'],
-            order_data['date'])
+        order = Order(order_data['user'], order_data['meal'], order_data['menu_id'], order_data['date'])
         order.save_order()
         order_as_dict = Order.order_as_dict(order)
 
@@ -282,12 +276,7 @@ class OrdersView(MethodView):
 
         orderdb = Order.query.all()
         orders = Order.get_all_orders(orderdb)
-        orders_response = {
-            'message': 'success',
-            'status_code': 200,
-            'orders': orders
-        }
-        return make_response(jsonify(orders_response)), 200
+        return make_response(jsonify({'message': 'success', 'status_code': 200, 'orders': orders })), 200
 
     def put(self, orderId):
         # Allow the user to modify an order they've already made
@@ -301,17 +290,13 @@ class OrdersView(MethodView):
                 {'message': 'Modifying order expects the order id, user, menu id, meal id keys.'})), 400
 
         response = Order.validate_order_update_data(order_data)
+
         if not response['validation_pass']:
             return make_response(jsonify({'message': response['message'], 'status_code': response['status_code']
             })), response['status_code']
 
-        # UtilHelper.return_validation_response(response)
-
-        Order.query.filter_by(
-            order_id=orderId,
-            menu_id=order_data['menu_id']).update(
-            dict(
-                meal_id=order_data['order_to_update']))
+        Order.query.filter_by(order_id=orderId, menu_id=order_data['menu_id']).update(
+            dict(meal_id=order_data['order_to_update']))
         Order.update_order()
 
         return make_response(
@@ -334,53 +319,18 @@ get_all_orders = OrdersView.as_view('all_orders')
 modify_order = OrdersView.as_view('modify_order')
 
 
-endpoints_blueprint.add_url_rule(
-    '/auth/signup',
-    view_func=signup,
-    methods=['POST'])
-endpoints_blueprint.add_url_rule(
-    '/auth/login',
-    view_func=login,
-    methods=['POST'])
+endpoints_blueprint.add_url_rule('/auth/signup', view_func=signup, methods=['POST'])
+endpoints_blueprint.add_url_rule('/auth/login', view_func=login, methods=['POST'])
 
-endpoints_blueprint.add_url_rule(
-    '/meals/',
-    view_func=meals_views,
-    methods=['POST'])
-endpoints_blueprint.add_url_rule(
-    '/meals/',
-    view_func=meals_views,
-    methods=['GET'])
-endpoints_blueprint.add_url_rule(
-    '/meals/<mealId>',
-    view_func=get_meal_by_id,
-    methods=['GET'])
-endpoints_blueprint.add_url_rule(
-    '/meals/<mealId>',
-    view_func=meals_views,
-    methods=[
-        'PUT',
-        'DELETE'])
+endpoints_blueprint.add_url_rule('/meals/', view_func=meals_views, methods=['POST'])
+endpoints_blueprint.add_url_rule('/meals/', view_func=meals_views, methods=['GET'])
+endpoints_blueprint.add_url_rule('/meals/<mealId>', view_func=get_meal_by_id, methods=['GET'])
+endpoints_blueprint.add_url_rule('/meals/<mealId>', view_func=meals_views, methods=['PUT', 'DELETE'])
 
 
-endpoints_blueprint.add_url_rule(
-    '/menu/',
-    view_func=get_menu_of_the_day,
-    methods=['GET'])
-endpoints_blueprint.add_url_rule(
-    '/menu/',
-    view_func=set_menu_the_day,
-    methods=['POST'])
+endpoints_blueprint.add_url_rule('/menu/', view_func=get_menu_of_the_day, methods=['GET'])
+endpoints_blueprint.add_url_rule('/menu/', view_func=set_menu_the_day, methods=['POST'])
 
-endpoints_blueprint.add_url_rule(
-    '/orders/',
-    view_func=make_order,
-    methods=['POST'])
-endpoints_blueprint.add_url_rule(
-    '/orders/',
-    view_func=get_all_orders,
-    methods=['GET'])
-endpoints_blueprint.add_url_rule(
-    '/orders/<orderId>',
-    view_func=modify_order,
-    methods=['PUT'])
+endpoints_blueprint.add_url_rule('/orders/', view_func=make_order, methods=['POST'])
+endpoints_blueprint.add_url_rule('/orders/', view_func=get_all_orders, methods=['GET'])
+endpoints_blueprint.add_url_rule('/orders/<orderId>', view_func=modify_order, methods=['PUT'])

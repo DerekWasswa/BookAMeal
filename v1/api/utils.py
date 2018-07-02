@@ -32,9 +32,3 @@ class UtilHelper(object):
         if db_table_obj is not None:
             return True
         return False
-
-    @staticmethod
-    def return_validation_response(response):
-        if not response['validation_pass']:
-            return make_response(jsonify({'message': response['message'], 'status_code': response['status_code']
-            })), response['status_code']
