@@ -141,7 +141,7 @@ class BaseCaseTest(unittest.TestCase):
 
         self.app_order = json.dumps({
             'user': 'derrekwasswa256@gmail.com',
-            'meal': 2,
+            'meal_id': 2,
             'date': '2018-05-12',
             'menu_id': 1
         })
