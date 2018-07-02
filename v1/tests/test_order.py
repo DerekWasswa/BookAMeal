@@ -31,7 +31,7 @@ class OrderTests(BaseCaseTest):
 
         app_order = json.dumps({
             'user': 'derrekwasswa256@gmail.com',
-            'meal': 2,
+            'meal_id': 2,
             'date': '2018-05-12',
             'menu_id': 10
         })
@@ -52,7 +52,7 @@ class OrderTests(BaseCaseTest):
 
         app_order = json.dumps({
             'user': 'derrekwasswa256@gmail.com',
-            'meal': 25,
+            'meal_id': 25,
             'date': '2018-05-12',
             'menu_id': 1
         })
@@ -117,7 +117,7 @@ class OrderTests(BaseCaseTest):
         self.mock_login()
 
         app_menu = json.dumps({
-            'meal': '',
+            'meal_id': '',
             'date': '',
             'user': '',
             'menu_id': ''
@@ -142,7 +142,7 @@ class OrderTests(BaseCaseTest):
 
         app_order = json.dumps({
             'user': 'derrekwasswa256@gmail.com',
-            'meal': 3,
+            'meal_id': 3,
             'date': '20180515',
             'menu_id': 1
         })
@@ -174,7 +174,7 @@ class OrderTests(BaseCaseTest):
         self.mock_login()
 
         app_menu = json.dumps({
-            'meal': 2,
+            'meal_id': 2,
             'user': 'wasswadero',
             'date': '2018-05-15',
             'menu_id': 1
@@ -218,7 +218,7 @@ class OrderTests(BaseCaseTest):
 
         app_order = json.dumps({
             'user': 'derrekwasswa256@gmail.com',
-            'meal': 3,
+            'meal_id': 3,
             'date': '2015-05-15',
             'menu_id': 1
         })
@@ -297,7 +297,7 @@ class OrderTests(BaseCaseTest):
 
         app_order = json.dumps({
             'user': 'derrekwasswa@andela.com',
-            'meal': 2,
+            'meal_id': 2,
             'date': '2018-05-12',
             'menu_id': 1
         })

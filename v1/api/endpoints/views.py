@@ -260,7 +260,7 @@ class OrdersView(MethodView):
             })), response['status_code']
 
         # MEAL EXISTS IN THE MENU -> Make the Order to the db
-        order = Order(order_data['user'], order_data['meal'], order_data['menu_id'], order_data['date'])
+        order = Order(order_data['user'], order_data['meal_id'], order_data['menu_id'], order_data['date'])
         order.save_order()
         order_as_dict = Order.order_as_dict(order)
 

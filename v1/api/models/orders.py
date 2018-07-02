@@ -62,7 +62,7 @@ class Order(db.Model):
             if 'meal_id' not in order_data or 'user' not in order_data or 'order_to_update' not in order_data or 'menu_id' not in order_data:
                 return False
         else:
-            if 'meal' not in order_data or 'user' not in order_data or 'date' not in order_data or 'menu_id' not in order_data:
+            if 'meal_id' not in order_data or 'user' not in order_data or 'date' not in order_data or 'menu_id' not in order_data:
                 return False
         return True
 
@@ -70,17 +70,42 @@ class Order(db.Model):
     def validate_order_data(order_data):
         ''' validate the Order data '''
 
-        user = User('', order_data['user'], '', '')
         message, status_code, validation_pass = '', 0, True
 
         if UtilHelper.check_for_empty_variables(
-                order_data['meal'], order_data['user'], order_data['date'], order_data['menu_id']):
+                order_data['meal_id'], order_data['user'], order_data['date'], order_data['menu_id']):
             message = 'Can not order with empty content.'
             status_code, validation_pass = 400, False
         elif not User.is_email_valid(order_data['user']):
             message = 'User Email not valid.'
             status_code, validation_pass = 400, False
-        elif not user.check_if_user_exists():
+        elif not Order.validate_order_user_meal_menu_exist(order_data)['validation_pass']:
+            response = Order.validate_order_user_meal_menu_exist(order_data)
+            message = response['message']
+            status_code, validation_pass = response['status_code'], response['validation_pass']
+        return {'message': message, 'status_code': status_code, 'validation_pass': validation_pass}
+
+    @staticmethod
+    def validate_order_update_data(order_data):
+        ''' validate the Order data '''
+
+        message, status_code, validation_pass = '', 0, True
+
+        if UtilHelper.check_for_empty_variables(
+                order_data['order_to_update'], order_data['user'], order_data['meal_id'], order_data['menu_id']):
+            message = 'Can not modify an order with empty content.'
+            status_code, validation_pass = 400, False
+        elif not Order.validate_order_user_meal_menu_exist(order_data)['validation_pass']:
+            response = Order.validate_order_user_meal_menu_exist(order_data)
+            message = response['message']
+            status_code, validation_pass = response['status_code'], response['validation_pass']
+        return {'message': message, 'status_code': status_code, 'validation_pass': validation_pass}
+
+    @staticmethod
+    def validate_order_user_meal_menu_exist(order_data):
+        user = User('', order_data['user'], '', '')
+        message, status_code, validation_pass = '', 0, True
+        if not user.check_if_user_exists():
             # check if the user is a registered user and is logged
             message = 'User doesnot exist or is not logged in.'
             status_code, validation_pass = 401, False
@@ -89,34 +114,8 @@ class Order(db.Model):
             message = 'Menu ID does not exist.'
             status_code, validation_pass = 400, False
         elif not Menu.check_meal_exists_in_menu(
-                order_data['menu_id'], order_data['meal']):
-                 # if false then meal does not exist
-            message = 'Meal ID does not exist in the menu of the day'
-            status_code, validation_pass = 400, False
-        return {'message': message, 'status_code': status_code, 'validation_pass': validation_pass}
-
-    @staticmethod
-    def validate_order_update_data(order_data):
-        ''' validate the Order data '''
-
-        user = User('', order_data['user'], '', '')
-        message, status_code, validation_pass = '', 0, True
-
-        if UtilHelper.check_for_empty_variables(
-                order_data['order_to_update'], order_data['user'], order_data['meal_id'], order_data['menu_id']):
-            message = 'Can not modify an order with empty content.'
-            status_code, validation_pass = 400, False
-        elif not user.check_if_user_exists():
-            # check if the user is a registered user
-            message = 'User doesnot exist or is not logged in.'
-            status_code, validation_pass = 401, False
-        elif not UtilHelper.check_row_id_exists_in_table(Menu, 'menu_id' , order_data['menu_id']):
-            # verify if menu id exists and has the meal id specified
-            message = 'Menu ID does not exist.'
-            status_code, validation_pass = 400, False
-        elif not Menu.check_meal_exists_in_menu(
                 order_data['menu_id'], order_data['meal_id']):
-            # if false then meal does not exist
+                 # if false then meal does not exist
             message = 'Meal ID does not exist in the menu of the day'
             status_code, validation_pass = 400, False
         return {'message': message, 'status_code': status_code, 'validation_pass': validation_pass}
