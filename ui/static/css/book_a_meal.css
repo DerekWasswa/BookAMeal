@@ -1,0 +1,119 @@
+body {
+    display: block;
+}
+
+div.app_wrapper {
+    width: 100%;
+    border: 1px solid gray;
+}
+
+header, footer {
+    padding: 0.5em 1em 0.5em 1em;
+    color: white;
+    background-color: #1b1f22;
+    clear: left;
+}
+
+.app_name {
+    text-align: left;
+}
+
+.user_details {
+    float: right;
+}
+
+.header_item {
+    display: inline-block;
+}
+
+#app_block {
+    padding: 20px;
+}
+
+
+
+#footer {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  text-align: center;
+}
+
+#main_block {
+    padding: 20px;
+}
+
+nav {
+    float: left;
+    max-width: 160px;
+    margin: 0;
+    padding: 1em;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+}
+   
+nav ul a {
+    text-decoration: none;
+}
+
+
+/*SIGNIN AND SIGNOUT BLOCKS*/
+
+.authentication_block {
+    margin: auto;
+    width: 50%;
+    border: 1px solid #1b1f22;
+    padding: 20px;
+}
+
+.field {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+
+.block_off_screen {
+    display: none;
+}
+
+
+.details_block {
+    margin: auto;
+    width: 100%;
+    height:400px;
+    padding-top: 10px;
+    display:block;
+    overflow:scroll;
+}
+
+#day_menu_block {
+    border: 1px solid #1b1f22;
+    padding: 10px;
+}
+#order_history_block {
+    border: 1px solid #1b1f22;
+    padding: 10px;
+}
+
+.admin_actions {
+    border: 1px solid #1b1f22;
+    padding: 10px;
+}
+
+.meal_item {
+    display: inline-block;
+}
+
+
+.order_item {
+    border-bottom: 1px solid #1b1f22;
+    padding: 10px;
+}
+
+
+
+
