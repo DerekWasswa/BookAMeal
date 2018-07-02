@@ -34,8 +34,7 @@ class SignUp(MethodView):
             return make_response(jsonify({'message': response['message'], 'status_code': response['status_code']
             })), response['status_code']
 
-        user = User(user_data['username'], user_data['email'], generate_password_hash(
-            str(user_data['password'])), user_data['admin'])
+        user = User.instantiate_user(user_data)
 
         # ADD THE USER TO THE DB SESSION
         user.save()

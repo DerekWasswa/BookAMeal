@@ -40,8 +40,7 @@ class User(db.Model):
     def validate_user_registration_data(user_data):
         message, status_code, validation_pass = '', 0, True
 
-        user = User(user_data['username'], user_data['email'], generate_password_hash(
-            str(user_data['password'])), user_data['admin'])
+        user = User.instantiate_user(user_data)
 
         if UtilHelper.check_for_empty_variables(user_data['email'], user_data['password'], user_data['username'], user_data['admin']):
             message = 'Missing Credentials'
@@ -109,6 +108,11 @@ class User(db.Model):
             return True
         else:
             return False
+
+    @staticmethod
+    def instantiate_user(data):
+        return User(data['username'], data['email'], generate_password_hash(
+            str(data['password'])), data['admin'])
 
     def __repr__(self):
         return "<User(user_id = '%s', username ='%s', password='%s', email='%s', admin='%s')>" % (
