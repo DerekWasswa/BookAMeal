@@ -4,6 +4,7 @@ from flask_api import FlaskAPI, status
 import json
 from werkzeug.security import generate_password_hash, check_password_hash
 from v1.api.models import User, Meal, Menu, Order
+from v1.api.utils import UtilHelper
 from v1.api import models
 from validate_email import validate_email
 import jwt
@@ -160,11 +161,11 @@ class MealsViews(MethodView):
                 {'message': 'You need to login as Admin to perform this operation.', 'status_code': 401})), 401
 
         # Allow the admin to delete a particular meal option if it exists
-        if Meal.meals_empty():
+        if UtilHelper.check_empty_database_table(Meal):
             return make_response(
                 jsonify({'message': 'Meals are Empty', 'status_Code': 200})), 200
 
-        if not Meal.is_meal_available(mealId):
+        if not UtilHelper.check_row_id_exists_in_table(Meal, 'meal_id', mealId):
             return make_response(jsonify(
                 {'message': 'Deletion Incomplete! Meal Not Found.', 'status_code': 404})), 404
 
@@ -290,7 +291,7 @@ class OrdersView(MethodView):
 
     def put(self, orderId):
         # Allow the user to modify an order they've already made
-        if Order.orders_empty():
+        if UtilHelper.check_empty_database_table(Order):
             return make_response(
                 jsonify({'message': 'Orders are Empty', 'status_code': 200})), 200
 
@@ -303,6 +304,8 @@ class OrdersView(MethodView):
         if not response['validation_pass']:
             return make_response(jsonify({'message': response['message'], 'status_code': response['status_code']
             })), response['status_code']
+
+        # UtilHelper.return_validation_response(response)
 
         Order.query.filter_by(
             order_id=orderId,

@@ -66,6 +66,12 @@ exclude_patterns:
 - "ui/"
 - "**/ui/"
 - "**/ui/*"
-- "**/*.js"
-- "**.js"
 - "ui/static/js/book_a_meal.js"
+ratings:
+  paths:
+  - "**.js"
+exclude_paths:
+- ui/
+- ui/**/*
+- UI/
+- UI/**/*
