@@ -1,2 +1,2 @@
 [run]
-omit = *tests*, *models*, *static*, *templates*, *doc*
+omit = *tests*, *models*, *static*, *templates*, *doc*, *utils*, *meals*, *menu*, *orders*, *users*

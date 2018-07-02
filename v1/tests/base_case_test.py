@@ -3,7 +3,10 @@ import json
 from flask import session
 from v1.api import create_app
 from v1.api import db
-from v1.api.models import User, Meal, Menu, Order
+from v1.api.models.meals import Meal
+from v1.api.models.users import User
+from v1.api.models.menu import Menu
+from v1.api.models.orders import Order
 
 
 class BaseCaseTest(unittest.TestCase):
