@@ -47,6 +47,9 @@ plugins:
   enabled: true
  brakeman:
   enabled: true
+ratings:
+  paths:
+  - "**.js"
 exclude_patterns:
 - "config/"
 - "db/"
@@ -67,9 +70,6 @@ exclude_patterns:
 - "**/ui/"
 - "**/ui/*"
 - "ui/static/js/book_a_meal.js"
-ratings:
-  paths:
-  - "**.js"
 exclude_paths:
 - ui/
 - ui/**/*
