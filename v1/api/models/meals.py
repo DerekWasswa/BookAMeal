@@ -124,14 +124,3 @@ class Meal(db.Model):
         if isinstance(price, int):
             return True
         return False
-
-    @staticmethod
-    def meal_request_data_keys_exist(meal_data=None, invoke_from=None):
-        ''' Verify if the api ping has the request keys provided '''
-        if invoke_from == 'add_meal_option':
-            if 'meal' not in meal_data or 'price' not in meal_data:
-                return False
-        else:
-            if 'meal_update' not in meal_data or 'price_update' not in meal_data:
-                return False
-        return True

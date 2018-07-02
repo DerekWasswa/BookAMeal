@@ -71,13 +71,6 @@ class Menu(db.Model):
         return False
 
     @staticmethod
-    def menu_request_data_keys_exist(menu_data=None):
-        ''' Verify if the api ping has the request keys provided '''
-        if 'date' not in menu_data or 'description' not in menu_data or 'menu_name' not in menu_data or 'meal_id' not in menu_data:
-            return False
-        return True
-
-    @staticmethod
     def check_caterer_menu_exists(vendor_id, date):
         ''' Check of a particular caterer has already set a menu for a particular date '''
         menudb = Menu.query.filter_by(vendor_id=vendor_id, date=date).first()

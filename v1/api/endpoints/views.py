@@ -16,6 +16,7 @@ from flask.views import MethodView
 from .import endpoints_blueprint
 from v1.api import create_app
 from v1.api import db
+from v1.api.utils import UtilHelper
 import datetime
 
 
@@ -25,7 +26,7 @@ class SignUp(MethodView):
         # Sign up a user either as a customer or vendor admin
         user_data = request.get_json(force=True)
 
-        if not User.user_data_parameters_exist(user_data):
+        if not UtilHelper.check_for_request_params(user_data, 'email', 'password', 'admin', 'username'):
             return make_response(jsonify(
                 {'message': 'Signup expects username, email, password, admin values.'})), 400
 
@@ -34,8 +35,7 @@ class SignUp(MethodView):
             return make_response(jsonify({'message': response['message'], 'status_code': response['status_code']
             })), response['status_code']
 
-        user = User(user_data['username'], user_data['email'], generate_password_hash(
-            str(user_data['password'])), user_data['admin'])
+        user = User.instantiate_user(user_data)
 
         # ADD THE USER TO THE DB SESSION
         user.save()
@@ -50,7 +50,7 @@ class Login(MethodView):
         # authenticate customers or admin
         user_data = request.get_json(force=True)
 
-        if not User.user_data_parameters_exist(user_data):
+        if not UtilHelper.check_for_request_params(user_data, 'email', 'password', 'admin'):
             return make_response(jsonify(
                 {'message': 'Logged requests expects email, password, and admin values.'})), 400
 
@@ -98,7 +98,7 @@ class MealsViews(MethodView):
 
         # Allow the vendor admin to add another meal option
         meal_data = request.get_json(force=True)
-        if not Meal.meal_request_data_keys_exist(meal_data, 'add_meal_option'):
+        if not UtilHelper.check_for_request_params(meal_data, 'meal', 'price'):
             return make_response(jsonify(
                 {'message': 'Meal addition request expects a MEAL and its PRICE, either of them is not provided'})), 400
 
@@ -129,8 +129,7 @@ class MealsViews(MethodView):
 
         # Allow the ADMIN to edit a particular meal option
         meal_data = request.get_json(force=True)
-        if not Meal.meal_request_data_keys_exist(
-                meal_data, 'update_meal_option'):
+        if not UtilHelper.check_for_request_params(meal_data, 'meal_update', 'price_update'):
             return make_response(jsonify(
                 {'message': 'Meal Update expects MEAL_UPDATE and PRICE_UPDATE, either of them is not provided.'})), 400
 
@@ -217,7 +216,7 @@ class MenusView(MethodView):
         # Allow the admin an operation to the set the menu of the day
         menu_data = request.get_json(force=True)
 
-        if not Menu.menu_request_data_keys_exist(menu_data):
+        if not UtilHelper.check_for_request_params(menu_data, 'date', 'description', 'menu_name', 'meal_id'):
             return make_response(jsonify(
                 {'message': 'Setting a Menu expects Menu name, date, description, and meal Id keys.'})), 400
 
@@ -250,7 +249,7 @@ class OrdersView(MethodView):
         # Allow the authenticated users to make orders from the menu of the day
 
         order_data = request.get_json(force=True)
-        if not Order.order_request_data_keys_exist(order_data):
+        if not UtilHelper.check_for_request_params(order_data, 'meal_id', 'user', 'date', 'menu_id'):
             return make_response(jsonify(
                 {'message': 'Making Order expects; user email, meal id, menu_id, and date keys.', 'status_code': 400})), 400
 
@@ -285,7 +284,7 @@ class OrdersView(MethodView):
                 jsonify({'message': 'Orders are Empty', 'status_code': 200})), 200
 
         order_data = request.get_json(force=True)
-        if not Order.order_request_data_keys_exist(order_data):
+        if not UtilHelper.check_for_request_params(order_data, 'meal_id', 'user', 'order_to_update', 'menu_id'):
             return make_response(jsonify(
                 {'message': 'Modifying order expects the order id, user, menu id, meal id keys.'})), 400
 
