@@ -56,17 +56,6 @@ class Order(db.Model):
         return order_as_dict
 
     @staticmethod
-    def order_request_data_keys_exist(order_data=None):
-        ''' Verify if the api ping has the order request keys provided '''
-        if 'order_to_update' in order_data:
-            if 'meal_id' not in order_data or 'user' not in order_data or 'order_to_update' not in order_data or 'menu_id' not in order_data:
-                return False
-        else:
-            if 'meal_id' not in order_data or 'user' not in order_data or 'date' not in order_data or 'menu_id' not in order_data:
-                return False
-        return True
-
-    @staticmethod
     def validate_order_data(order_data):
         ''' validate the Order data '''
 

@@ -32,3 +32,12 @@ class UtilHelper(object):
         if db_table_obj is not None:
             return True
         return False
+
+    @staticmethod
+    def check_for_request_params(request_data, *request_keys):
+        status = True
+        for key in request_keys:
+            if key not in request_data:
+                status = False
+                break
+        return status

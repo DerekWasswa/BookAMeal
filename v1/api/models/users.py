@@ -75,17 +75,6 @@ class User(db.Model):
             status_code, validation_pass = 401, False
         return {'message': message, 'status_code': status_code, 'validation_pass': validation_pass}
 
-    # verify if the user data requests exist
-
-    @staticmethod
-    def user_data_parameters_exist(user_data):
-        if 'username' in user_data:
-            if 'username' not in user_data or 'email' not in user_data or 'password' not in user_data or 'admin' not in user_data:
-                return False
-        else:
-            if 'email' not in user_data or 'password' not in user_data or 'admin' not in user_data:
-                return False
-        return True
 
     # Check if the password the user is submitting matches the one they
     # registered with
