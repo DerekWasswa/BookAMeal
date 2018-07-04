@@ -1,5 +1,5 @@
 from werkzeug.security import check_password_hash, generate_password_hash
-from flask import jsonify, make_response
+from flask import Flask, jsonify, make_response
 from validate_email import validate_email
 from v1.api.utils import UtilHelper
 from v1.api import db
@@ -58,37 +58,31 @@ class Order(db.Model):
     @staticmethod
     def validate_order_data(order_data):
         ''' validate the Order data '''
-
-        message, status_code, validation_pass = '', 0, True
-
+        response = None
         if UtilHelper.check_for_empty_variables(
                 order_data['meal_id'], order_data['user'], order_data['date'], order_data['menu_id']):
-            message = 'Can not order with empty content.'
-            status_code, validation_pass = 400, False
+            return make_response((jsonify({"message": 'Can not order with empty content.', 'status_code': 400})), 400)
         elif not User.is_email_valid(order_data['user']):
-            message = 'User Email not valid.'
-            status_code, validation_pass = 400, False
+            return make_response((jsonify({"message": 'User Email not valid.', 'status_code': 400})), 400)
         elif not Order.validate_order_user_meal_menu_exist(order_data)['validation_pass']:
             response = Order.validate_order_user_meal_menu_exist(order_data)
-            message = response['message']
-            status_code, validation_pass = response['status_code'], response['validation_pass']
-        return {'message': message, 'status_code': status_code, 'validation_pass': validation_pass}
+            return make_response((jsonify({"message": response['message'],
+             'status_code': response['status_code']})), response['status_code'])
+        return response
 
     @staticmethod
     def validate_order_update_data(order_data):
         ''' validate the Order data '''
-
-        message, status_code, validation_pass = '', 0, True
-
+        response = None
         if UtilHelper.check_for_empty_variables(
                 order_data['order_to_update'], order_data['user'], order_data['meal_id'], order_data['menu_id']):
-            message = 'Can not modify an order with empty content.'
-            status_code, validation_pass = 400, False
+            return make_response((jsonify({"message":"Can not modify an order with empty content.",
+            'status_code': 400})), 400)
         elif not Order.validate_order_user_meal_menu_exist(order_data)['validation_pass']:
             response = Order.validate_order_user_meal_menu_exist(order_data)
-            message = response['message']
-            status_code, validation_pass = response['status_code'], response['validation_pass']
-        return {'message': message, 'status_code': status_code, 'validation_pass': validation_pass}
+            return make_response((jsonify({"message": response['message'],
+             'status_code': response['status_code']})), response['status_code'])
+        return response
 
     @staticmethod
     def validate_order_user_meal_menu_exist(order_data):

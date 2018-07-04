@@ -31,9 +31,8 @@ class SignUp(MethodView):
                 {'message': 'Signup expects username, email, password, admin values.'})), 400
 
         response = User.validate_user_registration_data(user_data)
-        if not response['validation_pass']:
-            return make_response(jsonify({'message': response['message'], 'status_code': response['status_code']
-            })), response['status_code']
+        if response:
+            return response
 
         user = User.instantiate_user(user_data)
 
@@ -57,9 +56,8 @@ class Login(MethodView):
         user = User('n/a', user_data['email'], user_data['password'], user_data['admin'])
 
         response = User.validate_user_login_data(user_data, user)
-        if not response['validation_pass']:
-            return make_response(jsonify({'message': response['message'], 'status_code': response['status_code']
-            })), response['status_code']
+        if response:
+            return response
 
         # Create the app instance to use to generate the token
         # CREATE TOKEN: leverage isdangerous to create the token
@@ -107,9 +105,8 @@ class MealsViews(MethodView):
         meal_object = Meal(meal_data['meal'], meal_data['price'], vendor_id)
 
         response = Meal.validate_meal_data(meal_data, meal_object)
-        if not response['validation_pass']:
-            return make_response(jsonify({'message': response['message'], 'status_code': response['status_code']
-            })), response['status_code']
+        if response:
+            return response
 
         # ADD THE USER TO THE DB SESSION
         meal_object.save()
@@ -134,9 +131,8 @@ class MealsViews(MethodView):
                 {'message': 'Meal Update expects MEAL_UPDATE and PRICE_UPDATE, either of them is not provided.'})), 400
 
         response = Meal.validate_meal_update_data(meal_data['meal_update'], meal_data['price_update'], mealId)
-        if not response['validation_pass']:
-            return make_response(jsonify({'message': response['message'], 'status_code': response['status_code']
-            })), response['status_code']
+        if response:
+            return response
 
         vendor_id = g.user_id
         Meal.query.filter_by(meal_id=mealId, vendor_id=vendor_id).update(
@@ -221,9 +217,8 @@ class MenusView(MethodView):
                 {'message': 'Setting a Menu expects Menu name, date, description, and meal Id keys.'})), 400
 
         response = Menu.validate_menu_data(menu_data)
-        if not response['validation_pass']:
-            return make_response(jsonify({'message': response['message'], 'status_code': response['status_code']
-            })), response['status_code']
+        if response:
+            return response
 
         # CHECK IF THE MENU OF THE DAY ALREADY EXISTS
         vendor_id = g.user_id
@@ -254,9 +249,8 @@ class OrdersView(MethodView):
                 {'message': 'Making Order expects; user email, meal id, menu_id, and date keys.', 'status_code': 400})), 400
 
         response = Order.validate_order_data(order_data)
-        if not response['validation_pass']:
-            return make_response(jsonify({'message': response['message'], 'status_code': response['status_code']
-            })), response['status_code']
+        if response:
+            return response
 
         # MEAL EXISTS IN THE MENU -> Make the Order to the db
         order = Order(order_data['user'], order_data['meal_id'], order_data['menu_id'], order_data['date'])
@@ -289,10 +283,8 @@ class OrdersView(MethodView):
                 {'message': 'Modifying order expects the order id, user, menu id, meal id keys.'})), 400
 
         response = Order.validate_order_update_data(order_data)
-
-        if not response['validation_pass']:
-            return make_response(jsonify({'message': response['message'], 'status_code': response['status_code']
-            })), response['status_code']
+        if response:
+            return response
 
         Order.query.filter_by(order_id=orderId, menu_id=order_data['menu_id']).update(
             dict(meal_id=order_data['order_to_update']))

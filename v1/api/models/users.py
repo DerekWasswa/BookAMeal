@@ -1,5 +1,5 @@
 from werkzeug.security import check_password_hash, generate_password_hash
-from flask import jsonify, make_response
+from flask import Flask, jsonify, make_response
 from validate_email import validate_email
 from v1.api.utils import UtilHelper
 from v1.api import db
@@ -38,42 +38,35 @@ class User(db.Model):
 
     @staticmethod
     def validate_user_registration_data(user_data):
-        message, status_code, validation_pass = '', 0, True
-
+        response = None
         user = User.instantiate_user(user_data)
 
         if UtilHelper.check_for_empty_variables(user_data['email'], user_data['password'], user_data['username'], user_data['admin']):
-            message = 'Missing Credentials'
-            status_code, validation_pass = 400, False
+            return make_response((jsonify({"message": 'Missing Credentials', 'status_code': 400})), 400)
         elif not User.is_email_valid(user_data['email']):
             # CHECK IF EMAIL IS VALID
-            message = 'Email is Invalid'
-            status_code, validation_pass = 401, False
+            return make_response((jsonify({"message": 'Email is Invalid', 'status_code': 401})), 401)
         elif user.check_if_user_exists():
-            message = 'User already exists. Please login.'
-            status_code, validation_pass = 200, False
-        return {'message': message, 'status_code': status_code, 'validation_pass': validation_pass}
+            return make_response((jsonify({"message": 'User already exists. Please login.', 'status_code': 200})), 200)
+        return response
 
     # Verify user login data
 
     @staticmethod
     def validate_user_login_data(user_data, user_object):
-        message, status_code, validation_pass = '', 0, True
+        response = None
 
         if UtilHelper.check_for_empty_variables(user_data['email'], user_data['password'], user_data['admin']):
-            message = 'Could not verify. Login credentials required.'
-            status_code, validation_pass = 401, False
+            return make_response((jsonify({"message": 'Could not verify. Login credentials required.',
+            'status_code': 401})), 401)
         elif not User.is_email_valid(user_data['email']):
             # CHECK IF EMAIL IS VALID
-            message = 'Email is Invalid'
-            status_code, validation_pass = 401, False
+            return make_response((jsonify({"message": 'Email is Invalid', 'status_code': 401})), 401)
         elif not user_object.check_if_user_exists():
-            message = 'User email not found!!'
-            status_code, validation_pass = 401, False
+            return make_response((jsonify({"message": 'User email not found!!', 'status_code': 401})), 401)
         elif not user_object.verify_user_password():
-            message = 'Invalid/Wrong Password'
-            status_code, validation_pass = 401, False
-        return {'message': message, 'status_code': status_code, 'validation_pass': validation_pass}
+            return make_response((jsonify({"message": 'Invalid/Wrong Password', 'status_code': 401})), 401)
+        return response
 
 
     # Check if the password the user is submitting matches the one they

@@ -35,18 +35,11 @@ checks:
   similar-code:
     enabled: true
     config:
-      threshold: 55
+      threshold: # Changing this affects the whole language set
   identical-code:
     enabled: true
     config:
-      threshold: 30
-plugins:
-  duplication:
-    enabled: true
-    config:
-      languages:
-        python:
-          count_threshold: 3
+      threshold: # Changing this affects the whole language set
  rubocop:
   enabled: true
  eslint:
