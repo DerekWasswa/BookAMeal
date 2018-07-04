@@ -41,6 +41,12 @@ checks:
     config:
       threshold: 30
 plugins:
+  duplication:
+    enabled: true
+    config:
+      languages:
+        python:
+          count_threshold: 3
  rubocop:
   enabled: true
  eslint:
