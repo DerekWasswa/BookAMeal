@@ -35,11 +35,11 @@ checks:
   similar-code:
     enabled: true
     config:
-      threshold: #language-specific defaults. overrides affect all languages.
+      threshold: 50
   identical-code:
     enabled: true
     config:
-      threshold: #language-specific defaults. overrides affect all languages.
+      threshold: 25
 plugins:
  rubocop:
   enabled: true
@@ -47,9 +47,6 @@ plugins:
   enabled: true
  brakeman:
   enabled: true
-ratings:
-  paths:
-  - "**.js"
 exclude_patterns:
 - "config/"
 - "db/"
@@ -66,12 +63,9 @@ exclude_patterns:
 - "**/vendor/"
 - "**/*.d.ts"
 - "**/migrations/"
-- "ui/"
-- "**/ui/"
-- "**/ui/*"
-- "ui/static/js/book_a_meal.js"
+- "models/"
+- "**/models/"
+- "**/models/*"
 exclude_paths:
-- ui/
-- ui/**/*
-- UI/
-- UI/**/*
+- "v1/api/models/**/*"
+- "models/**/*"
