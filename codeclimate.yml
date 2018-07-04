@@ -35,11 +35,11 @@ checks:
   similar-code:
     enabled: true
     config:
-      threshold: 50
+      threshold: 55
   identical-code:
     enabled: true
     config:
-      threshold: 25
+      threshold: 30
 plugins:
  rubocop:
   enabled: true
