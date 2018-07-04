@@ -27,7 +27,7 @@ checks:
   nested-control-flow:
     enabled: true
     config:
-      threshold: 5
+      threshold: 4
   return-statements:
     enabled: true
     config:
@@ -35,11 +35,11 @@ checks:
   similar-code:
     enabled: true
     config:
-      threshold: #language-specific defaults. overrides affect all languages.
+      threshold: 50
   identical-code:
     enabled: true
     config:
-      threshold: #language-specific defaults. overrides affect all languages.
+      threshold: 25
 plugins:
  rubocop:
   enabled: true
