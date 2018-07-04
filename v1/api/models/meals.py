@@ -1,5 +1,5 @@
 from werkzeug.security import check_password_hash, generate_password_hash
-from flask import jsonify, make_response
+from flask import Flask, jsonify, make_response
 from validate_email import validate_email
 from v1.api.utils import UtilHelper
 from v1.api import db
@@ -46,36 +46,35 @@ class Meal(db.Model):
     @staticmethod
     def validate_meal_data(meal_data, meal_object):
         ''' validate the meal data '''
-        message, status_code, validation_pass = '', 0, True
+        response = None
 
         if UtilHelper.check_for_empty_variables(meal_data['meal'], meal_data['price']):
-            message = 'Meal Options Missing.'
-            status_code, validation_pass = 400, False
+            return make_response((jsonify({"message": 'Meal Options Missing.',
+            'status_code': 400})), 400)
         elif not Meal.is_price_integer(meal_data['price']):
             # Try parsing the Price, If doesnot pass the try then cast error
-            message = 'Meal Price has to be an Integer.'
-            status_code, validation_pass = 400, False
+            return make_response((jsonify({"message": 'Meal Price has to be an Integer.',
+            'status_code': 400})), 400)
         elif meal_object.is_meal_already_existing():
             # check if the meal has already been entered
-            message = 'Meal already exists.'
-            status_code, validation_pass = 400, False
-        return {'message': message, 'status_code': status_code, 'validation_pass': validation_pass}
+            return make_response((jsonify({"message": 'Meal already exists.',
+            'status_code': 400})), 400)
+        return response
 
     @staticmethod
     def validate_meal_update_data(meal, price, mealId):
         ''' validate the meal data '''
-        message, status_code, validation_pass = '', 0, True
-
+        response = None
         if not UtilHelper.check_row_id_exists_in_table(Meal, 'meal_id', mealId):
-            message = 'Update Incomplete! Meal does not exist.'
-            status_code, validation_pass = 404, False
+            return make_response((jsonify({"message": 'Update Incomplete! Meal does not exist.',
+            'status_code': 404})), 404)
         elif UtilHelper.check_for_empty_variables(meal, price):
-            message = 'Can not update meal with empty meal options'
-            status_code, validation_pass = 400, False
+            return make_response((jsonify({"message": 'Can not update meal with empty meal options',
+            'status_code': 400})), 400)
         elif not Meal.is_price_integer(price):
-            message = 'Can not update meal with non integer price'
-            status_code, validation_pass = 400, False
-        return {'message': message, 'status_code': status_code, 'validation_pass': validation_pass}
+            return make_response((jsonify({"message": 'Can not update meal with non integer price',
+            'status_code': 400})), 400)
+        return response
 
     @staticmethod
     def validate_meal_deletion(mealId):

@@ -1,5 +1,5 @@
 from werkzeug.security import check_password_hash, generate_password_hash
-from flask import jsonify, make_response
+from flask import Flask, jsonify, make_response
 from validate_email import validate_email
 from v1.api.utils import UtilHelper
 from v1.api import db
@@ -91,13 +91,13 @@ class Menu(db.Model):
     @staticmethod
     def validate_menu_data(menu_data):
         ''' validate the meal data '''
-        message, status_code, validation_pass = '', 0, True
+        response = None
 
         if UtilHelper.check_for_empty_variables(
                 menu_data['menu_name'], menu_data['description'], menu_data['date'], menu_data['meal_id']):
-            message = 'Empty Menu Details.'
-            status_code, validation_pass = 400, False
+            return make_response((jsonify({"message": 'Empty Menu Details.',
+            'status_code': 400})), 400)
         elif not UtilHelper.check_row_id_exists_in_table(Meal, 'meal_id', menu_data['meal_id']):
-            message = 'Meal with provided ID does not exist.'
-            status_code, validation_pass = 200, False
-        return {'message': message, 'status_code': status_code, 'validation_pass': validation_pass}
+            return make_response((jsonify({"message": 'Meal with provided ID does not exist.',
+            'status_code': 200})), 200)
+        return response
