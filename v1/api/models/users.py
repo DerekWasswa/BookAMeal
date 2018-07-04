@@ -55,8 +55,10 @@ class User(db.Model):
     @staticmethod
     def validate_user_login_data(user_data, user_object):
         response = None
+        empty_status_user = UtilHelper.check_for_empty_variables(user_data['email'], user_data['password'],
+        user_data['admin'])
 
-        if UtilHelper.check_for_empty_variables(user_data['email'], user_data['password'], user_data['admin']):
+        if empty_status_user:
             return make_response((jsonify({"message": 'Could not verify. Login credentials required.',
             'status_code': 401})), 401)
         elif not User.is_email_valid(user_data['email']):

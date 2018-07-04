@@ -92,9 +92,10 @@ class Menu(db.Model):
     def validate_menu_data(menu_data):
         ''' validate the meal data '''
         response = None
+        empty_status_menu = UtilHelper.check_for_empty_variables(
+                menu_data['menu_name'], menu_data['description'], menu_data['date'], menu_data['meal_id'])
 
-        if UtilHelper.check_for_empty_variables(
-                menu_data['menu_name'], menu_data['description'], menu_data['date'], menu_data['meal_id']):
+        if empty_status_menu:
             return make_response((jsonify({"message": 'Empty Menu Details.',
             'status_code': 400})), 400)
         elif not UtilHelper.check_row_id_exists_in_table(Meal, 'meal_id', menu_data['meal_id']):
