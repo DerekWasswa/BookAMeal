@@ -59,34 +59,31 @@ class Order(db.Model):
     def validate_order_data(order_data):
         ''' validate the Order data '''
         response = None
-        empty_status = UtilHelper.check_for_empty_variables(
-                order_data['meal_id'], order_data['user'], order_data['date'], order_data['menu_id'])
+        response_menu_eixstance = Order.validate_order_user_meal_menu_exist(order_data)
 
-        if empty_status:
-            return make_response((jsonify({"message": 'Can not order with empty content.', 'status_code': 400})),
-            400)
+        if UtilHelper.check_for_empty_variables(
+                order_data['meal_id'], order_data['user'], order_data['date'], order_data['menu_id']):
+            return make_response((jsonify({"message": 'Can not order with empty content.', 'status_code': 400})), 400)
         elif not User.is_email_valid(order_data['user']):
             return make_response((jsonify({"message": 'User Email not valid.', 'status_code': 400})), 400)
-        elif not Order.validate_order_user_meal_menu_exist(order_data)['validation_pass']:
-            response = Order.validate_order_user_meal_menu_exist(order_data)
-            return make_response((jsonify({"message": response['message'],
-             'status_code': response['status_code']})), response['status_code'])
+        elif not response_menu_eixstance['validation_pass']:
+            return make_response((jsonify({"message": response_menu_eixstance['message'],
+             'status_code': response_menu_eixstance['status_code']})), response_menu_eixstance['status_code'])
         return response
 
     @staticmethod
     def validate_order_update_data(order_data):
         ''' validate the Order data '''
         response = None
-        empty_status_update = UtilHelper.check_for_empty_variables(
-                order_data['order_to_update'], order_data['user'], order_data['meal_id'], order_data['menu_id'])
+        response_menu_exists = Order.validate_order_user_meal_menu_exist(order_data)
 
-        if empty_status_update:
+        if UtilHelper.check_for_empty_variables(
+                order_data['order_to_update'], order_data['user'], order_data['meal_id'], order_data['menu_id']):
             return make_response((jsonify({"message":"Can not modify an order with empty content.",
             'status_code': 400})), 400)
-        elif not Order.validate_order_user_meal_menu_exist(order_data)['validation_pass']:
-            response = Order.validate_order_user_meal_menu_exist(order_data)
-            return make_response((jsonify({"message": response['message'],
-             'status_code': response['status_code']})), response['status_code'])
+        elif not response_menu_exists['validation_pass']:
+            return make_response((jsonify({"message": response_menu_exists['message'],
+             'status_code': response_menu_exists['status_code']})), response_menu_exists['status_code'])
         return response
 
     @staticmethod
