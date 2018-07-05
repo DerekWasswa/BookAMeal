@@ -4,6 +4,11 @@ from flask_api import FlaskAPI, status
 import json
 from flask_sqlalchemy import SQLAlchemy
 
+doc = Flask(__name__)
+@doc.route('/api/v1')
+def show_app_home():
+    return render_template('app_home.html')
+
 db = SQLAlchemy()
 
 def create_app(configuration):
