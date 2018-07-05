@@ -4,7 +4,8 @@ from flask_api import FlaskAPI, status
 import json
 from flask_sqlalchemy import SQLAlchemy
 
-@app.route('/api/v1')
+doc = Flask(__name__)
+@doc.route('/api/v1')
 def show_app_home():
     return render_template('app_home.html')
 
