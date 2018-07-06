@@ -35,6 +35,13 @@ class BaseCaseTest(unittest.TestCase):
             'admin': False
         })
 
+        self.username_too_long = json.dumps({
+            'username': 'Wasswa Derick wasswaderoeyJhbGciOiJIUzI1NiIsInReyJhZG1pbiI6dHJ1ZSwidXNlcl9pZCI6MSwiZXhwIjoxNTMwOWmmwre3KiFcdv7F7an1pTcOhLprAtmvxAyFUDU2MDgyfQ5cCI6IkpXVCJ9',
+            'email': 'wasswadero@gmail.com',
+            'password': '12345',
+            'admin': False
+        })
+
         self.invalid_email_user_data = json.dumps({
             'username': 'example',
             'email': 'test',
@@ -116,6 +123,13 @@ class BaseCaseTest(unittest.TestCase):
 
         self.caterer_menu = json.dumps({
             'menu_name': 'Jojo Restaurant Special Friday',
+            'date': '2018-05-12',
+            'description': 'For our special friday, enjoy the menu with a free dessert',
+            'meal_id': 1
+        })
+
+        self.menu_too_long = json.dumps({
+            'menu_name': 'Jojo Restaurant Special Friday wasswaderoeyJhbGciOiJIUzI1NiIsInReyJhZG1pbiI6dHJ1ZSwidXNlcl9pZCI6MSwiZXhwIjoxNTMwOWmmwre3KiFcdv7F7an1pTcOhLprAtmvxAyFUDU2MDgyfQ5cCI6IkpXVCJ9',
             'date': '2018-05-12',
             'description': 'For our special friday, enjoy the menu with a free dessert',
             'meal_id': 1

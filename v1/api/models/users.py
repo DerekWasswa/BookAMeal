@@ -11,7 +11,7 @@ class User(db.Model):
     __tablename__ = 'users'
     user_id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), nullable=False, unique=True)
+    email = db.Column(db.String(1000), nullable=False, unique=True)
     password = db.Column(db.String(1000), nullable=False)
     admin = db.Column(db.Boolean, nullable=False)
 
@@ -43,8 +43,10 @@ class User(db.Model):
 
         if UtilHelper.check_for_empty_variables(user_data['email'], user_data['password'], user_data['username'], user_data['admin']):
             return make_response((jsonify({"message": 'Missing Credentials', 'status_code': 400})), 400)
+        elif UtilHelper.validate_exceeds_length(user_data['username'], 100):
+            return make_response((jsonify({"message": 'Username length should be less than 100 characters.',
+             'status_code': 400})), 400)
         elif not User.is_email_valid(user_data['email']):
-            # CHECK IF EMAIL IS VALID
             return make_response((jsonify({"message": 'Email is Invalid', 'status_code': 401})), 401)
         elif user.check_if_user_exists():
             return make_response((jsonify({"message": 'User already exists. Please login.', 'status_code': 200})), 200)
@@ -60,7 +62,6 @@ class User(db.Model):
             return make_response((jsonify({"message": 'Could not verify. Login credentials required.',
             'status_code': 401})), 401)
         elif not User.is_email_valid(user_data['email']):
-            # CHECK IF EMAIL IS VALID
             return make_response((jsonify({"message": 'Email is Invalid', 'status_code': 401})), 401)
         elif not user_object.check_if_user_exists():
             return make_response((jsonify({"message": 'User email not found!!', 'status_code': 401})), 401)
@@ -90,6 +91,11 @@ class User(db.Model):
             return True
         else:
             return False
+
+    def get_user_id(self):
+        userdb = User.query.filter_by(email=self.email).first()
+        return userdb.user_id
+
 
     @staticmethod
     def instantiate_user(data):

@@ -128,3 +128,17 @@ class MenuTests(BaseCaseTest):
         self.assertIn(
             "Meal with provided ID does not exist.", str(
                 response.data))
+
+    def test_menu_name_does_not_exceed_char_limit(self):
+        self.mock_signup()
+        login = self.mock_login()
+        login_response = json.loads(login.get_data(as_text=True))
+
+        # Testing setting the menu of the day with meals
+        response = self.client.post(
+            '/api/v1/menu/',
+            data=self.menu_too_long,
+            headers=self.headers_with_token(
+                login_response['token']))
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Menu name should not exceed 100 characters.", str(response.data))

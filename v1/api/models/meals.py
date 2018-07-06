@@ -30,9 +30,9 @@ class Meal(db.Model):
         db.session.commit()
 
     @staticmethod
-    def retrieve_all_meals():
+    def retrieve_all_meals(vendor_id):
         '''' Return all meals from the db '''
-        meals = Meal.query.all()
+        meals = Meal.query.filter_by(vendor_id=vendor_id)
         meals_list = []
         for meal in meals:
             meal_dict = {}

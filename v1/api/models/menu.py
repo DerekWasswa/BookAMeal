@@ -97,6 +97,9 @@ class Menu(db.Model):
                 menu_data['menu_name'], menu_data['description'], menu_data['date'], menu_data['meal_id']):
             return make_response((jsonify({"message": 'Empty Menu Details.',
             'status_code': 400})), 400)
+        elif UtilHelper.validate_exceeds_length(menu_data['menu_name'], 100):
+            return make_response((jsonify({"message": 'Menu name should not exceed 100 characters.',
+            'status_code': 400})), 400)
         elif not UtilHelper.check_row_id_exists_in_table(Meal, 'meal_id', menu_data['meal_id']):
             return make_response((jsonify({"message": 'Meal with provided ID does not exist.',
             'status_code': 200})), 200)

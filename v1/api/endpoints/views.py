@@ -61,7 +61,7 @@ class Login(MethodView):
 
         # Create the app instance to use to generate the token
         # CREATE TOKEN: leverage isdangerous to create the token
-        encoded_jwt_token = jwt.encode({'admin': user_data['admin'], 'user_id': user.user_id,
+        encoded_jwt_token = jwt.encode({'admin': user_data['admin'], 'user_id': user.get_user_id(),
                                         'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=35)},
                                        'boOk-a-MeAL', algorithm='HS256')
 
@@ -84,7 +84,7 @@ class MealsViews(MethodView):
         return make_response(jsonify({
             'message': 'success',
             'status_code': 200,
-            'data': Meal.retrieve_all_meals()
+            'data': Meal.retrieve_all_meals(g.user_id)
         })), 200
 
     @auth_decorator.token_required_to_authenticate
@@ -98,7 +98,8 @@ class MealsViews(MethodView):
         meal_data = request.get_json(force=True)
         if not UtilHelper.check_for_request_params(meal_data, 'meal', 'price'):
             return make_response(jsonify(
-                {'message': 'Meal addition request expects a MEAL and its PRICE, either of them is not provided'})), 400
+                {'message': 'Meal addition request expects a MEAL and its PRICE keys.',
+                'status_code': 400})), 400
 
         vendor_id = g.user_id
 
@@ -128,24 +129,30 @@ class MealsViews(MethodView):
         meal_data = request.get_json(force=True)
         if not UtilHelper.check_for_request_params(meal_data, 'meal_update', 'price_update'):
             return make_response(jsonify(
-                {'message': 'Meal Update expects MEAL_UPDATE and PRICE_UPDATE, either of them is not provided.'})), 400
+                {'message': 'Meal Update expects MEAL_UPDATE and PRICE_UPDATE keys.',
+                'status_code': 400})), 400
 
         response = Meal.validate_meal_update_data(meal_data['meal_update'], meal_data['price_update'], mealId)
         if response:
             return response
 
         vendor_id = g.user_id
-        Meal.query.filter_by(meal_id=mealId, vendor_id=vendor_id).update(
+        update_status = Meal.query.filter_by(meal_id=mealId, vendor_id=vendor_id).update(
             dict(meal=meal_data['meal_update'], price=meal_data['price_update']))
         Meal.commit_meal_changes()
 
-        meal_as_dict = {}
-        meal_as_dict['meal_id'] = mealId
-        meal_as_dict['meal'] = meal_data['meal_update']
-        meal_as_dict['price'] = meal_data['price_update']
+        if update_status == 1:
+            meal_as_dict = {}
+            meal_as_dict['meal_id'] = mealId
+            meal_as_dict['meal'] = meal_data['meal_update']
+            meal_as_dict['price'] = meal_data['price_update']
 
-        return make_response(jsonify({'message': 'Meal Updated successfully',
-                                      'status_code': 202, 'data': meal_as_dict})), 202
+            return make_response(jsonify({'message': 'Meal Updated successfully',
+                                          'status_code': 202, 'data': meal_as_dict})), 202
+        else:
+            return make_response(jsonify({'message': 'Update Failed! Meal not in my meals.',
+                                          'status_code': 404})), 404
+
 
     @auth_decorator.token_required_to_authenticate
     def delete(current_user, self, mealId):
@@ -164,11 +171,16 @@ class MealsViews(MethodView):
                 {'message': 'Deletion Incomplete! Meal Not Found.', 'status_code': 404})), 404
 
         vendor_id = g.user_id
-        Meal.query.filter_by(meal_id=mealId, vendor_id=vendor_id).delete()
+        deletion_status = Meal.query.filter_by(meal_id=mealId, vendor_id=vendor_id).delete()
         Meal.commit_meal_changes()
 
-        return make_response(
-            jsonify({'message': 'Meal Deleted successfully', 'status_code': 202})), 202
+        if deletion_status == 1:
+            return make_response(
+                jsonify({'message': 'Meal Deleted successfully', 'status_code': 202})), 202
+        else:
+            return make_response(
+                jsonify({'message': 'Meal Deletion failed! Not found in my meals.', 'status_code': 404})), 404
+
 
 
 class GetMealById(MethodView):

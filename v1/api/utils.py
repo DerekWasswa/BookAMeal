@@ -41,3 +41,9 @@ class UtilHelper(object):
                 status = False
                 break
         return status
+
+    @staticmethod
+    def validate_exceeds_length(name, required_length):
+        if len(name) > required_length:
+            return True
+        return False
