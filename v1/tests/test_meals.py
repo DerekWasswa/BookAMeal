@@ -188,7 +188,7 @@ class MealTests(BaseCaseTest):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             result['message'],
-            'Meal addition request expects a MEAL and its PRICE, either of them is not provided')
+            'Meal addition request expects a MEAL and its PRICE keys.')
 
     def test_meal_update_with_empty_request_parameters(self):
         self.mock_signup()
@@ -213,7 +213,7 @@ class MealTests(BaseCaseTest):
         self.assertEqual(response_edit_meal.status_code, 400)
         self.assertEqual(
             result['message'],
-            'Meal Update expects MEAL_UPDATE and PRICE_UPDATE, either of them is not provided.')
+            'Meal Update expects MEAL_UPDATE and PRICE_UPDATE keys.')
 
     def test_meal_update_with_non_integer_price(self):
         self.mock_signup()

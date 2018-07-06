@@ -109,3 +109,10 @@ class Authentication(BaseCaseTest):
         self.assertIn(
             result['message'],
             'Logged requests expects email, password, and admin values.')
+
+    def test_registration_username_should_not_exceed_chars_limit(self):
+        response = self.client.post('/api/v1/auth/signup', data=self.username_too_long)
+        result = json.loads(response.data.decode())
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(result['message'],
+            'Username length should be less than 100 characters.')
