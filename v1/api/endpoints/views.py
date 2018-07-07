@@ -141,17 +141,12 @@ class MealsViews(MethodView):
             dict(meal=meal_data['meal_update'], price=meal_data['price_update']))
         Meal.commit_meal_changes()
 
+        message, status = '', 0
         if update_status == 1:
-            meal_as_dict = {}
-            meal_as_dict['meal_id'] = mealId
-            meal_as_dict['meal'] = meal_data['meal_update']
-            meal_as_dict['price'] = meal_data['price_update']
-
-            return make_response(jsonify({'message': 'Meal Updated successfully',
-                                          'status_code': 202, 'data': meal_as_dict})), 202
+            message, status = 'Meal Updated successfully', 202
         else:
-            return make_response(jsonify({'message': 'Update Failed! Meal not in my meals.',
-                                          'status_code': 404})), 404
+            message, status = 'Update Failed! Meal not in my meals.', 404
+        return make_response((jsonify({"message": message, 'status_code': status})), status)
 
 
     @auth_decorator.token_required_to_authenticate
@@ -174,13 +169,12 @@ class MealsViews(MethodView):
         deletion_status = Meal.query.filter_by(meal_id=mealId, vendor_id=vendor_id).delete()
         Meal.commit_meal_changes()
 
+        message, status = '', 0
         if deletion_status == 1:
-            return make_response(
-                jsonify({'message': 'Meal Deleted successfully', 'status_code': 202})), 202
+            message, status = 'Meal Deleted successfully', 202
         else:
-            return make_response(
-                jsonify({'message': 'Meal Deletion failed! Not found in my meals.', 'status_code': 404})), 404
-
+            message, status = 'Meal Deletion failed! Not found in my meals.', 404
+        return make_response((jsonify({"message": message, 'status_code': status})), status)
 
 
 class GetMealById(MethodView):

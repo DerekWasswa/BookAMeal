@@ -40,33 +40,41 @@ class User(db.Model):
     def validate_user_registration_data(user_data):
         response = None
         user = User.instantiate_user(user_data)
+        message, status, validation = '', 0, True
 
-        if UtilHelper.check_for_empty_variables(user_data['email'], user_data['password'], user_data['username'], user_data['admin']):
-            return make_response((jsonify({"message": 'Missing Credentials', 'status_code': 400})), 400)
+        if UtilHelper.check_for_empty_variables(user_data['email'], user_data['password'],
+            user_data['username'], user_data['admin']):
+            message, status, validation = 'Missing Credentials', 400, False
         elif UtilHelper.validate_exceeds_length(user_data['username'], 100):
-            return make_response((jsonify({"message": 'Username length should be less than 100 characters.',
-             'status_code': 400})), 400)
+            message, status, validation = 'Username length should be less than 100 characters.', 400, False
         elif not User.is_email_valid(user_data['email']):
-            return make_response((jsonify({"message": 'Email is Invalid', 'status_code': 401})), 401)
+            message, status, validation = 'Email is Invalid', 401, False
         elif user.check_if_user_exists():
-            return make_response((jsonify({"message": 'User already exists. Please login.', 'status_code': 200})), 200)
+            message, status, validation = 'User already exists. Please login.', 200, False
+
+        if not validation:
+            return make_response((jsonify({"message": message, 'status_code': status})), status)
         return response
+
 
     # Verify user login data
 
     @staticmethod
     def validate_user_login_data(user_data, user_object):
         response = None
+        message, status, validation = '', 0, True
 
         if UtilHelper.check_for_empty_variables(user_data['email'], user_data['password'], user_data['admin']):
-            return make_response((jsonify({"message": 'Could not verify. Login credentials required.',
-            'status_code': 401})), 401)
+            message, status, validation = 'Could not verify. Login credentials required.', 401, False
         elif not User.is_email_valid(user_data['email']):
-            return make_response((jsonify({"message": 'Email is Invalid', 'status_code': 401})), 401)
+            message, status, validation = 'Email is Invalid', 401, False
         elif not user_object.check_if_user_exists():
-            return make_response((jsonify({"message": 'User email not found!!', 'status_code': 401})), 401)
+            message, status, validation = 'User email not found!!', 401, False
         elif not user_object.verify_user_password():
-            return make_response((jsonify({"message": 'Invalid/Wrong Password', 'status_code': 401})), 401)
+            message, status, validation = 'Invalid/Wrong Password', 401, False
+
+        if not validation:
+            return make_response((jsonify({"message": message, 'status_code': status})), status)
         return response
 
 
