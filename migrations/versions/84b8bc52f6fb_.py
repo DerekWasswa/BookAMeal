@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: b287c6e64c1b
-Revises: c3d80c0e0536
-Create Date: 2018-05-12 11:42:16.190392
+Revision ID: 84b8bc52f6fb
+Revises: 
+Create Date: 2018-07-11 15:17:04.185377
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'b287c6e64c1b'
-down_revision = 'c3d80c0e0536'
+revision = '84b8bc52f6fb'
+down_revision = None
 branch_labels = None
 depends_on = None
 
@@ -21,8 +21,8 @@ def upgrade():
     op.create_table('users',
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('username', sa.String(length=100), nullable=False),
-    sa.Column('email', sa.String(length=100), nullable=False),
-    sa.Column('password', sa.String(length=200), nullable=False),
+    sa.Column('email', sa.String(length=1000), nullable=False),
+    sa.Column('password', sa.String(length=1000), nullable=False),
     sa.Column('admin', sa.Boolean(), nullable=False),
     sa.PrimaryKeyConstraint('user_id'),
     sa.UniqueConstraint('email')
@@ -43,8 +43,7 @@ def upgrade():
     sa.Column('description', sa.Text(), nullable=True),
     sa.Column('date', sa.Date(), nullable=False),
     sa.ForeignKeyConstraint(['vendor_id'], ['users.user_id'], ),
-    sa.PrimaryKeyConstraint('menu_id'),
-    sa.UniqueConstraint('date')
+    sa.PrimaryKeyConstraint('menu_id')
     )
     op.create_table('menu_meals',
     sa.Column('menu_id', sa.Integer(), nullable=False),
