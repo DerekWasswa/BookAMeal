@@ -3,6 +3,7 @@ from flask import Flask, session, render_template, request, redirect, url_for, j
 from flask_api import FlaskAPI, status
 import json
 from flask_sqlalchemy import SQLAlchemy
+import os
 
 db = SQLAlchemy()
 
@@ -13,8 +14,9 @@ def create_app(configuration):
 
     asyncMode = None
 
-    if configuration == 'development':
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/book_a_meal_db'#pragma:no cover
+    if configuration == 'production':
+        app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+        'DATABASE_URL', 'postgresql://localhost/book_a_meal_db')#pragma:no cover
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False#pragma:no cover
         db.init_app(app)#pragma:no cover
 
