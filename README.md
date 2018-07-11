@@ -4,7 +4,7 @@ An application that allows a user to make meal orders from various vendors
 
 
 [![Build Status](https://travis-ci.org/DerekWasswa/BookAMeal.svg?branch=develop)](https://travis-ci.org/DerekWasswa/BookAMeal)
-[![Coverage Status](https://coveralls.io/repos/github/DerekWasswa/BookAMeal/badge.svg?branch=develop)](https://coveralls.io/github/DerekWasswa/BookAMeal?branch=develop)
+[![Coverage Status](https://coveralls.io/repos/github/DerekWasswa/BookAMeal/badge.svg?branch=develop&service=github)](https://coveralls.io/github/DerekWasswa/BookAMeal?branch=develop)
 [![Maintainability](https://api.codeclimate.com/v1/badges/2877ce828afcde45fe6a/maintainability)](https://codeclimate.com/github/DerekWasswa/BookAMeal/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/2877ce828afcde45fe6a/test_coverage)](https://codeclimate.com/github/DerekWasswa/BookAMeal/test_coverage)
 
