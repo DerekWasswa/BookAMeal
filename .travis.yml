@@ -7,7 +7,7 @@ env:
 
 python:
     - "3.6"
-    
+
 
 virtualenv:
     system_site_package: true
@@ -20,13 +20,12 @@ before_script:
   - psql -c 'create database book_a_meal_test_db;' -U postgres
 
 script:
-- coverage run --source='v1/' manage.py test 
-- coverage report 
-    
+- coverage run --source='v1/' manage.py test
+- coverage report
+
 after_script:
 - codeclimate-test-reporter
 - coveralls
 
 after_success:
     - coveralls
-

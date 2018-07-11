@@ -77,7 +77,7 @@ class MenuTests(BaseCaseTest):
         self.add_mock_menu(self.headers_with_token(login_response['token']))
 
         # Testing for retrieving the menu of the day
-        response_get = self.client.get('/api/v1/menu/', data=self.menu_date)
+        response_get = self.client.get('/api/v1/menu/')
         self.assertEqual(response_get.status_code, 200)
         self.assertIn('1', str(response_get.data))
 
@@ -109,7 +109,7 @@ class MenuTests(BaseCaseTest):
 
     def test_get_menu_of_the_day_not_set(self):
         # Testing for retrieving the menu of the day which does not exist
-        response_get = self.client.get('/api/v1/menu/', data=self.menu_date)
+        response_get = self.client.get('/api/v1/menu/')
         self.assertEqual(200, response_get.status_code)
         self.assertIn('No menu set for the day.', str(response_get.data))
 
