@@ -34,8 +34,19 @@ class TestingConfig(Config):
     def init_app(app):
         pass
 
+class ProductionConfig(Config):
+    """ Production credentials """
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        'DATABASE_URL', 'postgresql://localhost/book_a_meal_db')
+
+    TESTING = False
+    DEBUG = False
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+
 config = {
     'testing': TestingConfig,
     'development': DevConfig,
+    'production': ProductionConfig,
     'default': Config
 }
