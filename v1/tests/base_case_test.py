@@ -7,6 +7,7 @@ from v1.api.models.meals import Meal
 from v1.api.models.users import User
 from v1.api.models.menu import Menu
 from v1.api.models.orders import Order
+import datetime
 
 
 class BaseCaseTest(unittest.TestCase):
@@ -123,27 +124,23 @@ class BaseCaseTest(unittest.TestCase):
 
         self.caterer_menu = json.dumps({
             'menu_name': 'Jojo Restaurant Special Friday',
-            'date': '2018-05-12',
+            'date': datetime.datetime.today().strftime('%Y-%m-%d'),
             'description': 'For our special friday, enjoy the menu with a free dessert',
             'meal_id': 1
         })
 
         self.menu_too_long = json.dumps({
             'menu_name': 'Jojo Restaurant Special Friday wasswaderoeyJhbGciOiJIUzI1NiIsInReyJhZG1pbiI6dHJ1ZSwidXNlcl9pZCI6MSwiZXhwIjoxNTMwOWmmwre3KiFcdv7F7an1pTcOhLprAtmvxAyFUDU2MDgyfQ5cCI6IkpXVCJ9',
-            'date': '2018-05-12',
+            'date': datetime.datetime.today().strftime('%Y-%m-%d'),
             'description': 'For our special friday, enjoy the menu with a free dessert',
             'meal_id': 1
         })
 
         self.caterer_menu_wrong_request_params = json.dumps({
             'menu_n': 'Jojo Restaurant Special Friday',
-            'dae': '2018-05-12',
+            'dae': datetime.datetime.today().strftime('%Y-%m-%d'),
             'dcription': 'For our special friday, enjoy the menu with a free dessert',
             'ml_id': 1
-        })
-
-        self.menu_date = json.dumps({
-            'date': '2018-05-12'
         })
 
         self.empty_menu = json.dumps({
@@ -156,7 +153,7 @@ class BaseCaseTest(unittest.TestCase):
         self.app_order = json.dumps({
             'user': 'derrekwasswa256@gmail.com',
             'meal_id': 2,
-            'date': '2018-05-12',
+            'date': datetime.datetime.today().strftime('%Y-%m-%d'),
             'menu_id': 1
         })
 
@@ -213,7 +210,7 @@ class BaseCaseTest(unittest.TestCase):
 
         app_menu = json.dumps({
             'menu_name': 'Jojo Restaurant Special Friday',
-            'date': '2018-05-12',
+            'date': datetime.datetime.today().strftime('%Y-%m-%d'),
             'description': 'For our special friday, enjoy the menu with a free dessert',
             'meal_id': 2
         })
@@ -221,7 +218,7 @@ class BaseCaseTest(unittest.TestCase):
 
         app_menu_two = json.dumps({
             'menu_name': 'Jojo Restaurant Special Friday',
-            'date': '2018-05-12',
+            'date': datetime.datetime.today().strftime('%Y-%m-%d'),
             'description': 'For our special friday, enjoy the menu with a free dessert',
             'meal_id': 3
         })
@@ -248,7 +245,7 @@ class BaseCaseTest(unittest.TestCase):
 
         app_menu = json.dumps({
             'menu_name': 'Jojo Restaurant Special Friday',
-            'date': '2018-05-12',
+            'date': datetime.datetime.today().strftime('%Y-%m-%d'),
             'description': 'For our special friday, enjoy the menu with a free dessert',
             'meal_id': 1
         })

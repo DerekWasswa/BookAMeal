@@ -196,13 +196,12 @@ class MenusView(MethodView):
     def get(self):
 
         # Allow the authenticated users to view menu of the day
-        menu_data = request.get_json(force=True)
-
-        if not Menu.check_menu_of_the_day_exists(menu_data['date']):
+        day_date = datetime.datetime.today().strftime('%Y-%m-%d')
+        if not Menu.check_menu_of_the_day_exists(day_date):
             return make_response(
                 jsonify({'message': 'No menu set for the day.', 'status_code': 200})), 200
 
-        menudb = Menu.query.filter_by(date=menu_data['date']).first()
+        menudb = Menu.query.filter_by(date=day_date).first()
         menu_as_dict = Menu.get_menu_as_dict(menudb)
 
         return make_response(
