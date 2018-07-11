@@ -44,6 +44,14 @@ class Menu(db.Model):
         db.session.commit()
 
     @staticmethod
+    def get_menu_of_the_day(day):
+        menudb = Menu.query.filter_by(date=day)
+        menu_list = []
+        for menu in menudb:
+            menu_list.append(Menu.get_menu_as_dict(menu))
+        return menu_list
+
+    @staticmethod
     def get_menu_as_dict(menudb):
         menu_dict = {}
         meals_list = []

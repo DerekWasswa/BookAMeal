@@ -201,11 +201,10 @@ class MenusView(MethodView):
             return make_response(
                 jsonify({'message': 'No menu set for the day.', 'status_code': 200})), 200
 
-        menudb = Menu.query.filter_by(date=day_date).first()
-        menu_as_dict = Menu.get_menu_as_dict(menudb)
+        menu_list = Menu.get_menu_of_the_day(day_date)
 
         return make_response(
-            jsonify({'message': 'success', 'status_code': 200, 'data': menu_as_dict})), 200
+            jsonify({'message': 'success', 'status_code': 200, 'data': menu_list})), 200
 
     @auth_decorator.token_required_to_authenticate
     def post(current_user, self):
