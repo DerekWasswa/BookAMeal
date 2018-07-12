@@ -1,5 +1,6 @@
 from . import db
 from flask import jsonify, make_response
+import re
 
 class UtilHelper(object):
 
@@ -45,5 +46,12 @@ class UtilHelper(object):
     @staticmethod
     def validate_exceeds_length(name, required_length):
         if len(name) > required_length:
+            return True
+        return False
+
+    @staticmethod
+    def validate_email(email):
+        validation = re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", email)
+        if validation:
             return True
         return False
