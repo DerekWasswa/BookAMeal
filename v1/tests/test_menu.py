@@ -23,7 +23,7 @@ class MenuTests(BaseCaseTest):
             data=self.caterer_menu,
             headers=self.headers_with_token(
                 login_response['token']))
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(201, response.status_code)
         self.assertIn("success", str(response.data))
 
     def test_setting_empty_menu(self):
@@ -43,7 +43,7 @@ class MenuTests(BaseCaseTest):
             data=self.empty_menu,
             headers=self.headers_with_token(
                 login_response['token']))
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(400, response.status_code)
         self.assertIn("Empty Menu Details.", str(response.data))
 
     def test_setting_menu_of_the_day_with_empty_request_parameters(self):
@@ -65,7 +65,7 @@ class MenuTests(BaseCaseTest):
             headers=self.headers_with_token(
                 login_response['token']))
         result = json.loads(response.data.decode())
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(400, response.status_code)
         self.assertEqual(
             result['message'],
             'Setting a Menu expects Menu name, date, description, and meal Id keys.')
@@ -78,7 +78,7 @@ class MenuTests(BaseCaseTest):
 
         # Testing for retrieving the menu of the day
         response_get = self.client.get('/api/v1/menu/')
-        self.assertEqual(response_get.status_code, 200)
+        self.assertEqual(200, response_get.status_code)
         self.assertIn('1', str(response_get.data))
 
     def test_setting_menu_with_unauthorized_access(self):
@@ -102,7 +102,7 @@ class MenuTests(BaseCaseTest):
             data=self.caterer_menu,
             headers=self.headers_with_token(
                 unpriviledged_response['token']))
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(401, response.status_code)
         self.assertIn(
             "You need to login as Admin to perform this operation.", str(
                 response.data))
@@ -114,7 +114,7 @@ class MenuTests(BaseCaseTest):
         self.assertIn('No menu set for the day.', str(response_get.data))
 
     def test_setting_menu_of_the_day_meal_option_does_not_exist(self):
-        ''' verify that setting a menu with a meal not in meals should not complete '''
+        # verify that setting a menu with a meal not in meals should not complete
         self.mock_signup()
         login = self.mock_login()
         login_response = json.loads(login.get_data(as_text=True))
@@ -124,7 +124,7 @@ class MenuTests(BaseCaseTest):
             data=self.caterer_menu,
             headers=self.headers_with_token(
                 login_response['token']))
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(200, response.status_code)
         self.assertIn(
             "Meal with provided ID does not exist.", str(
                 response.data))
@@ -140,5 +140,5 @@ class MenuTests(BaseCaseTest):
             data=self.menu_too_long,
             headers=self.headers_with_token(
                 login_response['token']))
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(400, response.status_code)
         self.assertIn("Menu name should not exceed 100 characters.", str(response.data))

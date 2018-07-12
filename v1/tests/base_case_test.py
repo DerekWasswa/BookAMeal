@@ -32,35 +32,42 @@ class BaseCaseTest(unittest.TestCase):
         self.user_data = json.dumps({
             'username': 'Wasswa Derick',
             'email': 'wasswadero@gmail.com',
-            'password': '12345',
+            'password': '12345678',
             'admin': False
         })
 
         self.username_too_long = json.dumps({
             'username': 'Wasswa Derick wasswaderoeyJhbGciOiJIUzI1NiIsInReyJhZG1pbiI6dHJ1ZSwidXNlcl9pZCI6MSwiZXhwIjoxNTMwOWmmwre3KiFcdv7F7an1pTcOhLprAtmvxAyFUDU2MDgyfQ5cCI6IkpXVCJ9',
             'email': 'wasswadero@gmail.com',
-            'password': '12345',
+            'password': '12345678',
             'admin': False
         })
 
         self.invalid_email_user_data = json.dumps({
             'username': 'example',
             'email': 'test',
-            'password': '12345',
+            'password': '12345678',
+            'admin': True
+        })
+
+        self.weak_password = json.dumps({
+            'username': 'deborah',
+            'email': 'deborah@gmail.com',
+            'password': '123',
             'admin': True
         })
 
         self.wrong_request_user_params = json.dumps({
             'us': 'example',
             'ma': 'tester@example.com',
-            'asswo': '12345',
+            'asswo': '12345678',
             'dmi': True
         })
 
         self.user_does_not_exists = json.dumps({
             'username': 'invasionworld',
             'email': 'invasionworlds@yahoo.com',
-            'password': '12345',
+            'password': '12345678',
             'admin': True
         })
 
@@ -161,7 +168,7 @@ class BaseCaseTest(unittest.TestCase):
         user_data = json.dumps({
             'username': 'derreckwasswa',
             'email': 'derrekwasswa256@gmail.com',
-            'password': '12345',
+            'password': '12345678',
             'admin': True
         })
         self.client.post('/api/v1/auth/signup', data=user_data)
@@ -169,7 +176,7 @@ class BaseCaseTest(unittest.TestCase):
     def mock_login(self):
         user_data = json.dumps({
             'email': 'derrekwasswa256@gmail.com',
-            'password': '12345',
+            'password': '12345678',
             'admin': True
         })
         return self.client.post('/api/v1/auth/login', data=user_data)
@@ -177,7 +184,7 @@ class BaseCaseTest(unittest.TestCase):
     def unpriviledged_mock_login(self):
         user_data = json.dumps({
             'email': 'derrekwasswa256@gmail.com',
-            'password': '12345',
+            'password': '12345678',
             'admin': False
         })
         return self.client.post('/api/v1/auth/login', data=user_data)

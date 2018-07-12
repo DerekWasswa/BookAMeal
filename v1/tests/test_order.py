@@ -17,10 +17,10 @@ class OrderTests(BaseCaseTest):
                 login_response['token']))
 
         response = self.client.post('/api/v1/orders/', data=self.app_order)
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(201, response.status_code)
 
     def test_make_order_where_menu_id_not_existing(self):
-        '''' verify that a user cannot order for a meal whose menu doesnot exist '''
+        # verify that a user cannot order for a meal whose menu doesnot exist
         self.mock_signup()
         login = self.mock_login()
         login_response = json.loads(login.get_data(as_text=True))
@@ -37,11 +37,11 @@ class OrderTests(BaseCaseTest):
         })
 
         response = self.client.post('/api/v1/orders/', data=app_order)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(400, response.status_code)
         self.assertIn('Menu ID does not exist.', str(response.data))
 
     def test_make_order_where_meal_id_is_not_in_the_menu(self):
-        '''' verify that a user cannot order for a meal which is not on the menu '''
+        # verify that a user cannot order for a meal which is not on the menu
         self.mock_signup()
         login = self.mock_login()
         login_response = json.loads(login.get_data(as_text=True))
@@ -58,7 +58,7 @@ class OrderTests(BaseCaseTest):
         })
 
         response = self.client.post('/api/v1/orders/', data=app_order)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(400, response.status_code)
         self.assertIn(
             'Meal ID does not exist in the menu of the day', str(
                 response.data))
@@ -87,7 +87,7 @@ class OrderTests(BaseCaseTest):
             data=order_update
         )
 
-        self.assertEqual(response_edit_order.status_code, 202)
+        self.assertEqual(202, response_edit_order.status_code)
         results_get_order_by_id = self.client.get(
             '/api/v1/orders/',
             headers=self.headers_with_token(
@@ -96,7 +96,7 @@ class OrderTests(BaseCaseTest):
             results_get_order_by_id.data))
 
     def test_modify_order_where_orders_are_empty(self):
-        ''' verify that attempts to update orders fail where there are no orders '''
+        # verify that attempts to update orders fail where there are no orders
         order_update = json.dumps({
             'order_to_update': 3,
             'user': 'derrekwasswa256@gmail.com',
@@ -108,7 +108,7 @@ class OrderTests(BaseCaseTest):
             data=order_update
         )
 
-        self.assertEqual(response_edit_order.status_code, 200)
+        self.assertEqual(200, response_edit_order.status_code)
         self.assertIn('Orders are Empty', str(response_edit_order.data))
 
     def test_making_order_with_empty_fields(self):
@@ -125,7 +125,7 @@ class OrderTests(BaseCaseTest):
         response = self.client.post('/api/v1/orders/', data=app_menu)
 
         result = json.loads(response.data.decode())
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(400, response.status_code)
         self.assertEqual(
             result['message'],
             'Can not order with empty content.')
@@ -162,7 +162,7 @@ class OrderTests(BaseCaseTest):
         )
 
         result = json.loads(response_edit_order.data.decode())
-        self.assertEqual(response_edit_order.status_code, 400)
+        self.assertEqual(400, response_edit_order.status_code)
         self.assertEqual(
             result['message'],
             'Can not modify an order with empty content.')
@@ -182,7 +182,7 @@ class OrderTests(BaseCaseTest):
         response = self.client.post('/api/v1/orders/', data=app_menu)
 
         result = json.loads(response.data.decode())
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(400, response.status_code)
         self.assertIn(result['message'], 'User Email not valid.')
 
     def test_making_orders_with_empty_request_parameters(self):
@@ -200,7 +200,7 @@ class OrderTests(BaseCaseTest):
         response = self.client.post('/api/v1/orders/', data=app_order)
         result = json.loads(response.data.decode())
 
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(400, response.status_code)
         self.assertEqual(
             result['message'],
             'Making Order expects; user email, meal id, menu_id, and date keys.')
@@ -237,7 +237,7 @@ class OrderTests(BaseCaseTest):
             data=order_update
         )
         result = json.loads(response_edit_order.data.decode())
-        self.assertEqual(response_edit_order.status_code, 400)
+        self.assertEqual(400, response_edit_order.status_code)
         self.assertEqual(
             result['message'],
             'Modifying order expects the order id, user, menu id, meal id keys.')
@@ -258,7 +258,7 @@ class OrderTests(BaseCaseTest):
             '/api/v1/orders/',
             headers=self.headers_with_token(
                 login_response['token']))
-        self.assertEqual(response_get_orders.status_code, 200)
+        self.assertEqual(200, response_get_orders.status_code)
         self.assertIn('2', str(response_get_orders.data))
 
     def test_getting_all_orders_with_authorized_access(self):
@@ -280,7 +280,7 @@ class OrderTests(BaseCaseTest):
             '/api/v1/orders/',
             headers=self.headers_with_token(
                 unpriviledged_response['token']))
-        self.assertEqual(response_get_orders.status_code, 401)
+        self.assertEqual(401, response_get_orders.status_code)
         self.assertIn(
             "You need to login as Admin to perform this operation.", str(
                 response_get_orders.data))
@@ -303,7 +303,7 @@ class OrderTests(BaseCaseTest):
         })
 
         response = self.client.post('/api/v1/orders/', data=app_order)
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(401, response.status_code)
         self.assertIn(
             "User doesnot exist or is not logged in.", str(
                 response.data))

@@ -18,7 +18,7 @@ class MealTests(BaseCaseTest):
             headers=self.headers_with_token(
                 login_response['token']))
 
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(201, response.status_code)
         self.assertIn("Fish with All foods", str(response.data))
         self.assertIn('Meal Added Successfully', str(response.data))
 
@@ -39,7 +39,7 @@ class MealTests(BaseCaseTest):
             data=self.all_food_meal,
             headers=self.headers_with_token(
                 login_response['token']))
-        self.assertEqual(response_existing.status_code, 400)
+        self.assertEqual(400, response_existing.status_code)
         self.assertIn("Meal already exists.", str(response_existing.data))
 
     def test_modifying_a_meal_option(self):
@@ -61,7 +61,7 @@ class MealTests(BaseCaseTest):
                                              headers=self.headers_with_token(
                                                  login_response['token'])
                                              )
-        self.assertEqual(response_edit_meal.status_code, 202)
+        self.assertEqual(202, response_edit_meal.status_code)
         results_get_meals = self.client.get(
             '/api/v1/meals/',
             headers=self.headers_with_token(
@@ -94,7 +94,7 @@ class MealTests(BaseCaseTest):
                 posted_data['meal']['meal_id']),
             headers=self.headers_with_token(
                 login_response['token']))
-        self.assertEqual(response_get.status_code, 404)
+        self.assertEqual(404, response_get.status_code)
 
     def test_getting_all_meals(self):
         self.mock_signup()
@@ -113,7 +113,7 @@ class MealTests(BaseCaseTest):
             '/api/v1/meals/',
             headers=self.headers_with_token(
                 login_response['token']))
-        self.assertEqual(response_get.status_code, 200)
+        self.assertEqual(200, response_get.status_code)
         self.assertIn('Fish with All foods', str(response_get.data))
 
     def test_adding_empty_meal_options(self):
@@ -129,7 +129,7 @@ class MealTests(BaseCaseTest):
             headers=self.headers_with_token(
                 login_response['token']))
         result = json.loads(response.data.decode())
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(400, response.status_code)
         self.assertIn(result['message'], 'Meal Options Missing.')
 
     def test_adding_meal_price_that_is_not_an_int(self):
@@ -145,7 +145,7 @@ class MealTests(BaseCaseTest):
             headers=self.headers_with_token(
                 login_response['token']))
         result = json.loads(response.data.decode())
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(400, response.status_code)
         self.assertIn(result['message'], 'Meal Price has to be an Integer.')
 
     def test_modifying_a_meal_with_empty_meal_options(self):
@@ -166,7 +166,7 @@ class MealTests(BaseCaseTest):
                                              headers=self.headers_with_token(
                                                  login_response['token'])
                                              )
-        self.assertEqual(response_edit_meal.status_code, 400)
+        self.assertEqual(400, response_edit_meal.status_code)
         self.assertIn(
             'Can not update meal with empty meal options', str(
                 response_edit_meal.data))
@@ -185,7 +185,7 @@ class MealTests(BaseCaseTest):
             headers=self.headers_with_token(
                 login_response['token']))
         result = json.loads(response.data.decode())
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(400, response.status_code)
         self.assertEqual(
             result['message'],
             'Meal addition request expects a MEAL and its PRICE keys.')
@@ -210,7 +210,7 @@ class MealTests(BaseCaseTest):
                                                  login_response['token'])
                                              )
         result = json.loads(response_edit_meal.data.decode())
-        self.assertEqual(response_edit_meal.status_code, 400)
+        self.assertEqual(400, response_edit_meal.status_code)
         self.assertEqual(
             result['message'],
             'Meal Update expects MEAL_UPDATE and PRICE_UPDATE keys.')
@@ -234,14 +234,14 @@ class MealTests(BaseCaseTest):
                                              headers=self.headers_with_token(
                                                  login_response['token'])
                                              )
-        self.assertEqual(response_edit_meal.status_code, 400)
+        self.assertEqual(400, response_edit_meal.status_code)
         result = json.loads(response_edit_meal.get_data(as_text=True))
         self.assertEqual(
             result['message'],
             'Can not update meal with non integer price')
 
     def test_meal_update_not_found(self):
-        ''' verify that updating does not happen if the meal does not exist '''
+        # verify that updating does not happen if the meal does not exist
         self.mock_signup()
         login = self.mock_login()
         login_response = json.loads(login.get_data(as_text=True))
@@ -256,7 +256,7 @@ class MealTests(BaseCaseTest):
                                              headers=self.headers_with_token(
                                                  login_response['token'])
                                              )
-        self.assertEqual(response_edit_meal.status_code, 404)
+        self.assertEqual(404, response_edit_meal.status_code)
         self.assertIn(
             'Update Incomplete! Meal does not exist.', str(
                 response_edit_meal.data))
@@ -273,7 +273,7 @@ class MealTests(BaseCaseTest):
             data=self.all_food_meal,
             headers=self.headers_with_token(
                 unpriviledged_response['token']))
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(401, response.status_code)
         self.assertIn(
             "You need to login as Admin to perform this operation.", str(
                 response.data))
@@ -300,7 +300,7 @@ class MealTests(BaseCaseTest):
                                              headers=self.headers_with_token(
                                                  unpriviledged_response['token'])
                                              )
-        self.assertEqual(response_edit_meal.status_code, 401)
+        self.assertEqual(401, response_edit_meal.status_code)
         self.assertIn(
             "You need to login as Admin to perform this operation.", str(
                 response_edit_meal.data))
@@ -320,7 +320,7 @@ class MealTests(BaseCaseTest):
             '/api/v1/meals/',
             headers=self.headers_with_token(
                 unpriviledged_response['token']))
-        self.assertEqual(response_get.status_code, 401)
+        self.assertEqual(401, response_get.status_code)
         self.assertIn(
             "You need to login as Admin to perform this operation.", str(
                 response_get.data))
@@ -346,7 +346,7 @@ class MealTests(BaseCaseTest):
             '/api/v1/meals/{}' . format(posted_data['meal']['meal_id']),
             headers=self.headers_with_token(unpriviledged_response['token'])
         )
-        self.assertEqual(response_delete_meal.status_code, 401)
+        self.assertEqual(401, response_delete_meal.status_code)
         self.assertIn(
             "You need to login as Admin to perform this operation.", str(
                 response_delete_meal.data))
@@ -382,7 +382,7 @@ class MealTests(BaseCaseTest):
             '/api/v1/meals/{}' . format(20),
             headers=self.headers_with_token(
                 login_response['token']))
-        self.assertEqual(response_delete_meal.status_code, 404)
+        self.assertEqual(404, response_delete_meal.status_code)
         self.assertIn(
             "Deletion Incomplete! Meal Not Found.", str(
                 response_delete_meal.data))
@@ -390,21 +390,21 @@ class MealTests(BaseCaseTest):
     """ TOKEN TESTS """
 
     def test_add_meal_with_no_auth_token(self):
-        ''' Test that without a token, one cannot add a meal '''
+        # Test that without a token, one cannot add a meal
 
         response = self.client.post(
             '/api/v1/meals/',
             data=self.all_food_meal,
             headers=self.no_token_headers)
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(401, response.status_code)
         self.assertIn("No token in the headers", str(response.data))
 
     def test_add_meal_with_invalid_token(self):
-        ''' Test that an invalid token, one cannot add a meal '''
+        # Test that an invalid token, one cannot add a meal
 
         response = self.client.post(
             '/api/v1/meals/',
             data=self.all_food_meal,
             headers=self.invalid_token_headers)
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(401, response.status_code)
         self.assertIn("Token is Invalid.", str(response.data))

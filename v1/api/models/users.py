@@ -35,7 +35,7 @@ class User(db.Model):
 
     # Verify user registration data
 
-    def validate_user_registration_data(self):
+    def validate_user_registration_data(self, password):
         response = None
         message, status, validation = '', 0, True
 
@@ -44,6 +44,8 @@ class User(db.Model):
             message, status, validation = 'Missing Credentials', 400, False
         elif UtilHelper.validate_exceeds_length(self.username, 100):
             message, status, validation = 'Username length should be less than 100 characters.', 400, False
+        elif not UtilHelper.validate_password_strength(password):
+            message, status, validation = 'Password is too weak.', 401, False
         elif not UtilHelper.validate_email(self.email):
             message, status, validation = 'Email is Invalid', 401, False
         elif self.check_if_user_exists():
