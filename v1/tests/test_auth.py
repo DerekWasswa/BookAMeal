@@ -10,7 +10,7 @@ class Authentication(BaseCaseTest):
         # User registration should complete successfully
         response = self.client.post('/api/v1/auth/signup', data=self.user_data)
         result = json.loads(response.data.decode())
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(201, response.status_code)
         self.assertIn(
             result['message'],
             'Successfully Registered. Please login')
@@ -21,7 +21,7 @@ class Authentication(BaseCaseTest):
 
         response_post_two = self.client.post(
             '/api/v1/auth/signup', data=self.user_data)
-        self.assertEqual(response_post_two.status_code, 200)
+        self.assertEqual(200, response_post_two.status_code)
         result = json.loads(response_post_two.data.decode())
         self.assertEqual(
             result['message'],
@@ -30,7 +30,7 @@ class Authentication(BaseCaseTest):
     def test_user_registration_with_empty_credentials(self):
         # User should not register with missing credentials
         response = self.client.post('/api/v1/auth/signup', data=self.empty_user_data)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(400, response.status_code)
         result = json.loads(response.data.decode())
         self.assertEqual(result['message'], "Missing Credentials")
 
@@ -38,7 +38,7 @@ class Authentication(BaseCaseTest):
         # User registration with invalid emails should show invalid email
         response = self.client.post('/api/v1/auth/signup', data=self.invalid_email_user_data)
         result = json.loads(response.data.decode())
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(401, response.status_code)
         self.assertIn(result['message'], 'Email is Invalid')
 
     def test_registration_with_empty_request_parameters(self):
@@ -46,7 +46,7 @@ class Authentication(BaseCaseTest):
         # to execute
         response = self.client.post('/api/v1/auth/signup', data=self.wrong_request_user_params)
         result = json.loads(response.data.decode())
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(400, response.status_code)
         self.assertIn(
             result['message'],
             'Signup expects username, email, password, admin values.')
@@ -56,7 +56,7 @@ class Authentication(BaseCaseTest):
     def test_user_login_with_empty_credentials(self):
         # User should not login with missing credentials
         response = self.client.post('/api/v1/auth/login', data=self.empty_user_data_login)
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(401, response.status_code)
         result = json.loads(response.data.decode())
         self.assertEqual(
             result['message'],
@@ -69,7 +69,7 @@ class Authentication(BaseCaseTest):
         user_login_response = self.client.post(
             '/api/v1/auth/login', data=self.user_data)
         result = json.loads(user_login_response.get_data(as_text=True))
-        self.assertEqual(user_login_response.status_code, 200)
+        self.assertEqual(200, user_login_response.status_code)
         self.assertEqual(result['message'], 'Logged in successfully')
 
     def test_user_login_with_user_who_does_not_exist(self):
@@ -78,14 +78,14 @@ class Authentication(BaseCaseTest):
         user_login_response = self.client.post(
             '/api/v1/auth/login', data=self.user_does_not_exists)
         result = json.loads(user_login_response.get_data(as_text=True))
-        self.assertEqual(user_login_response.status_code, 401)
+        self.assertEqual(401, user_login_response.status_code)
         self.assertEqual(result['message'], 'User email not found!!')
 
     def test_login_for_invalid_emails(self):
         # User login with invalid emails should show invalid email
         response = self.client.post('/api/v1/auth/login', data=self.invalid_email_user_data)
         result = json.loads(response.data.decode())
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(401, response.status_code)
         self.assertIn(result['message'], 'Email is Invalid')
 
     def test_login_with_invalid_password(self):
@@ -98,14 +98,14 @@ class Authentication(BaseCaseTest):
         })
         response = self.client.post('/api/v1/auth/login', data=user_data)
         result = json.loads(response.data.decode())
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(401, response.status_code)
         self.assertIn(result['message'], 'Invalid/Wrong Password')
 
     def test_login_with_empty_request_parameters(self):
         # User login with invalid emails should show invalid email
         response = self.client.post('/api/v1/auth/login', data=self.wrong_request_user_params)
         result = json.loads(response.data.decode())
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(400, response.status_code)
         self.assertIn(
             result['message'],
             'Logged requests expects email, password, and admin values.')
@@ -113,7 +113,7 @@ class Authentication(BaseCaseTest):
     def test_registration_username_should_not_exceed_chars_limit(self):
         response = self.client.post('/api/v1/auth/signup', data=self.username_too_long)
         result = json.loads(response.data.decode())
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(400, response.status_code)
         self.assertIn(result['message'],
             'Username length should be less than 100 characters.')
 
@@ -121,7 +121,7 @@ class Authentication(BaseCaseTest):
         # User registration should not complete successfully if the password is weak
         response = self.client.post('/api/v1/auth/signup', data=self.weak_password)
         result = json.loads(response.data.decode())
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(401, response.status_code)
         self.assertIn(
             result['message'],
             'Password is too weak.')
