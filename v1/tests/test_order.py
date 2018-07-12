@@ -20,7 +20,7 @@ class OrderTests(BaseCaseTest):
         self.assertEqual(response.status_code, 201)
 
     def test_make_order_where_menu_id_not_existing(self):
-        '''' verify that a user cannot order for a meal whose menu doesnot exist '''
+        # verify that a user cannot order for a meal whose menu doesnot exist
         self.mock_signup()
         login = self.mock_login()
         login_response = json.loads(login.get_data(as_text=True))
@@ -41,7 +41,7 @@ class OrderTests(BaseCaseTest):
         self.assertIn('Menu ID does not exist.', str(response.data))
 
     def test_make_order_where_meal_id_is_not_in_the_menu(self):
-        '''' verify that a user cannot order for a meal which is not on the menu '''
+        # verify that a user cannot order for a meal which is not on the menu
         self.mock_signup()
         login = self.mock_login()
         login_response = json.loads(login.get_data(as_text=True))
@@ -96,7 +96,7 @@ class OrderTests(BaseCaseTest):
             results_get_order_by_id.data))
 
     def test_modify_order_where_orders_are_empty(self):
-        ''' verify that attempts to update orders fail where there are no orders '''
+        # verify that attempts to update orders fail where there are no orders
         order_update = json.dumps({
             'order_to_update': 3,
             'user': 'derrekwasswa256@gmail.com',

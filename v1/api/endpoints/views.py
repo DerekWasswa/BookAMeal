@@ -32,7 +32,7 @@ class SignUp(MethodView):
 
         user = User(user_data['username'], user_data['email'], generate_password_hash(
             str(user_data['password'])), user_data['admin'])
-        response = user.validate_user_registration_data()
+        response = user.validate_user_registration_data(user_data['password'])
         if response:
             return response
 

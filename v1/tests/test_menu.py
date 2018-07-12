@@ -114,7 +114,7 @@ class MenuTests(BaseCaseTest):
         self.assertIn('No menu set for the day.', str(response_get.data))
 
     def test_setting_menu_of_the_day_meal_option_does_not_exist(self):
-        ''' verify that setting a menu with a meal not in meals should not complete '''
+        # verify that setting a menu with a meal not in meals should not complete
         self.mock_signup()
         login = self.mock_login()
         login_response = json.loads(login.get_data(as_text=True))

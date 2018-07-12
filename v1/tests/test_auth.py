@@ -116,3 +116,12 @@ class Authentication(BaseCaseTest):
         self.assertEqual(response.status_code, 400)
         self.assertIn(result['message'],
             'Username length should be less than 100 characters.')
+
+    def test_registration_with_weak_password_should_fail(self):
+        # User registration should not complete successfully if the password is weak
+        response = self.client.post('/api/v1/auth/signup', data=self.weak_password)
+        result = json.loads(response.data.decode())
+        self.assertEqual(response.status_code, 401)
+        self.assertIn(
+            result['message'],
+            'Password is too weak.')

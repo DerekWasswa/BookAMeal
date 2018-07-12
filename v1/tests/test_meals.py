@@ -241,7 +241,7 @@ class MealTests(BaseCaseTest):
             'Can not update meal with non integer price')
 
     def test_meal_update_not_found(self):
-        ''' verify that updating does not happen if the meal does not exist '''
+        # verify that updating does not happen if the meal does not exist
         self.mock_signup()
         login = self.mock_login()
         login_response = json.loads(login.get_data(as_text=True))
@@ -390,7 +390,7 @@ class MealTests(BaseCaseTest):
     """ TOKEN TESTS """
 
     def test_add_meal_with_no_auth_token(self):
-        ''' Test that without a token, one cannot add a meal '''
+        # Test that without a token, one cannot add a meal
 
         response = self.client.post(
             '/api/v1/meals/',
@@ -400,7 +400,7 @@ class MealTests(BaseCaseTest):
         self.assertIn("No token in the headers", str(response.data))
 
     def test_add_meal_with_invalid_token(self):
-        ''' Test that an invalid token, one cannot add a meal '''
+        # Test that an invalid token, one cannot add a meal
 
         response = self.client.post(
             '/api/v1/meals/',

@@ -55,3 +55,9 @@ class UtilHelper(object):
         if validation:
             return True
         return False
+
+    @staticmethod
+    def validate_password_strength(password):
+        if len(password) < 6:
+            return False
+        return True
