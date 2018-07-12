@@ -55,27 +55,25 @@ class Order(db.Model):
         order_as_dict['date'] = order.date
         return order_as_dict
 
-    @staticmethod
-    def validate_order_data(order_data):
+    def validate_order_data(self):
         ''' validate the Order data '''
         response = None
-        response_menu_eixstance = Order.validate_order_user_meal_menu_exist(order_data)
+        response_menu_eixstance = self.validate_order_user_meal_menu_exist()
 
         if UtilHelper.check_for_empty_variables(
-                order_data['meal_id'], order_data['user'], order_data['date'], order_data['menu_id']):
+                self.meal_id, self.user, self.date, self.menu_id):
             return make_response((jsonify({"message": 'Can not order with empty content.', 'status_code': 400})), 400)
-        elif not User.is_email_valid(order_data['user']):
+        elif not UtilHelper.validate_email(self.user):
             return make_response((jsonify({"message": 'User Email not valid.', 'status_code': 400})), 400)
         elif not response_menu_eixstance['validation_pass']:
             return make_response((jsonify({"message": response_menu_eixstance['message'],
              'status_code': response_menu_eixstance['status_code']})), response_menu_eixstance['status_code'])
         return response
 
-    @staticmethod
-    def validate_order_update_data(order_data):
+    def validate_order_update_data(self, order_data):
         ''' validate the Order data '''
         response = None
-        response_menu_exists = Order.validate_order_user_meal_menu_exist(order_data)
+        response_menu_exists = self.validate_order_user_meal_menu_exist()
 
         if UtilHelper.check_for_empty_variables(
                 order_data['order_to_update'], order_data['user'], order_data['meal_id'], order_data['menu_id']):
@@ -86,20 +84,19 @@ class Order(db.Model):
              'status_code': response_menu_exists['status_code']})), response_menu_exists['status_code'])
         return response
 
-    @staticmethod
-    def validate_order_user_meal_menu_exist(order_data):
-        user = User('', order_data['user'], '', '')
+    def validate_order_user_meal_menu_exist(self):
+        user = User('', self.user, '', '')
         message, status_code, validation_pass = '', 0, True
         if not user.check_if_user_exists():
             # check if the user is a registered user and is logged
             message = 'User doesnot exist or is not logged in.'
             status_code, validation_pass = 401, False
-        elif not UtilHelper.check_row_id_exists_in_table(Menu, 'menu_id' , order_data['menu_id']):
+        elif not UtilHelper.check_row_id_exists_in_table(Menu, 'menu_id' , self.menu_id):
             # verify if menu id exists and has the meal id specified
             message = 'Menu ID does not exist.'
             status_code, validation_pass = 400, False
         elif not Menu.check_meal_exists_in_menu(
-                order_data['menu_id'], order_data['meal_id']):
+                self.menu_id, self.meal_id):
                  # if false then meal does not exist
             message = 'Meal ID does not exist in the menu of the day'
             status_code, validation_pass = 400, False

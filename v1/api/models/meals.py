@@ -1,6 +1,5 @@
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask import Flask, jsonify, make_response
-from validate_email import validate_email
 from v1.api.utils import UtilHelper
 from v1.api import db
 

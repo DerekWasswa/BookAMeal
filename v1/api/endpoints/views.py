@@ -30,11 +30,11 @@ class SignUp(MethodView):
             return make_response(jsonify(
                 {'message': 'Signup expects username, email, password, admin values.'})), 400
 
-        response = User.validate_user_registration_data(user_data)
+        user = User(user_data['username'], user_data['email'], generate_password_hash(
+            str(user_data['password'])), user_data['admin'])
+        response = user.validate_user_registration_data()
         if response:
             return response
-
-        user = User.instantiate_user(user_data)
 
         # ADD THE USER TO THE DB SESSION
         user.save()
@@ -54,8 +54,7 @@ class Login(MethodView):
                 {'message': 'Logged requests expects email, password, and admin values.'})), 400
 
         user = User('n/a', user_data['email'], user_data['password'], user_data['admin'])
-
-        response = User.validate_user_login_data(user_data, user)
+        response = user.validate_user_login_data()
         if response:
             return response
 
@@ -252,12 +251,13 @@ class OrdersView(MethodView):
             return make_response(jsonify(
                 {'message': 'Making Order expects; user email, meal id, menu_id, and date keys.', 'status_code': 400})), 400
 
-        response = Order.validate_order_data(order_data)
+        order = Order(order_data['user'], order_data['meal_id'], order_data['menu_id'], order_data['date'])
+
+        response = order.validate_order_data()
         if response:
             return response
 
         # MEAL EXISTS IN THE MENU -> Make the Order to the db
-        order = Order(order_data['user'], order_data['meal_id'], order_data['menu_id'], order_data['date'])
         order.save_order()
         order_as_dict = Order.order_as_dict(order)
 
@@ -286,7 +286,8 @@ class OrdersView(MethodView):
             return make_response(jsonify(
                 {'message': 'Modifying order expects the order id, user, menu id, meal id keys.'})), 400
 
-        response = Order.validate_order_update_data(order_data)
+        order = Order(order_data['user'], order_data['meal_id'], order_data['menu_id'], "date")
+        response = order.validate_order_update_data(order_data)
         if response:
             return response
 
