@@ -62,7 +62,7 @@ class User(db.Model):
         response = None
         message, status, validation = '', 0, True
 
-        if UtilHelper.check_for_empty_variables(self.email, self.password, self.admin):
+        if UtilHelper.check_for_empty_variables(self.email, self.password):
             message, status, validation = 'Could not verify. Login credentials required.', 401, False
         elif not UtilHelper.validate_email(self.email):
             message, status, validation = 'Email is Invalid', 401, False
@@ -97,6 +97,13 @@ class User(db.Model):
         userdb = User.query.filter_by(email=self.email).first()
         return userdb.user_id
 
+    def is_admin(self):
+        userdb = User.query.filter_by(email=self.email).first()
+        return userdb.admin
+
+    def get_username(self):
+        userdb = User.query.filter_by(email=self.email).first()
+        return userdb.username
 
     @staticmethod
     def instantiate_user(data):

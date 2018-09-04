@@ -12,6 +12,7 @@ docopt==0.6.2
 enum34==1.1.6
 Flask==1.0.2
 Flask-API==1.0
+Flask-Cors==3.0.6
 Flask-Migrate==2.1.1
 Flask-Script==2.0.6
 Flask-SQLAlchemy==2.3.2
@@ -22,7 +23,6 @@ itsdangerous==0.24
 Jinja2==2.10
 Mako==1.0.7
 MarkupSafe==1.0
-psycopg2==2.7.4
 psycopg2-binary==2.7.5
 pycodestyle==2.4.0
 pycparser==2.18

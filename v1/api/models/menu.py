@@ -3,6 +3,7 @@ from flask import Flask, jsonify, make_response
 from v1.api.utils import UtilHelper
 from v1.api import db
 from v1.api.models.meals import Meal
+from v1.api.models.users import User
 
 associate_meals_to_menu = db.Table('menu_meals',
                                    db.Column(
@@ -10,7 +11,7 @@ associate_meals_to_menu = db.Table('menu_meals',
                                        db.Integer,
                                        db.ForeignKey('menus.menu_id'),
                                        primary_key=True),
-                                   db.Column('meal_id', db.Integer, db.ForeignKey('meals.meal_id'), primary_key=True))
+                                   db.Column('meal_id', db.Integer, db.ForeignKey('meals.meal_id', ondelete='CASCADE'), primary_key=True))
 
 
 class Menu(db.Model):
@@ -23,7 +24,7 @@ class Menu(db.Model):
     meals = db.relationship('Meal',
                             secondary=associate_meals_to_menu,
                             lazy='subquery',
-                            backref=db.backref('menu', lazy=True)
+                            backref=db.backref('menu', cascade='all,delete', passive_deletes=True, lazy=True)
                             )
     date = db.Column(db.Date, nullable=False)
 
@@ -43,6 +44,11 @@ class Menu(db.Model):
         db.session.commit()
 
     @staticmethod
+    def commit_menu_changes():
+        ''' Invoke when Deleting meal option off the menu '''
+        db.session.commit()
+
+    @staticmethod
     def get_menu_of_the_day(day):
         menudb = Menu.query.filter_by(date=day)
         menu_list = []
@@ -51,13 +57,33 @@ class Menu(db.Model):
         return menu_list
 
     @staticmethod
+    def get_vendor_menus(vendor_id):
+        menudb = Menu.query.filter_by(vendor_id=vendor_id).order_by(Menu.date.desc())
+        menu_list = []
+        for menu in menudb:
+            menu_list.append(Menu.get_menu_as_dict(menu))
+        return menu_list
+
+    @staticmethod
+    def get_menu_vendor_name(menu_id):
+        menudb = Menu.query.filter_by(menu_id=menu_id).first()
+        vendor = Menu.get_menu_as_dict(menudb)
+        return vendor
+
+    @staticmethod
     def get_menu_as_dict(menudb):
         menu_dict = {}
         meals_list = []
+
+        caterer = User.query.filter_by(user_id=menudb.vendor_id).first()
+
         menu_dict['menu_id'] = menudb.menu_id
         menu_dict['name'] = menudb.name
         menu_dict['description'] = menudb.description
         menu_dict['vendor_id'] = menudb.vendor_id
+        menu_dict['vendor'] = caterer.username
+        menu_dict['contact'] = caterer.email
+        menu_dict['date'] = menudb.date
 
         for meal in menudb.meals:
             meals_dict = {}
