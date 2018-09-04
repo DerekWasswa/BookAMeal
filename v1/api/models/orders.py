@@ -5,21 +5,25 @@ from v1.api.utils import UtilHelper
 from v1.api import db
 from v1.api.models.users import User
 from v1.api.models.menu import Menu
+from v1.api.models.meals import Meal
+from datetime import datetime, timedelta
 
 class Order(db.Model):
     """ Order Object to define the Order in the db """
     __tablename__ = 'orders'
     order_id = db.Column(db.Integer, primary_key=True)
-    menu_id = db.Column(db.Integer, db.ForeignKey('menus.menu_id'))
-    meal_id = db.Column(db.Integer, db.ForeignKey('meals.meal_id'))
+    menu_id = db.Column(db.Integer, db.ForeignKey('menus.menu_id', ondelete='CASCADE'))
+    meal_id = db.Column(db.Integer, db.ForeignKey('meals.meal_id', ondelete='CASCADE'))
     user = db.Column(db.String(100), db.ForeignKey('users.email'))
+    status = db.Column(db.String(20), default="Not Served")
+    expiry = db.Column(db.String(100), default=str(int((datetime.now() + timedelta(hours=1)).timestamp())) )
     date = db.Column(db.Date, nullable=False)
 
-    def __init__(self, user, meal_id, menu_id, date):
+    def __init__(self, user, meal_id, menu_id, date, expiry):
         self.user = user
         self.meal_id = meal_id
         self.menu_id = menu_id
-        self.expiry_time = None
+        self.expiry = expiry
         self.date = date
 
     def save_order(self):
@@ -38,8 +42,8 @@ class Order(db.Model):
             order_dict = {}
             order_dict['order_id'] = order.order_id
             order_dict['user'] = order.user
-            order_dict['meal_id'] = order.meal_id
-            order_dict['menu_id'] = order.menu_id
+            order_dict['meal'] = Meal.get_meal_by_id(order.meal_id)
+            order_dict['menu'] = Menu.get_menu_vendor_name(order.menu_id)
             order_dict['date'] = order.date
             orders_list.append(order_dict)
         return orders_list
@@ -101,3 +105,20 @@ class Order(db.Model):
             message = 'Meal ID does not exist in the menu of the day'
             status_code, validation_pass = 400, False
         return {'message': message, 'status_code': status_code, 'validation_pass': validation_pass}
+
+    @staticmethod
+    def get_all_caterer_orders(caterer):
+        orders_list = []
+        orders = Order.query.all()
+        for order in orders:
+            meal = Meal.query.filter_by(meal_id=order.meal_id).first()
+            if str(caterer) == str(meal.vendor_id):
+                order_dict = {}
+                order_dict['order_id'] = order.order_id
+                order_dict['user'] = order.user
+                order_dict['meal'] = Meal.get_meal_by_id(order.meal_id)
+                order_dict['menu'] = Menu.get_menu_vendor_name(order.menu_id)
+                order_dict['date'] = order.date
+                order_dict['status'] = order.status
+                orders_list.append(order_dict)
+        return orders_list

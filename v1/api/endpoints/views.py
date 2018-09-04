@@ -18,6 +18,7 @@ from v1.api import create_app
 from v1.api import db
 from v1.api.utils import UtilHelper
 import datetime
+from datetime import datetime, timedelta
 
 
 class SignUp(MethodView):
@@ -49,19 +50,19 @@ class Login(MethodView):
         # authenticate customers or admin
         user_data = request.get_json(force=True)
 
-        if not UtilHelper.check_for_request_params(user_data, 'email', 'password', 'admin'):
+        if not UtilHelper.check_for_request_params(user_data, 'email', 'password'):
             return make_response(jsonify(
                 {'message': 'Logged requests expects email, password, and admin values.'})), 400
 
-        user = User('n/a', user_data['email'], user_data['password'], user_data['admin'])
+        user = User('n/a', user_data['email'], user_data['password'], 'admin')
         response = user.validate_user_login_data()
         if response:
             return response
 
         # Create the app instance to use to generate the token
         # CREATE TOKEN: leverage isdangerous to create the token
-        encoded_jwt_token = jwt.encode({'admin': user_data['admin'], 'user_id': user.get_user_id(),
-                                        'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=35)},
+        encoded_jwt_token = jwt.encode({'admin': user.is_admin(), 'name': user.get_username(), 'user_id': user.get_user_id(),
+                                        'exp': datetime.utcnow() + timedelta(minutes=35)},
                                        'boOk-a-MeAL', algorithm='HS256')
 
         return make_response(jsonify({
@@ -195,7 +196,7 @@ class MenusView(MethodView):
     def get(self):
 
         # Allow the authenticated users to view menu of the day
-        day_date = datetime.datetime.today().strftime('%Y-%m-%d')
+        day_date = datetime.today().strftime('%Y-%m-%d')
         if not Menu.check_menu_of_the_day_exists(day_date):
             return make_response(
                 jsonify({'message': 'No menu set for the day.', 'status_code': 200})), 200
@@ -225,20 +226,60 @@ class MenusView(MethodView):
 
         # CHECK IF THE MENU OF THE DAY ALREADY EXISTS
         vendor_id = g.user_id
-        if Menu.check_caterer_menu_exists(vendor_id, menu_data['date']):
-            mealdb = Meal.query.filter_by(meal_id=menu_data['meal_id']).first()
-            menudb = Menu.query.filter_by(vendor_id=vendor_id, date=menu_data['date']).first()
-            menudb.meals.append(mealdb)
-            Menu.add_meals_to_menu()
-        else:
-            create_new_menu = Menu(menu_data['menu_name'], menu_data['date'], menu_data['description'], g.user_id)
-            mealdb = Meal.query.filter_by(meal_id=menu_data['meal_id']).first()
-            create_new_menu.meals.append(mealdb)
-            create_new_menu.create_menu()
-
+        for meal in menu_data['meal_id']:
+            if Menu.check_caterer_menu_exists(vendor_id, menu_data['date']):
+                mealdb = Meal.query.filter_by(meal_id=meal).first()
+                menudb = Menu.query.filter_by(vendor_id=vendor_id, date=menu_data['date']).first()
+                menudb.meals.append(mealdb)
+                Menu.add_meals_to_menu()
+            else:
+                create_new_menu = Menu(menu_data['menu_name'], menu_data['date'], menu_data['description'], g.user_id)
+                mealdb = Meal.query.filter_by(meal_id=meal).first()
+                create_new_menu.meals.append(mealdb)
+                create_new_menu.create_menu()
 
         return make_response(
             jsonify({'status_code': 201, 'message': 'success'})), 201
+
+class VendorMenuView(MethodView):
+    """  MANAGE THE VENDORS MENUS """
+
+    @auth_decorator.token_required_to_authenticate
+    def get(current_user, self):
+        # Allow the authenticated VENDORS to view their menus
+        if not current_user:
+            return make_response(jsonify(
+                {'message': 'You need to login as Admin to perform this operation.', 'status_code': 401})), 401
+
+        vendor_id = g.user_id
+        menu_list = Menu.get_vendor_menus(vendor_id)
+        return make_response(
+            jsonify({'message': 'success', 'status_code': 200, 'data': menu_list})), 200
+
+    @auth_decorator.token_required_to_authenticate
+    def delete(current_user, self, menuId, mealId):
+        # Verify If User is admin
+        if not current_user:
+            return make_response(jsonify(
+                {'message': 'You need to login as Admin to perform this operation.', 'status_code': 401})), 401
+
+        vendor_id = g.user_id
+        menu = Menu.query.filter_by(menu_id=menuId, vendor_id=vendor_id).first()
+
+        deletion_status = 0
+        for meal in menu.meals:
+            if str(meal.meal_id) == str(mealId):
+                deletion_status = 1
+                menu.meals.remove(meal)
+                break
+
+        message, status = '', 0
+        if deletion_status == 1:
+            db.session.commit()
+            message, status = 'Meal Deleted from Menu successfully', 202
+        else:
+            message, status = 'Meal Deletion failed! Not found in menu meals.', 404
+        return make_response((jsonify({"message": message, 'status_code': status})), status)
 
 
 class OrdersView(MethodView):
@@ -251,7 +292,8 @@ class OrdersView(MethodView):
             return make_response(jsonify(
                 {'message': 'Making Order expects; user email, meal id, menu_id, and date keys.', 'status_code': 400})), 400
 
-        order = Order(order_data['user'], order_data['meal_id'], order_data['menu_id'], order_data['date'])
+        expiration = str(int((datetime.now() + timedelta(hours=1)).timestamp()))
+        order = Order(order_data['user'], order_data['meal_id'], order_data['menu_id'], order_data['date'], expiration)
 
         response = order.validate_order_data()
         if response:
@@ -271,8 +313,8 @@ class OrdersView(MethodView):
             return make_response(jsonify(
                 {'message': 'You need to login as Admin to perform this operation.', 'status_code': 401})), 401
 
-        orderdb = Order.query.all()
-        orders = Order.get_all_orders(orderdb)
+        vendor_id = g.user_id
+        orders = Order.get_all_caterer_orders(vendor_id)
         return make_response(jsonify({'message': 'success', 'status_code': 200, 'orders': orders })), 200
 
     def put(self, orderId):
@@ -286,7 +328,7 @@ class OrdersView(MethodView):
             return make_response(jsonify(
                 {'message': 'Modifying order expects the order id, user, menu id, meal id keys.'})), 400
 
-        order = Order(order_data['user'], order_data['meal_id'], order_data['menu_id'], "date")
+        order = Order(order_data['user'], order_data['meal_id'], order_data['menu_id'], "date", 'expiry')
         response = order.validate_order_update_data(order_data)
         if response:
             return response
@@ -299,6 +341,55 @@ class OrdersView(MethodView):
             jsonify({'message': 'Order Updated successfully', 'status_code': 202})), 202
 
 
+class CustomerOrdersView(MethodView):
+
+    def get(self, customerId):
+        orders_list = []
+        orders = Order.query.all()
+        for order in orders:
+            user = User.query.filter_by(user_id=customerId).first()
+            if str(user.email) == str(order.user):
+                order_dict = {}
+                order_dict['order_id'] = order.order_id
+                order_dict['user'] = order.user
+                order_dict['meal'] = Meal.get_meal_by_id(order.meal_id)
+                order_dict['menu'] = Menu.get_menu_vendor_name(order.menu_id)
+                order_dict['date'] = order.date
+                order_dict['status'] = order.status
+                order_dict['expiration'] = order.expiry
+                orders_list.append(order_dict)
+        return make_response(jsonify({'message': 'success', 'status_code': 200, 'orders': orders_list })), 200
+
+
+class VendorOrderView(MethodView):
+
+    @auth_decorator.token_required_to_authenticate
+    def put(current_user, self, orderId):
+        if not current_user:
+            return make_response(jsonify(
+                {'message': 'You need to login as Admin to perform this operation.', 'status_code': 401})), 401
+
+        # Allow the user to modify an order they've already made
+        if UtilHelper.check_empty_database_table(Order):
+            return make_response(
+                jsonify({'message': 'Orders are Empty', 'status_code': 200})), 200
+
+        print('prepare')
+        result = Order.query.filter_by(order_id=orderId).update(dict(status='Served'))
+        Order.update_order()
+
+        print('going in')
+        if result == 1:
+            print('served')
+            return make_response(
+                jsonify({'message': 'Order Served successfully', 'status_code': 202})
+            ), 202
+        else:
+            print('not served')
+            return make_response(
+                jsonify({'message': 'Order Serve went wrong!', 'status_code': 400})
+            ), 400
+
 
 # ADD THE VIEWS
 signup = SignUp.as_view('signup_view')
@@ -309,10 +400,14 @@ get_meal_by_id = GetMealById.as_view('get_meal_by_id')
 
 get_menu_of_the_day = MenusView.as_view('get_menu_of_the_day')
 set_menu_the_day = MenusView.as_view('set_menu_of_the_day')
+get_vendor_menus = VendorMenuView.as_view('get_vendor_menus')
+delete_vendor_menus = VendorMenuView.as_view('delete_vendor_menus')
 
 make_order = OrdersView.as_view('make_order')
 get_all_orders = OrdersView.as_view('all_orders')
 modify_order = OrdersView.as_view('modify_order')
+get_customer_orders = CustomerOrdersView.as_view('customer_orders')
+serve_customer_order = VendorOrderView.as_view('serve_customer_order')
 
 
 endpoints_blueprint.add_url_rule('/auth/signup', view_func=signup, methods=['POST'])
@@ -325,8 +420,12 @@ endpoints_blueprint.add_url_rule('/meals/<mealId>', view_func=meals_views, metho
 
 
 endpoints_blueprint.add_url_rule('/menu/', view_func=get_menu_of_the_day, methods=['GET'])
+endpoints_blueprint.add_url_rule('/vendor/menu/', view_func=get_vendor_menus, methods=['GET'])
 endpoints_blueprint.add_url_rule('/menu/', view_func=set_menu_the_day, methods=['POST'])
+endpoints_blueprint.add_url_rule('/menu/<menuId>/<mealId>', view_func=delete_vendor_menus, methods=['DELETE'])
 
 endpoints_blueprint.add_url_rule('/orders/', view_func=make_order, methods=['POST'])
 endpoints_blueprint.add_url_rule('/orders/', view_func=get_all_orders, methods=['GET'])
+endpoints_blueprint.add_url_rule('/orders/<customerId>', view_func=get_customer_orders, methods=['GET'])
 endpoints_blueprint.add_url_rule('/orders/<orderId>', view_func=modify_order, methods=['PUT'])
+endpoints_blueprint.add_url_rule('/orders/serve/<orderId>', view_func=serve_customer_order, methods=['PUT'])

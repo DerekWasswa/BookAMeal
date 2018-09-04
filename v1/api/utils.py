@@ -28,7 +28,8 @@ class UtilHelper(object):
         if table_field == 'menu_id':
             db_table_obj = table_name.query.filter_by(menu_id=field_value).first()
         else:
-            db_table_obj = table_name.query.filter_by(meal_id=field_value).first()
+            for meal_id in field_value:
+                db_table_obj = table_name.query.filter_by(meal_id=meal_id).first()
 
         if db_table_obj is not None:
             return True

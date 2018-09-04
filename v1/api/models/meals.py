@@ -100,6 +100,11 @@ class Meal(db.Model):
 
         return {'message': message, 'status_code': status_code, 'validation_pass': validation_pass}
 
+    @staticmethod
+    def get_meal_by_id(meal_id):
+        mealdb = Meal.query.filter_by(meal_id=meal_id).first()
+        return mealdb.get_meal_as_dict()
+
     def get_meal_as_dict(self):
         ''' return a meal option as a dictionary '''
         meal_as_dict = {}
