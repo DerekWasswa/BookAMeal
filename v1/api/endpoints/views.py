@@ -374,20 +374,41 @@ class VendorOrderView(MethodView):
             return make_response(
                 jsonify({'message': 'Orders are Empty', 'status_code': 200})), 200
 
-        print('prepare')
         result = Order.query.filter_by(order_id=orderId).update(dict(status='Served'))
         Order.update_order()
 
-        print('going in')
         if result == 1:
-            print('served')
             return make_response(
                 jsonify({'message': 'Order Served successfully', 'status_code': 202})
             ), 202
         else:
-            print('not served')
             return make_response(
                 jsonify({'message': 'Order Serve went wrong!', 'status_code': 400})
+            ), 400
+
+class VendorCancelOrderView(MethodView):
+
+    @auth_decorator.token_required_to_authenticate
+    def put(current_user, self, orderId):
+        if not current_user:
+            return make_response(jsonify(
+                {'message': 'You need to login as Admin to perform this operation.', 'status_code': 401})), 401
+
+        # Allow the user to modify an order they've already made
+        if UtilHelper.check_empty_database_table(Order):
+            return make_response(
+                jsonify({'message': 'Orders are Empty', 'status_code': 200})), 200
+
+        result = Order.query.filter_by(order_id=orderId).update(dict(status='Cancelled'))
+        Order.update_order()
+
+        if result == 1:
+            return make_response(
+                jsonify({'message': 'Order Cancelled successfully', 'status_code': 202})
+            ), 202
+        else:
+            return make_response(
+                jsonify({'message': 'Order Cancelling went wrong!', 'status_code': 400})
             ), 400
 
 
@@ -408,6 +429,7 @@ get_all_orders = OrdersView.as_view('all_orders')
 modify_order = OrdersView.as_view('modify_order')
 get_customer_orders = CustomerOrdersView.as_view('customer_orders')
 serve_customer_order = VendorOrderView.as_view('serve_customer_order')
+cancel_customer_order = VendorCancelOrderView.as_view('cancel_customer_order')
 
 
 endpoints_blueprint.add_url_rule('/auth/signup', view_func=signup, methods=['POST'])
@@ -429,3 +451,4 @@ endpoints_blueprint.add_url_rule('/orders/', view_func=get_all_orders, methods=[
 endpoints_blueprint.add_url_rule('/orders/<customerId>', view_func=get_customer_orders, methods=['GET'])
 endpoints_blueprint.add_url_rule('/orders/<orderId>', view_func=modify_order, methods=['PUT'])
 endpoints_blueprint.add_url_rule('/orders/serve/<orderId>', view_func=serve_customer_order, methods=['PUT'])
+endpoints_blueprint.add_url_rule('/orders/cancel/<orderId>', view_func=cancel_customer_order, methods=['PUT'])
